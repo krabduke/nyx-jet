@@ -217,7 +217,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 3,
-   "faces": 35980
+   "faces": 36317
   },
   {
    "key": "02 Flying surfaces",
@@ -231,7 +231,7 @@
    "label": "Intakes",
    "color": "#6F7B84",
    "parts": 2,
-   "faces": 11808
+   "faces": 15744
   },
   {
    "key": "04 Cockpit",
@@ -1445,7 +1445,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35518
+   "f": 35855
   },
   "gear_bay_main_l": {
    "m": "06 Landing gear",
@@ -1495,12 +1495,12 @@
   "intake_duct_l": {
    "m": "03 Intakes",
    "mat": "skin",
-   "f": 5904
+   "f": 7872
   },
   "intake_duct_r": {
    "m": "03 Intakes",
    "mat": "skin",
-   "f": 5904
+   "f": 7872
   },
   "keel": {
    "m": "07 Structure",

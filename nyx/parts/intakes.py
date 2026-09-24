@@ -26,7 +26,7 @@ import shapes    # noqa: E402
 from parts import engines   # noqa: E402
 
 I = spec.INTAKE
-NP = 72
+NP = 96
 
 
 def smooth(t):
@@ -51,15 +51,58 @@ def _shape(x, grow):
     R = engines.info()["inlet_bore"] + grow
     a, b = I["w_mouth"] / 2 + grow, I["h_mouth"] / 2 + grow
     yc, zc = centre(x)
-    n = 5.0
+    poly = _mouth_polygon(a, b)
     pts = []
     for k in range(NP):
         th = 2 * math.pi * k / NP
         c, s = math.cos(th), math.sin(th)
-        ys = a * math.copysign(abs(c) ** (2 / n), c)
-        zs = b * math.copysign(abs(s) ** (2 / n), s)
-        pts.append((yc + (1 - e) * ys + e * R * c, zc + (1 - e) * zs + e * R * s))
+        # the corners eased over a few degrees: sharp, the samples cut
+        # across them differently for the duct and for its hole in the skin
+        r = sum(_reach(poly, math.cos(th + d), math.sin(th + d))
+                for d in _EASE) / len(_EASE)
+        pts.append((yc + (1 - e) * r * c + e * R * c,
+                    zc + (1 - e) * r * s + e * R * s))
     return pts
+
+
+_EASE = [math.radians(v) for v in (-4.0, -2.0, 0.0, 2.0, 4.0)]
+
+
+def _mouth_polygon(a, b):
+    """The mouth, about its centre (y outboard, z up): a trapezoid, full
+    width under the chine and cut back underneath on the outboard side --
+    straight edges and hard corners, which is what a caret is. It was a
+    rounded superellipse, a soft scoop on a faceted airframe."""
+    k = I["mouth_taper"]
+    c = I["mouth_chamfer"]
+    trap = [(-a, b), (a, b), (a - 2 * a * k, -b), (-a, -b)]
+    # every corner cut back along both its edges: square, they stood out
+    # through the skin under the chine and the belly as the duct turned in
+    out = []
+    n = len(trap)
+    for i in range(n):
+        p0, p1, p2 = trap[i - 1], trap[i], trap[(i + 1) % n]
+        out.append((p1[0] + (p0[0] - p1[0]) * c, p1[1] + (p0[1] - p1[1]) * c))
+        out.append((p1[0] + (p2[0] - p1[0]) * c, p1[1] + (p2[1] - p1[1]) * c))
+    return out
+
+
+def _reach(poly, c, s):
+    """Distance from the centre to the polygon's edge along (c, s)."""
+    best = 0.0
+    n = len(poly)
+    for i in range(n):
+        y0, z0 = poly[i]
+        y1, z1 = poly[(i + 1) % n]
+        ey, ez = y1 - y0, z1 - z0
+        den = c * ez - s * ey
+        if abs(den) < 1e-12:
+            continue
+        t = (y0 * ez - z0 * ey) / den
+        u = (y0 * s - z0 * c) / den
+        if t > 0.0 and -1e-9 <= u <= 1.0 + 1e-9:
+            best = max(best, t)
+    return best
 
 
 def lip_x(y, z):

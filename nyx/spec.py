@@ -194,6 +194,9 @@ INTAKE = {
     "w_mouth": 760.0,         # mouth width
     "h_mouth": 820.0,         # mouth height
     "lip_sweep": 38.0,        # deg: the caret lip is swept in plan and side
+    "mouth_taper": 0.20,      # the outboard lower corner is cut in by this
+                              # fraction of the width: a trapezoid mouth
+    "mouth_chamfer": 0.18,
     "wall": 10.0,
     # the duct ends on the engine's inlet case flange
     "x_end": ENGINE_FAN_FACE_X - 190.0,

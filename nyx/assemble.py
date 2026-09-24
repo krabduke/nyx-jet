@@ -146,7 +146,8 @@ def build_proto(name, proto, collection):
     return obj, ok
 
 
-FACETED = ("fuselage_skin", "aft_fairing", "aft_closure", "canopy_glass")
+FACETED = ("fuselage_skin", "aft_fairing", "aft_closure", "canopy_glass",
+           "intake_duct", "bay_door")
 
 
 def shade(obj, angle_deg=32.0):

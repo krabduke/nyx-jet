@@ -59,24 +59,50 @@ def structure():
     return mesh.join(*parts)
 
 
+# The bay's fore and aft edges are serrated, like every edge that crosses
+# the flow on this airframe: TEETH points across the bay, each TOOTH deep.
+TEETH, TOOTH = 8, 70.0
+
+
+def serration(y):
+    """How far in from the bay's nominal end the edge is at y: a sawtooth
+    across the bay's width, zero at the sides and the centreline."""
+    hw = B["half_w"]
+    u = (abs(y) / hw) * TEETH / 2.0
+    f = u - math.floor(u)
+    return TOOTH * (1.0 - abs(2.0 * f - 1.0))
+
+
 def opening_cutter():
     x0, x1, hw = B["x0"], B["x1"], B["half_w"]
-    return mesh.box(0.5 * (x0 + x1), 0.0, -1500.0, x1 - x0, 2 * hw,
-                    2 * (1500.0 + B["z_roof"]))
+    ys = [-hw + 2 * hw * j / (4 * TEETH) for j in range(4 * TEETH + 1)]
+    lo_z, hi_z = -3000.0, B["z_roof"]
+    fore = [(x0 + serration(y), y) for y in ys]
+    aft = [(x1 - serration(y), y) for y in reversed(ys)]
+    outline = fore + aft
+    return shapes.loft_rings([[(x, y, lo_z) for (x, y) in outline],
+                              [(x, y, hi_z) for (x, y) in outline]])
 
 
 def doors():
     """Two doors, each the patch of skin from the centreline split to the
     bay's side, one skin deep. Returns {name: part} and their hinge lines."""
     x0, x1, hw = B["x0"] + SEAT, B["x1"] - SEAT, B["half_w"] - SEAT
-    xs = [x0 + (x1 - x0) * i / 40 for i in range(41)]
     out = {}
     for side, sy in (("r", 1.0), ("l", -1.0)):
-        ys = [sy * (2.0 + (hw - 2.0) * j / 16) for j in range(17)]
+        # stations across the door on every tooth's point and root, so the
+        # serrated ends are sharp
+        ys = [sy * (2.0 + (hw - 2.0) * j / (2 * TEETH)) for j in range(2 * TEETH + 1)]
         rings = []
-        for x in xs:
-            outer = [(x, y, shapes.z_dn(x, y)) for y in ys]
-            inner = [(x, y, shapes.z_dn(x, y, spec.SKIN_T)) for y in reversed(ys)]
+        for i in range(41):
+            t = i / 40.0
+
+            def xat(y):
+                a, b = x0 + serration(y), x1 - serration(y)
+                return a + (b - a) * t
+            outer = [(xat(y), y, shapes.z_dn(xat(y), y)) for y in ys]
+            inner = [(xat(y), y, shapes.z_dn(xat(y), y, spec.SKIN_T))
+                     for y in reversed(ys)]
             rings.append(outer + inner)
         out[f"bay_door_{side}"] = shapes.loft_rings(rings)
     return out
