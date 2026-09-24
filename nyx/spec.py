@@ -340,6 +340,7 @@ def mac():
 MATERIAL_MAP = {
     "fuselage": "skin",
     "aft_closure": "skin",
+    "aft_fairing": "skin",
     "tail_stinger": "skin",
     "wing": "skin",
     "flaperon": "skin_dark",

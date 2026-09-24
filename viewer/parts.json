@@ -258,22 +258,22 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 6,
-   "faces": 1262
+   "parts": 7,
+   "faces": 6446
   },
   {
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
    "parts": 105,
-   "faces": 609612
+   "faces": 612348
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
    "parts": 105,
-   "faces": 609612
+   "faces": 612348
   }
  ],
  "parts": {
@@ -281,6 +281,11 @@
    "m": "01 Airframe",
    "mat": "skin",
    "f": 142
+  },
+  "aft_fairing": {
+   "m": "07 Structure",
+   "mat": "skin",
+   "f": 5184
   },
   "bay_door_l": {
    "m": "05 Weapons bay",
@@ -640,7 +645,7 @@
   "engine_l_hydraulic_lines": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 2120
+   "f": 4856
   },
   "engine_l_hydraulic_pump": {
    "m": "08 Engine port",
@@ -1170,7 +1175,7 @@
   "engine_r_hydraulic_lines": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 2120
+   "f": 4856
   },
   "engine_r_hydraulic_pump": {
    "m": "09 Engine starboard",

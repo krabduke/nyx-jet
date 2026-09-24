@@ -1,5 +1,6 @@
 name,collection,module,material,verts,faces,x_min_mm,x_max_mm,y_min_mm,y_max_mm,z_min_mm,z_max_mm,spool,spin
 aft_closure,01 Airframe,fuselage,skin,272,142,14078.0,14098.0,-1554.6,1554.6,-731.1,670.9,,
+aft_fairing,07 Structure,fuselage,skin,5184,5184,14100.0,14360.0,-1617.8,1617.8,-740.0,680.0,,
 bay_door_l,05 Weapons bay,bay,skin_dark,1394,1362,5250.2,9049.9,-404.9,-2.0,-769.5,-590.2,,
 bay_door_r,05 Weapons bay,bay,skin_dark,1394,1362,5250.2,9049.9,2.0,404.9,-769.5,-590.2,,
 bay_structure,05 Weapons bay,bay,structure,408,398,5242.0,9058.0,-413.0,413.0,-758.5,-142.0,,
@@ -71,7 +72,7 @@ engine_l_harnesses,08 Engine port,engines,rubber,168,144,11851.1,11926.9,-1218.6
 engine_l_hp_front_drum,08 Engine port,engines,titanium,960,960,11612.3,11814.8,-1082.0,-518.0,-282.0,282.0,hp,-1.0
 engine_l_hpc_drum,08 Engine port,engines,titanium,18240,18240,11814.8,12397.0,-1095.0,-505.0,-295.0,295.0,hp,-1.0
 engine_l_hpt_disc,08 Engine port,engines,nickel,3840,3840,12712.6,12805.2,-1062.0,-538.0,-262.0,262.0,hp,-1.0
-engine_l_hydraulic_lines,08 Engine port,engines,steel,2160,2120,11454.0,14135.8,-1246.0,-354.0,-628.3,197.6,,
+engine_l_hydraulic_lines,08 Engine port,engines,steel,4896,4856,11454.0,14135.9,-1245.8,-354.2,-627.7,197.7,,
 engine_l_hydraulic_pump,08 Engine port,engines,steel,128,128,11420.0,11510.0,-838.0,-762.0,-642.0,-566.0,,
 engine_l_igniters,08 Engine port,engines,steel,128,72,12439.0,12465.0,-1233.0,-367.0,166.3,255.3,,
 engine_l_inlet_case,08 Engine port,engines,casing,1600,1600,10800.0,10982.0,-1246.0,-354.0,-446.0,446.0,,
@@ -177,7 +178,7 @@ engine_r_harnesses,09 Engine starboard,engines,rubber,168,144,11851.1,11926.9,38
 engine_r_hp_front_drum,09 Engine starboard,engines,titanium,960,960,11612.3,11814.8,518.0,1082.0,-282.0,282.0,hp,-1.0
 engine_r_hpc_drum,09 Engine starboard,engines,titanium,18240,18240,11814.8,12397.0,505.0,1095.0,-295.0,295.0,hp,-1.0
 engine_r_hpt_disc,09 Engine starboard,engines,nickel,3840,3840,12712.6,12805.2,538.0,1062.0,-262.0,262.0,hp,-1.0
-engine_r_hydraulic_lines,09 Engine starboard,engines,steel,2160,2120,11454.0,14135.8,354.0,1246.0,-628.3,197.6,,
+engine_r_hydraulic_lines,09 Engine starboard,engines,steel,4896,4856,11454.0,14135.9,354.2,1245.8,-627.7,197.7,,
 engine_r_hydraulic_pump,09 Engine starboard,engines,steel,128,128,11420.0,11510.0,762.0,838.0,-642.0,-566.0,,
 engine_r_igniters,09 Engine starboard,engines,steel,128,72,12439.0,12465.0,367.0,1233.0,166.3,255.3,,
 engine_r_inlet_case,09 Engine starboard,engines,casing,1600,1600,10800.0,10982.0,354.0,1246.0,-446.0,446.0,,

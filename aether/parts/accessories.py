@@ -120,15 +120,32 @@ def _hydraulics():
     x_act = nz["x_trans1"] + 30.0
     z_act = nzl.H_TRANS * 0.62
     lines = []
-    r_run = 530.0
+    # Laid along the case, just over its ribs and lifted over the mid
+    # flange, the way a line clipped to a case runs. At a fixed 530 mm they
+    # stood 50-80 mm off the case the whole way aft, like wires strung past
+    # the engine.
+    cr = spec.CASE_RIBS
+
+    def over_case(x, extra):
+        r = outer_od(x) + cr["h"] + 6.0 + 2.0 + extra
+        # and over what rings the case: the FADEC harness, the mid flange
+        # with the fuel manifold and nozzles on it, the reheat manifold
+        for (a, b, top) in ((830.0, 970.0, 496.0), (1320.0, 1440.0, 485.0),
+                            (2300.0, 2380.0, 491.0)):
+            if a <= x <= b:
+                r = max(r, top + 6.0 + 2.5 + extra)
+        return r
     for sy, clock in ((-1.0, -135.0), (1.0, -45.0)):
         for sz, dz in ((-1.0, 0.0), (1.0, 14.0)):
-            r = r_run + dz
-            p_run = common.polar(0.0, r, clock)
+            # the pair on each side run side by side, 14 mm apart round
+            # the case rather than one over the other
+            ck = clock + sy * (dz / 470.0) * 57.3
+            run = [common.polar(x, over_case(x, 0.0), ck)
+                   for x in (620.0, 780.0, 840.0, 960.0, 1060.0, 1260.0,
+                             1330.0, 1430.0, 1520.0, 2000.0, 2240.0, 2310.0,
+                             2370.0, 2460.0, 2800.0)]
             path = [(470.0, sy * 20.0, zp),
-                    (470.0, sy * 200.0, zp - 6.0 - dz),
-                    (560.0, p_run[1], p_run[2]),
-                    (2800.0, p_run[1], p_run[2])]
+                    (470.0, sy * 200.0, zp - 6.0 - dz)] + run
             if sz < 0:
                 path += [(3000.0, sy * 432.0, -380.0 - dz),
                          (3110.0, sy * 432.0, -z_act - 20.0),

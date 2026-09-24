@@ -63,8 +63,8 @@
   },
   "parts/accessories.py": {
    "from": "engine/parts/accessories.py",
-   "sha": "e501c05726cf"
+   "sha": "e577489d281b"
   }
  },
- "commit": "7e847a8"
+ "commit": "f8bcb39"
 }
