@@ -96,7 +96,7 @@ Requires Blender (`brew install --cask blender`) and Python 3 with numpy.
 make aero       # area rule, vortex lattice, turn performance
 make build      # generate geometry, assemble build/nyx.blend, write parts.csv
 make verify     # every gate below  <- the definition of done
-make render     # hero, plan, side
+make render     # hero, plan, side, rear, x-ray
 make web        # decimated, Draco-compressed GLB for the viewer
 ```
 
