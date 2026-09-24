@@ -44,7 +44,7 @@ def collection_for(name):
         return "09 Engine starboard"
     if name.startswith(("fuselage", "aft_closure", "irst_", "air_data_",
                         "aoa_vane", "antenna_", "nav_light", "tail_light",
-                        "static_wicks")):
+                        "static_wicks", "panel_seams")):
         return "01 Airframe"
     if name.startswith(("wing", "le_flap", "flaperon", "canard", "fin", "rudder")):
         return "02 Flying surfaces"

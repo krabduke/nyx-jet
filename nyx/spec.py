@@ -353,6 +353,7 @@ MATERIAL_MAP = {
     "nav_light_r": "lens_green",
     "tail_light": "lens_white",
     "static_wicks": "rubber",
+    "panel_seams": "seam",
     "wing": "skin",
     "flaperon": "skin_dark",
     "le_flap": "skin_dark",
@@ -408,6 +409,8 @@ PALETTE = {
     "lens_green":   ((0.03, 0.55, 0.12), 0.00, 0.10),
     "lens_white":   ((0.85, 0.85, 0.82), 0.00, 0.08),
     "sensor_glass": ((0.22, 0.17, 0.08), 0.70, 0.05),
+    # the gaps between panels, filled with sealant a shade darker than skin
+    "seam":         ((0.055, 0.060, 0.068), 0.10, 0.70),
 }
 
 RES = {"body_rings": 150, "body_ring_pts": 128, "wing_chord_pts": 48,

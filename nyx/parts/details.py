@@ -279,8 +279,80 @@ def _gun_port():
         mesh.box(x0 - 190.0, GUN_Y, zc + 200.0, 460.0, 124.0, 400.0))
 
 
+# --------------------------------------------------------------------------
+# panel seams
+
+SEAM_W = 5.0          # the gap between two panels, as it reads on the skin
+SEAM_H = 0.8          # standing this proud of the skin, and 0.6 into it
+
+
+def _surface(x, y, upper):
+    return shapes.z_up(x, y) if upper else shapes.z_dn(x, y)
+
+
+def _ribbon(pts, upper):
+    """A seam along a polyline of (x, y) on the upper or lower skin: a thin
+    strip following the surface, SEAM_W wide."""
+    s = 1.0 if upper else -1.0
+    rings = []
+    n = len(pts)
+    for i, (x, y) in enumerate(pts):
+        xa, ya = pts[max(0, i - 1)]
+        xb, yb = pts[min(n - 1, i + 1)]
+        dx, dy = xb - xa, yb - ya
+        L = math.hypot(dx, dy) or 1.0
+        # across the seam, in plan
+        cx, cy = -dy / L * SEAM_W / 2, dx / L * SEAM_W / 2
+        ring = []
+        for (ox, oy, h) in ((cx, cy, -0.6), (-cx, -cy, -0.6),
+                            (-cx, -cy, SEAM_H), (cx, cy, SEAM_H)):
+            px, py = x + ox, y + oy
+            ring.append((px, py, _surface(px, py, upper) + s * h))
+        rings.append(ring)
+    return shapes.loft_rings(rings)
+
+
+def _across(x, upper, frac=0.97, n=60):
+    """A seam straight across the skin at station x, chine to chine."""
+    w = shapes.half_width(x) * frac
+    return _ribbon([(x, -w + 2 * w * i / n) for i in range(n + 1)], upper)
+
+
+def _panel(x0, x1, y0, y1, upper, teeth=0, tooth=60.0, n=24):
+    """An access panel's outline, its fore and aft edges serrated with
+    `teeth` teeth as the airframe's edges across the flow are."""
+    def edge(x, sgn):
+        pts = []
+        m = max(2, teeth * 2) if teeth else n
+        for i in range(m + 1):
+            y = y0 + (y1 - y0) * i / m
+            dx = (tooth if (teeth and i % 2 == 1) else 0.0) * sgn
+            pts.append((x + dx, y))
+        return pts
+    fwd = edge(x0, 1.0)
+    aft = edge(x1, -1.0)
+    side = lambda y: [(x0 + (x1 - x0) * i / n, y) for i in range(n + 1)]
+    return [_ribbon(fwd, upper), _ribbon(aft, upper),
+            _ribbon(side(y0), upper), _ribbon(side(y1), upper)]
+
+
+def _seams():
+    parts = [_across(1300.0, True), _across(1300.0, False),     # radome
+             _across(2250.0, True), _across(2250.0, False)]     # fwd fuselage
+    # spine access panels
+    parts += _panel(6350.0, 7450.0, -260.0, 260.0, True, teeth=4)
+    parts += _panel(8150.0, 9450.0, -300.0, 300.0, True, teeth=4)
+    # engine bay doors over and under each nacelle
+    for sy in (1.0, -1.0):
+        y0, y1 = sorted((sy * 380.0, sy * 1180.0))
+        parts += _panel(10300.0, 12700.0, y0, y1, True, teeth=5)
+        parts += _panel(10000.0, 12700.0, y0, y1, False, teeth=5)
+    return mesh.join(*parts)
+
+
 def build():
     out = {}
+    out["panel_seams"] = _seams()
     out["gun"] = _gun()
     out["cut:fuselage_skin"] = _gun_port()
     out.update(_aft_closure())
