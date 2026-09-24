@@ -799,7 +799,7 @@
    "label": "Landing gear",
    "color": "#5C6166",
    "parts": 15,
-   "faces": 5018
+   "faces": 16538
   },
   {
    "key": "07 Structure",
@@ -2327,32 +2327,32 @@
   "tyre_main_l": {
    "m": "06 Landing gear",
    "mat": "rubber",
-   "f": 624
+   "f": 2752
   },
   "tyre_main_r": {
    "m": "06 Landing gear",
    "mat": "rubber",
-   "f": 624
+   "f": 2752
   },
   "tyres_nose": {
    "m": "06 Landing gear",
    "mat": "rubber",
-   "f": 1248
+   "f": 5504
   },
   "wheel_main_l": {
    "m": "06 Landing gear",
    "mat": "wheel",
-   "f": 144
+   "f": 924
   },
   "wheel_main_r": {
    "m": "06 Landing gear",
    "mat": "wheel",
-   "f": 144
+   "f": 924
   },
   "wheels_nose": {
    "m": "06 Landing gear",
    "mat": "wheel",
-   "f": 288
+   "f": 1736
   },
   "wing_l": {
    "m": "02 Flying surfaces",

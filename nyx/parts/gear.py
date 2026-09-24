@@ -88,20 +88,60 @@ def _about_y(part, cx, cy, cz):
     return [(cx + z, cy + x, cz + y) for (x, y, z) in v], f
 
 
-def wheel(cx, cy, cz, r, w):
-    """(tyre, hub) for one wheel on an axle along y."""
-    rr = r * 0.55
-    prof = []
-    n = 10
+def wheel(cx, cy, cz, r, w, out=1.0):
+    """(tyre, hub) for one wheel on an axle along y; `out` is the side (+1
+    or -1 in y) its dished outer face looks to.
+
+    The tyre is a radial with rounded shoulders and three circumferential
+    grooves in its crown; the hub a split rim with flanges either side of
+    the bead, a dished face, a centre cap and a ring of ten bolts."""
+    rr = r * 0.55                     # bead seat
+    # tyre: crown with grooves, shoulders rounding into the sidewalls
+    grooves = (-0.26 * w, 0.0, 0.26 * w)
+    gw, gd = 0.055 * w, 0.022 * r
+    crown = []
+    n = 40
     for i in range(n + 1):
-        a = -0.5 * math.pi + math.pi * i / n
-        prof.append((0.5 * w * math.sin(a), r - 0.18 * w + 0.18 * w * math.cos(a)))
-    prof = [(-0.5 * w, rr)] + prof + [(0.5 * w, rr)]
-    tyre = _about_y(mesh.revolve_ring(prof, 48), cx, cy, cz)
-    hub = _about_y(mesh.revolve_ring([(-0.45 * w, 24.0), (0.45 * w, 24.0),
-                                      (0.45 * w, rr + 3.0), (-0.45 * w, rr + 3.0)],
-                                     36), cx, cy, cz)
-    return tyre, hub
+        u = -1.0 + 2.0 * i / n
+        x = 0.5 * w * u
+        shoulder = max(0.0, abs(u) - 0.62) / 0.38
+        rad = r - 0.20 * w * (1.0 - math.sqrt(max(0.0, 1.0 - shoulder ** 2)))
+        if any(abs(x - g) < gw / 2 for g in grooves):
+            rad -= gd
+        crown.append((x, rad))
+    prof = [(-0.5 * w, rr), (-0.5 * w, crown[0][1] - 0.2 * w)] + crown[1:-1] + \
+           [(0.5 * w, crown[-1][1] - 0.2 * w), (0.5 * w, rr)]
+    tyre = _about_y(mesh.revolve_ring(prof, 64), cx, cy, cz)
+    # hub: flanges at the bead, a barrel, the face dished in toward the axle
+    h = 0.5 * w
+    face = [(h * 0.95, rr + 10.0), (h * 0.95, rr - 6.0), (h * 0.55, rr - 10.0),
+            (h * 0.35, rr * 0.55), (h * 0.62, rr * 0.30), (h * 0.66, 30.0),
+            (h * 0.66, 12.0)]
+    back = [(-h * 0.95, 12.0), (-h * 0.95, rr - 6.0), (-h * 0.95, rr + 10.0)]
+    prof = [(x * out, y) for (x, y) in face] + [(x * out, y) for (x, y) in back]
+    hub = mesh.revolve_ring(prof, 64)
+    parts = [hub]
+    # the bolt ring and the centre cap on the outer face
+    for k in range(10):
+        a = 2.0 * math.pi * k / 10
+        yb, zb = rr * 0.42 * math.cos(a), rr * 0.42 * math.sin(a)
+        xf = h * 0.50 * out
+        parts.append(mesh.pipe([(xf - 2.0 * out, yb, zb), (xf + 12.0 * out, yb, zb)],
+                               9.0, 8))
+    parts.append(mesh.revolve_ring([(h * 0.60 * out, 12.0), (h * 0.80 * out, 12.0),
+                                    (h * 0.80 * out, 34.0), (h * 0.60 * out, 34.0)], 32))
+    return tyre, _about_y(mesh.join(*parts), cx, cy, cz)
+
+
+def brake(cx, cy, cz, r, w, inboard):
+    """A carbon brake stack and its piston housing, on the wheel's inboard
+    side between the hub and the fork."""
+    y0 = cy + inboard * 0.46 * w
+    y1 = cy + inboard * (0.46 * w + 46.0)
+    disc = mesh.pipe([(cx, y0, cz), (cx, y1, cz)], r * 0.46, 48)
+    housing = mesh.box(cx - r * 0.30, 0.5 * (y0 + y1), cz + r * 0.28, 90.0,
+                       abs(y1 - y0) + 10.0, 70.0)
+    return mesh.join(disc, housing)
 
 
 def nose():
@@ -129,7 +169,7 @@ def nose():
         mesh.box(xc - 82.0, 0.0, -560.0, 34.0, 60.0, 40.0))
     tyres, hubs = [], []
     for sy in (1.0, -1.0):
-        t, h = wheel(x_ax, sy * (0.5 * w + 45.0), z_ax, r, w)
+        t, h = wheel(x_ax, sy * (0.5 * w + 45.0), z_ax, r, w, out=sy)
         tyres.append(t); hubs.append(h)
     doors = [door(x0 + 10.0, x1 - 10.0, sy * (hw + 5.0), 8.0, 420.0) for sy in (1.0, -1.0)]
     return {"gear_nose": leg, "tyres_nose": mesh.join(*tyres),
@@ -160,7 +200,9 @@ def main(sy):
                    (xc - 58.0, yc, z_ax + 70.0)], 13.0, 10, bend=0.0),
         # the fork the axle runs through
         mesh.box(xc, yc + 10.0, z_ax, 150.0, 110.0, 120.0))
-    t, h = wheel(xc, yw, z_ax, r, w)
+    t, h = wheel(xc, yw, z_ax, r, w, out=1.0)
+    # and the brake stack inboard of the hub, bolted to the axle
+    h = mesh.join(h, brake(xc, yw, z_ax, r, w, -1.0))
     doors = mesh.join(door(x0 + 10.0, x1 - 10.0, y1 + 5.0, 8.0, 520.0),
                       door(x0 + 10.0, x1 - 10.0, y0 - 5.0, 8.0, 300.0))
     parts = {"gear_main": leg, "tyre_main": t, "wheel_main": h,
