@@ -90,8 +90,10 @@ def keel():
     xs = [x0 + (x1 - x0) * i / 20 for i in range(21)]
     rings = []
     for x in xs:
-        zt = shapes.z_up(x, 0.0, spec.SKIN_T + SEAT)
-        zb = shapes.z_dn(x, 0.0, spec.SKIN_T + SEAT)
+        # at its faces, not its middle: the faceted skin rises either side
+        # of the centreline crease
+        zt = shapes.z_up(x, 15.0, spec.SKIN_T + SEAT)
+        zb = shapes.z_dn(x, 15.0, spec.SKIN_T + SEAT)
         rings.append([(x, -15.0, zb), (x, 15.0, zb), (x, 15.0, zt), (x, -15.0, zt)])
     return shapes.loft_rings(rings)
 

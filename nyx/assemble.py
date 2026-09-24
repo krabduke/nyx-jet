@@ -146,6 +146,9 @@ def build_proto(name, proto, collection):
     return obj, ok
 
 
+FACETED = ("fuselage_skin", "aft_fairing", "aft_closure", "canopy_glass")
+
+
 def shade(obj, angle_deg=32.0):
     me = obj.data
     for p in me.polygons:
@@ -206,7 +209,10 @@ def main():
             for poly in obj.data.polygons:
                 poly.material_index = 0
             obj.data.materials.append(mats[mat])
-            shade(obj)
+            # the faceted airframe shades its creases hard: they are 10 to
+            # 25 degrees, and smoothed at the default 32 the panels melted
+            # back into a blob
+            shade(obj, 8.0 if name.startswith(FACETED) else 32.0)
             co = [tuple(v.co) for v in obj.data.vertices]
             bb = meshlib.bbox(co)
             sp = engines.part_spool(name)

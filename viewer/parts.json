@@ -217,7 +217,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 3,
-   "faces": 35935
+   "faces": 35980
   },
   {
    "key": "02 Flying surfaces",
@@ -280,7 +280,7 @@
   "aft_closure": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 142
+   "f": 140
   },
   "aft_fairing": {
    "m": "07 Structure",
@@ -1445,7 +1445,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35471
+   "f": 35518
   },
   "gear_bay_main_l": {
    "m": "06 Landing gear",

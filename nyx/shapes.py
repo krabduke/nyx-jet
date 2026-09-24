@@ -68,9 +68,7 @@ def section(x):
     return _W(x), _ZC(x), _ZT(x), _ZB(x)
 
 
-def z_up(x, y, inset=0.0):
-    """Upper surface height at (x, y); with `inset` the surface moved in
-    by that much (crown down, half-width in)."""
+def _z_up_smooth(x, y, inset=0.0):
     w, zc, zt, zb = section(x)
     w -= inset * _edge_ratio()
     zt -= inset
@@ -80,7 +78,7 @@ def z_up(x, y, inset=0.0):
     return zc + (zt - zc) * f
 
 
-def z_dn(x, y, inset=0.0):
+def _z_dn_smooth(x, y, inset=0.0):
     w, zc, zt, zb = section(x)
     w -= inset * _edge_ratio()
     zb += inset
@@ -88,6 +86,81 @@ def z_dn(x, y, inset=0.0):
         return zc
     f = (1.0 - (abs(y) / w) ** spec.M_DN) ** (1.0 / spec.N_DN)
     return zc - (zc - zb) * f
+
+
+# The body is faceted, the way a low-observable airframe is: each half of
+# each section is a few flat panels meeting at sharp creases, from the
+# crown to the chine. The panels run through points on the smooth section
+# and are then scaled out from the chine line just enough that no point of
+# the smooth section is outside them -- so everything built to sit inside
+# the old skin is still inside the new one.
+FACETS_UP = (0.0, 0.36, 0.66, 0.87, 1.0)
+FACETS_DN = (0.0, 0.40, 0.74, 1.0)
+_FACET_CACHE = {}
+
+
+def _facets(x, inset, up):
+    key = (round(x, 3), round(inset, 3), up)
+    hit = _FACET_CACHE.get(key)
+    if hit is not None:
+        return hit
+    w, zc, zt, zb = section(x)
+    w -= inset * _edge_ratio()
+    smooth = _z_up_smooth if up else _z_dn_smooth
+    fr = FACETS_UP if up else FACETS_DN
+    ys = [f * max(w, 0.0) for f in fr]
+    zs = [smooth(x, y, inset) - zc for y in ys]
+
+    def poly(y):
+        for i in range(len(ys) - 1):
+            if ys[i] <= y <= ys[i + 1]:
+                t = (y - ys[i]) / ((ys[i + 1] - ys[i]) or 1.0)
+                return zs[i] + (zs[i + 1] - zs[i]) * t
+        return 0.0
+    # (not over the last panel, from the outermost crease to the chine: the
+    # smooth section stands vertical at the chine, which no flat panel can
+    # cover, and the chine is solid SKIN_EDGE in from its edge anyway)
+    k = 1.0
+    if w > 1.0:
+        for j in range(1, 60):
+            y = ys[-2] * j / 60.0
+            p = poly(y)
+            c = smooth(x, y, inset) - zc
+            if abs(p) > 1e-6:
+                k = max(k, c / p)
+    out = (ys, [z * k for z in zs], zc, w)
+    if len(_FACET_CACHE) > 20000:
+        _FACET_CACHE.clear()
+    _FACET_CACHE[key] = out
+    return out
+
+
+def _faceted(x, y, inset, up):
+    ys, zs, zc, w = _facets(x, inset, up)
+    a = abs(y)
+    if w <= 0 or a >= w:
+        return zc
+    for i in range(len(ys) - 1):
+        if ys[i] <= a <= ys[i + 1]:
+            t = (a - ys[i]) / ((ys[i + 1] - ys[i]) or 1.0)
+            return zc + zs[i] + (zs[i + 1] - zs[i]) * t
+    return zc
+
+
+def facet_ys(x, inset=0.0):
+    """The crease positions (|y|) of the faceted section at x, upper and
+    lower, so a ring can put a point exactly on every crease."""
+    return (_facets(x, inset, True)[0], _facets(x, inset, False)[0])
+
+
+def z_up(x, y, inset=0.0):
+    """Upper surface height at (x, y); with `inset` the surface moved in
+    by that much (crown down, half-width in)."""
+    return _faceted(x, y, inset, True)
+
+
+def z_dn(x, y, inset=0.0):
+    return _faceted(x, y, inset, False)
 
 
 def _edge_ratio():
@@ -104,15 +177,32 @@ def half_width(x, inset=0.0):
 def ring(x, m, inset=0.0):
     """m points round the section at x, from the starboard chine over the
     top to the port chine and back underneath. Points are cosine-spaced in
-    y so the chine edges, where the surface turns fastest, get the most."""
+    y so the chine edges, where the surface turns fastest, get the most,
+    and the nearest point to each facet crease is moved onto it so the
+    creases stay sharp."""
     w = half_width(x, inset)
     h = m // 2
+    up_k, dn_k = facet_ys(x, inset)
+
+    def snapped(creases):
+        base = [w * math.cos(math.pi * k / h) for k in range(h + 1)]
+        taken = {0, h}
+        for c in creases[1:-1]:
+            for sgn in (1.0, -1.0):
+                j = min((i for i in range(1, h) if i not in taken),
+                        key=lambda i: abs(base[i] - sgn * c))
+                base[j] = sgn * c
+                taken.add(j)
+        # a crease at the crown itself (y = 0) belongs on the middle point
+        return sorted(base, reverse=True)
+    ups = snapped(list(up_k))
+    dns = snapped(list(dn_k))
     pts = []
     for k in range(h + 1):
-        y = w * math.cos(math.pi * k / h)
+        y = ups[k]
         pts.append((x, y, z_up(x, y, inset)))
     for k in range(1, h):
-        y = -w * math.cos(math.pi * k / h)
+        y = -dns[k]
         pts.append((x, y, z_dn(x, y, inset)))
     return pts
 

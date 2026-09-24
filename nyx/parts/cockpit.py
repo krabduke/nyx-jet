@@ -46,22 +46,66 @@ def canopy_top(x):
     return base + (CK["canopy_top_z"] - base) * f
 
 
+# The canopy is faceted like the airframe round it: a crown panel, two
+# shoulder panels and the side panels down to the sill, meeting at sharp
+# creases. The panels run through points on the old smooth arch and are
+# scaled up so the arch is inside them -- the pilot's head clearance only
+# grows.
+_CANOPY_CREASES = (0.0, 0.42, 0.76, 1.0)
+
+
+def _arch(u):
+    return max(0.0, 1.0 - u ** 2.3) ** 0.55
+
+
+def _arch_faceted(u):
+    us = _CANOPY_CREASES
+    fs = [_arch(c) for c in us]
+    k = 1.0
+    for j in range(1, 40):
+        v = us[-2] * j / 40.0
+        p = _lin(us, fs, v)
+        k = max(k, _arch(v) / p if p > 1e-9 else 1.0)
+    return min(1.0, _lin(us, fs, u) * k) if u < us[-2] else _lin(us, fs, u) * k
+
+
+def _lin(us, fs, u):
+    for i in range(len(us) - 1):
+        if us[i] <= u <= us[i + 1]:
+            t = (u - us[i]) / ((us[i + 1] - us[i]) or 1.0)
+            return fs[i] + (fs[i + 1] - fs[i]) * t
+    return 0.0
+
+
+def _canopy_ys(a, n):
+    """n+1 stations across, from +a to -a, with a point on every crease."""
+    base = [a * math.cos(math.pi * k / n) for k in range(n + 1)]
+    taken = {0, n}
+    for c in _CANOPY_CREASES[1:-1]:
+        for sgn in (1.0, -1.0):
+            j = min((i for i in range(1, n) if i not in taken),
+                    key=lambda i: abs(base[i] - sgn * c * a))
+            base[j] = sgn * c * a
+            taken.add(j)
+    if n % 2 == 0:
+        base[n // 2] = 0.0
+    return sorted(base, reverse=True)
+
+
 def _canopy_section(x, n=40):
     """A closed arch section: the outside from one sill over the top to the
     other, and back along the inside."""
     a = opening_half_width(x) + OVERLAP
     top = canopy_top(x)
     pts_o, pts_i = [], []
-    for k in range(n + 1):
-        y = a * math.cos(math.pi * k / n)
+    for y in _canopy_ys(a, n):
         zb = shapes.z_up(x, y) + SEAT
-        f = max(0.0, 1.0 - (abs(y) / a) ** 2.3) ** 0.55
+        f = _arch_faceted(abs(y) / a)
         pts_o.append((x, y, zb + (top - zb) * f))
     ai = a - GLASS_T
-    for k in range(n, -1, -1):
-        y = ai * math.cos(math.pi * k / n)
+    for y in reversed(_canopy_ys(ai, n)):
         zb = shapes.z_up(x, y) + SEAT
-        f = max(0.0, 1.0 - (abs(y) / ai) ** 2.3) ** 0.55
+        f = _arch_faceted(abs(y) / ai)
         pts_i.append((x, y, zb + (top - GLASS_T - zb) * f))
     return pts_o + pts_i
 
