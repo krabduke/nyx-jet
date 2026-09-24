@@ -343,6 +343,16 @@ def mac():
 
 MATERIAL_MAP = {
     "fuselage": "skin",
+    "aft_closure": "skin_dark",
+    "irst_fairing": "skin",
+    "irst_window": "sensor_glass",
+    "air_data_probe": "steel",
+    "aoa_vane": "steel",
+    "antenna": "skin_dark",
+    "nav_light_l": "lens_red",
+    "nav_light_r": "lens_green",
+    "tail_light": "lens_white",
+    "static_wicks": "rubber",
     "wing": "skin",
     "flaperon": "skin_dark",
     "le_flap": "skin_dark",
@@ -393,6 +403,11 @@ PALETTE = {
     "wheel":     ((0.40, 0.41, 0.42), 1.00, 0.35),
     "tank":      ((0.30, 0.30, 0.20), 0.00, 0.60),
     "radar":     ((0.35, 0.33, 0.30), 0.80, 0.35),
+    # lenses, and the IRST's glass: sapphire-dark, with a gold coat
+    "lens_red":     ((0.70, 0.04, 0.03), 0.00, 0.10),
+    "lens_green":   ((0.03, 0.55, 0.12), 0.00, 0.10),
+    "lens_white":   ((0.85, 0.85, 0.82), 0.00, 0.08),
+    "sensor_glass": ((0.22, 0.17, 0.08), 0.70, 0.05),
 }
 
 RES = {"body_rings": 150, "body_ring_pts": 128, "wing_chord_pts": 48,

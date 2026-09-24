@@ -3,7 +3,7 @@
  "role": "twin-engine canard-delta agile fighter",
  "figures": {
   "length_mm": 14890.0,
-  "span_mm": 13200.0,
+  "span_mm": 13236.0,
   "combat_mass_kg": 17510.0,
   "empty_mass_kg": 13160.0,
   "wing_area_m2": 68.2,
@@ -209,6 +209,42 @@
    ],
    "metal": 0.8,
    "rough": 0.35
+  },
+  "lens_red": {
+   "rgb": [
+    0.7,
+    0.04,
+    0.03
+   ],
+   "metal": 0.0,
+   "rough": 0.1
+  },
+  "lens_green": {
+   "rgb": [
+    0.03,
+    0.55,
+    0.12
+   ],
+   "metal": 0.0,
+   "rough": 0.1
+  },
+  "lens_white": {
+   "rgb": [
+    0.85,
+    0.85,
+    0.82
+   ],
+   "metal": 0.0,
+   "rough": 0.08
+  },
+  "sensor_glass": {
+   "rgb": [
+    0.22,
+    0.17,
+    0.08
+   ],
+   "metal": 0.7,
+   "rough": 0.05
   }
  },
  "nozzles": {
@@ -727,8 +763,8 @@
    "key": "01 Airframe",
    "label": "Airframe",
    "color": "#C9CDD1",
-   "parts": 1,
-   "faces": 35865
+   "parts": 17,
+   "faces": 39941
   },
   {
    "key": "02 Flying surfaces",
@@ -788,6 +824,46 @@
   }
  ],
  "parts": {
+  "aft_closure": {
+   "m": "01 Airframe",
+   "mat": "skin_dark",
+   "f": 382
+  },
+  "air_data_probe_l": {
+   "m": "01 Airframe",
+   "mat": "steel",
+   "f": 100
+  },
+  "air_data_probe_r": {
+   "m": "01 Airframe",
+   "mat": "steel",
+   "f": 100
+  },
+  "antenna_datalink": {
+   "m": "01 Airframe",
+   "mat": "skin_dark",
+   "f": 146
+  },
+  "antenna_dorsal": {
+   "m": "01 Airframe",
+   "mat": "skin_dark",
+   "f": 146
+  },
+  "antenna_ventral": {
+   "m": "01 Airframe",
+   "mat": "skin_dark",
+   "f": 146
+  },
+  "aoa_vane_l": {
+   "m": "01 Airframe",
+   "mat": "steel",
+   "f": 32
+  },
+  "aoa_vane_r": {
+   "m": "01 Airframe",
+   "mat": "steel",
+   "f": 32
+  },
   "bay_door_l": {
    "m": "05 Weapons bay",
    "mat": "skin_dark",
@@ -2143,6 +2219,16 @@
    "mat": "skin",
    "f": 7872
   },
+  "irst_fairing": {
+   "m": "01 Airframe",
+   "mat": "skin",
+   "f": 1536
+  },
+  "irst_window": {
+   "m": "01 Airframe",
+   "mat": "sensor_glass",
+   "f": 1200
+  },
   "keel": {
    "m": "07 Structure",
    "mat": "structure",
@@ -2168,6 +2254,16 @@
    "mat": "missile",
    "f": 1728
   },
+  "nav_light_l": {
+   "m": "01 Airframe",
+   "mat": "lens_red",
+   "f": 34
+  },
+  "nav_light_r": {
+   "m": "01 Airframe",
+   "mat": "lens_green",
+   "f": 34
+  },
   "radar_array": {
    "m": "07 Structure",
    "mat": "radar",
@@ -2192,6 +2288,26 @@
    "m": "04 Cockpit",
    "mat": "seat",
    "f": 42
+  },
+  "static_wicks_l": {
+   "m": "01 Airframe",
+   "mat": "rubber",
+   "f": 60
+  },
+  "static_wicks_r": {
+   "m": "01 Airframe",
+   "mat": "rubber",
+   "f": 60
+  },
+  "tail_light_l": {
+   "m": "01 Airframe",
+   "mat": "lens_white",
+   "f": 34
+  },
+  "tail_light_r": {
+   "m": "01 Airframe",
+   "mat": "lens_white",
+   "f": 34
   },
   "tyre_main_l": {
    "m": "06 Landing gear",

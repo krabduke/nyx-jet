@@ -64,6 +64,17 @@ AIRFRAME = [
     # cockpit furniture is bolted to the tub
     ("seat", "cockpit_tub"), ("cockpit_panel", "cockpit_tub"),
     ("cockpit_controls", "cockpit_tub"), ("cockpit_hud", "cockpit_panel"),
+    # the details: the aft closure is fastened inside the skin's lip; the
+    # IRST housing, probes, vanes and blade antennas stand on bases let into
+    # the skin, and the IRST's ball window is set into its housing's nose;
+    # the lights are set into the wing and fin tips, and the wicks are
+    # rooted in the trailing edges they bleed static from
+    ("aft_closure", "fuselage_skin"),
+    ("irst_", "fuselage_skin"), ("irst_window", "irst_fairing"),
+    ("air_data_probe_", "fuselage_skin"), ("aoa_vane_", "fuselage_skin"),
+    ("antenna_", "fuselage_skin"),
+    ("nav_light_", "wing_"), ("tail_light_", "fin_"),
+    ("static_wicks_", "wing_"), ("static_wicks_", "fin_"),
 ]
 
 EXPECTED = AIRFRAME + _engine_rules()
