@@ -72,6 +72,17 @@ EXPECTED = [
     ("ab_fuel_manifold", "augmentor_case"),
     ("ab_fuel_manifold", "augmentor_liner"),
     ("ab_fuel_manifold", "flameholder_vanes"),
+    # zones 2 and 3: the spraybars come off their manifolds and pass through
+    # the outer case, the augmentor case and the liner into the stream
+    ("ab_spraybars", "ab_fuel_manifold"), ("ab_spraybars", "case_outer_aft"),
+    ("ab_spraybars", "augmentor_case"), ("ab_spraybars", "augmentor_liner"),
+    # the igniter goes in through a boss on the case to the pilot's wake
+    ("ab_igniter", "case_outer_aft"), ("ab_igniter", "augmentor_case"),
+    ("ab_igniter", "augmentor_liner"),
+    # the pilot gutter sits on the vanes' trailing edges
+    ("ab_pilot_gutter", "flameholder_vanes"),
+    # the reheat control stands on the case and its feeds go into the rings
+    ("ab_fuel_control", "case_outer_aft"), ("ab_fuel_control", "ab_fuel_manifold"),
     # the flameholder vanes are let into the tail cone and the liner
     ("flameholder_vanes", "tailcone"), ("flameholder_vanes", "augmentor_liner"),
     # the variable-vane spindles pass through the case into each vane
@@ -99,7 +110,6 @@ EXPECTED = [
     ("fuel_metering_unit", "gearbox"), ("oil_tank", "gearbox"),
     # fuel lines leave the metering unit and end in the manifolds
     ("fuel_lines", "fuel_metering_unit"), ("fuel_lines", "fuel_manifold"),
-    ("fuel_lines", "ab_fuel_manifold"),
     # the FADECs stand on posts let into the case; the looms plug into
     # the FADECs and the gearbox
     ("fadec_", "case_outer_fwd"), ("harnesses", "fadec_"),
@@ -116,13 +126,34 @@ EXPECTED = [
     # rods pass into it through a boss
     ("mode_valve_actuators", "case_outer_fwd"),
     # the hydraulic pump is on a gearbox pad; its lines screw into the pump
-    # and into each nozzle actuator's cap end
+    # and into the front swivel motor's ports and the rotary union's
     ("hydraulic_pump", "gearbox"), ("hydraulic_lines", "hydraulic_pump"),
-    ("hydraulic_lines", "nozzle_actuators"),
-    # the nozzle: hinge pins run through the flaps into the sidewalls and seat
-    # on the transition's lip; the actuators' lugs are welded to the sidewalls
+    ("hydraulic_lines", "swivel_drive_1"), ("hydraulic_lines", "swivel_rotary_union"),
+    # the swivel: the fixed ring is bolted into the outer case's aft collar;
+    # each bearing's race sits between the two flanges it joins, and each
+    # motor's pinion is in mesh with its ring gear
+    ("flange_outer_aft", "swivel_fixed_ring"),
+    ("swivel_bearing_1", "swivel_fixed_ring"),
+    ("swivel_bearing_", "swivel_duct_"),
+    ("swivel_drive_", "swivel_bearing_"),
+    ("swivel_drive_1", "case_outer_aft"),
+    # the oblique bearings' motors stand on pads welded to the sloping shell
+    # of the duct in front, let into it at their low end
+    ("swivel_drive_", "swivel_duct_"),
+    ("swivel_rotary_union", "case_outer_aft"),
+    # the nozzle: hinge knuckles run through the flaps and seat on the
+    # static ring; seals and external flaps are pressed onto the flaps
     ("nozzle_hinges", "nozzle_"),
-    ("nozzle_actuators", "nozzle_sidewalls"),
+    ("nozzle_conv_seals", "nozzle_conv_flaps"),
+    ("nozzle_div_seals", "nozzle_div_flaps"),
+    ("nozzle_ext_flaps", "nozzle_div_flaps"),
+    ("nozzle_div_links", "nozzle_div_flaps"), ("nozzle_div_links", "nozzle_ext_flaps"),
+    ("nozzle_unison_ring", "nozzle_conv_flaps"),
+    # the actuators' head lugs are let into the aft duct; the bellcranks go
+    # in through the static ring and their arms into the unison ring
+    ("nozzle_actuators", "swivel_duct_aft"),
+    ("nozzle_actuators", "nozzle_static_ring"),
+    ("nozzle_actuators", "nozzle_unison_ring"),
 ]
 
 PKG = "engine/parts"

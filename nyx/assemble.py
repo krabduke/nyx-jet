@@ -42,7 +42,7 @@ def collection_for(name):
         return "08 Engine port"
     if name.startswith("engine_r_"):
         return "09 Engine starboard"
-    if name.startswith(("fuselage", "aft_closure", "tail_stinger")):
+    if name.startswith("fuselage"):
         return "01 Airframe"
     if name.startswith(("wing", "le_flap", "flaperon", "canard", "fin", "rudder")):
         return "02 Flying surfaces"
@@ -146,8 +146,7 @@ def build_proto(name, proto, collection):
     return obj, ok
 
 
-FACETED = ("fuselage_skin", "aft_fairing", "aft_closure", "canopy_glass",
-           "intake_duct", "bay_door")
+FACETED = ()
 
 
 def shade(obj, angle_deg=32.0):

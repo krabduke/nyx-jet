@@ -36,7 +36,6 @@ CFG = {
         "keel": (("keel",), 1),
         "canopy": (("canopy_glass",), 1),
         "ejection seat": (("seat",), 1),
-        "tail stinger": (("tail_stinger",), 1),
     },
 }
 

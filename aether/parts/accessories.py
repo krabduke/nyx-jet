@@ -105,20 +105,17 @@ def _mode_valve_actuators():
 
 def _hydraulics():
     """A hydraulic pump under the gearbox's front and the lines from it aft
-    to the four nozzle actuators: along the lower flanks at 45 degrees
-    below the horizontal, out round the nozzle shroud and on to each
-    actuator's cap end."""
+    along the lower flanks at 45 degrees below the horizontal: one pair to
+    the front swivel bearing's motor, the other to the rotary union that
+    carries pressure across the bearings to the two motors and the four
+    nozzle actuators that turn with the ducts."""
     out = {}
     zc = gb_centre_z()
     zp = zc - G["depth"] / 2.0 - 32.0
     pv, pf = mesh.revolve_ring([(430.0, 6.0), (520.0, 6.0), (520.0, 38.0),
                                 (430.0, 38.0)], 32)
     out["hydraulic_pump"] = ([(x, y, z + zp) for (x, y, z) in pv], pf)
-    nz = spec.NOZZLE
     from parts import nozzle as nzl
-    y_act = nzl.SW_OUT + nz["actuator_r"] - 0.2
-    x_act = nz["x_trans1"] + 30.0
-    z_act = nzl.H_TRANS * 0.62
     lines = []
     # Laid along the case, just over its ribs and lifted over the mid
     # flange, the way a line clipped to a case runs. At a fixed 530 mm they
@@ -131,7 +128,7 @@ def _hydraulics():
         # and over what rings the case: the FADEC harness, the mid flange
         # with the fuel manifold and nozzles on it, the reheat manifold
         for (a, b, top) in ((830.0, 970.0, 496.0), (1320.0, 1440.0, 485.0),
-                            (2300.0, 2380.0, 491.0)):
+                            (2210.0, 2380.0, 491.0)):
             if a <= x <= b:
                 r = max(r, top + 6.0 + 2.5 + extra)
         return r
@@ -146,14 +143,11 @@ def _hydraulics():
                              2370.0, 2460.0, 2800.0)]
             path = [(470.0, sy * 20.0, zp),
                     (470.0, sy * 200.0, zp - 6.0 - dz)] + run
-            if sz < 0:
-                path += [(3000.0, sy * 432.0, -380.0 - dz),
-                         (3110.0, sy * 432.0, -z_act - 20.0),
-                         (x_act + 12.0, sy * (y_act + 4.0), -z_act)]
-            else:
-                path += [(2960.0, sy * 440.0, -390.0 - dz),
-                         (3050.0, sy * 440.0, z_act - 40.0),
-                         (x_act + 12.0, sy * (y_act + 4.0), z_act)]
+            # down onto a port: the motor's two on the left, the union's
+            # on the right
+            xp, rp, cp = nzl.hyd_port(0 if sy < 0 else 1, 0 if dz == 0.0 else 1)
+            path += [common.polar(xp, rp + 30.0, cp),
+                     common.polar(xp, rp - 1.0, cp)]
             lines.append(mesh.pipe(path, 6.0, 12, bend=30.0))
     out["hydraulic_lines"] = mesh.join(*lines)
     return out
@@ -287,8 +281,8 @@ def _fuel_lines():
     clock = -112.0
     c = spec.COMBUSTOR
     rm = outer_od(c["manifold_x"]) + c["manifold_tube_r"] + 3.0
-    xa = spec.AUGMENTOR["ab_manifold_x"]
-    rab = outer_od(xa) + 12.0
+    from parts import augmentor
+    fc = augmentor.fuel_control_inlet()
     r_run = 500.0
     # out of the metering unit's side, under the generator, then up to the
     # run at seven o'clock
@@ -297,10 +291,11 @@ def _fuel_lines():
                       common.polar(c["manifold_x"] - 60.0, r_run, clock),
                       common.polar(c["manifold_x"], rm + 8.0, clock)],
                      8.0, PIPE, bend=40.0)
+    # the reheat feed runs on aft to the reheat fuel control on the case
     reheat = mesh.pipe([(770.0, -40.0, z_fmu), (770.0, -212.0, z_fmu - 52.0),
                         (950.0, *common.polar(0.0, r_run + 18.0, clock)[1:]),
-                        common.polar(xa - 80.0, r_run + 18.0, clock),
-                        common.polar(xa, rab + 6.0, clock)],
+                        common.polar(fc[0] - 90.0, r_run + 18.0, clock),
+                        (fc[0] - 30.0, fc[1], fc[2]), fc],
                        9.0, PIPE, bend=40.0)
     return mesh.join(main, reheat)
 

@@ -17,7 +17,7 @@ A mixed-flow afterburning turbofan with a third stream:
     25 HPC inlet (core)     3   HPC exit
     4  combustor exit       45  HPT exit / LPT inlet (cooling air re-mixed)
     5  LPT exit             6   mixed-out core + bypass
-    7  augmentor exit       8   2D nozzle throat,  9  exit
+    7  augmentor exit       8   nozzle throat       9  exit
 
 The core-driven fan stage (CDFS) sits on the HP spool and works on both the
 core and the bypass air -- that is what lets the engine move its bypass ratio

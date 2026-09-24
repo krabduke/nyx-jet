@@ -51,6 +51,10 @@ def build():
     out.update(_liner())
     out["flameholder_vanes"] = _vanes()
     out["ab_fuel_manifold"] = _ab_fuel()
+    out["ab_spraybars"] = _spraybars()
+    out["ab_pilot_gutter"] = _pilot()
+    out["ab_igniter"] = _igniter()
+    out["ab_fuel_control"] = _fuel_control()
     return out
 
 
@@ -145,17 +149,100 @@ def _vanes():
     return mesh.replicate(*one, row.count)
 
 
+TUBE = 9.0
+
+
+def manifold_r(x):
+    return spec.annulus(P["third"], x)[1] + spec.WALL["outer_case"] + TUBE + 3.0
+
+
 def _ab_fuel():
-    """The reheat fuel manifold round the outer case, and a feed down into
-    every flameholder vane, where the spraybar is."""
-    x = A["ab_manifold_x"]
-    r_od = spec.annulus(P["third"], x)[1] + spec.WALL["outer_case"]
-    tube = 9.0
-    rm = r_od + tube + 3.0
-    parts = [mesh.ring_torus(x, rm, tube, SEG, 12)]
+    """The three reheat zone manifolds round the outer case. Zone 1's feeds
+    run down into every flameholder vane, where its spraybar is; zones 2
+    and 3 feed the spraybars ahead of the vanes."""
+    parts = []
+    for x in A["zone_x"]:
+        parts.append(mesh.ring_torus(x, manifold_r(x), TUBE, SEG, 12))
+    x = A["zone_x"][0]
     n = A["n_vanes"]
     for k in range(n):
-        clock = 360.0 * k / n
-        parts.append(common.radial_pin(x, A["liner_r"] - 30.0, rm + 3.0, 5.0,
-                                       clock, 10))
+        parts.append(common.radial_pin(x, A["liner_r"] - 30.0, manifold_r(x) + 3.0,
+                                       5.0, 360.0 * k / n, 10))
+    return mesh.join(*parts)
+
+
+def _spraybars():
+    """Zones 2 and 3: a radial spraybar off each manifold between every
+    pair of vanes, down through the case and liner into the stream, with a
+    row of orifices on its downstream side. Zone 2 sprays the outer half of
+    the stream, zone 3 reaches in to the tail cone."""
+    n = A["n_vanes"]
+    parts = []
+    for x, r_in in zip(A["zone_x"][1:], A["spraybar_r"]):
+        rm = manifold_r(x)
+        for k in range(n):
+            clock = 360.0 * (k + 0.5) / n
+            parts.append(common.radial_pin(x, r_in, rm + 2.0, 6.0, clock, 12))
+            # a rounded tip, and the orifices down the aft face
+            parts.append(common.radial_pin(x, r_in - 3.0, r_in + 1.0, 4.5, clock, 12))
+            for j in range(5):
+                r = r_in + 12.0 + (A["liner_r"] - 20.0 - r_in - 12.0) * j / 4
+                parts.append(mesh.pipe([common.polar(x + 4.0, r, clock),
+                                        common.polar(x + 9.0, r, clock)], 2.4, 8))
+    return mesh.join(*parts)
+
+
+def _pilot():
+    """A pilot gutter: a V-section ring round the tail cone, open aft, sitting
+    on the flameholder vanes' trailing edges. It holds a small steady flame
+    that relights the main zones through a reheat transient."""
+    x, r = A["pilot_x"], A["pilot_r"]
+    loop = [(x - 2.0, r), (x + 34.0, r + 15.0), (x + 34.0, r + 11.5),
+            (x + 3.0, r), (x + 34.0, r - 11.5), (x + 34.0, r - 15.0)]
+    return mesh.revolve_ring(loop, SEG)
+
+
+def _igniter():
+    """The reheat igniter: through a boss on the case at two o'clock, its
+    tip in the pilot gutter's wake, and the lead's connector on top."""
+    x, clock = A["igniter_x"], 60.0
+    r_od = spec.annulus(P["third"], x)[1] + spec.WALL["outer_case"]
+    return mesh.join(
+        common.radial_pin(x, A["pilot_r"] + 40.0, r_od + 34.0, 7.0, clock, 14),
+        common.radial_pin(x, r_od - 2.0, r_od + 16.0, 17.0, clock, 18),
+        common.radial_pin(x, r_od + 30.0, r_od + 52.0, 11.0, clock, 16))
+
+
+FC_CLOCK = -112.0
+
+
+def fuel_control_inlet():
+    """Where the reheat feed plugs into the control unit's front face."""
+    x0 = A["fuel_control_x"][0]
+    return common.polar(x0 - 1.0, manifold_r(x0) + 26.0, FC_CLOCK)
+
+
+def _fuel_control():
+    """The reheat fuel control on the case at seven o'clock: it meters the
+    reheat feed and splits it three ways through the zone valves, one short
+    line to each zone's manifold."""
+    x0, x1 = A["fuel_control_x"]
+    r_od = spec.annulus(P["third"], x0)[1] + spec.WALL["outer_case"]
+    t = math.radians(FC_CLOCK)
+    body = common.sector_block(x0, x1, r_od - 1.0, r_od + 64.0, t - 0.1, t + 0.1, 6)
+    # three zone valves standing on its back
+    parts = [body]
+    for j, dc in enumerate((-4.0, 0.0, 4.0)):
+        xv = x0 + 30.0 + 30.0 * j
+        parts.append(common.radial_pin(xv, r_od + 62.0, r_od + 82.0, 11.0,
+                                       FC_CLOCK + dc, 16))
+    # feeds from its aft face to each manifold, at a clock apiece
+    for j, (x, dc) in enumerate(zip(A["zone_x"], (-5.0, 0.0, 5.0))):
+        c = FC_CLOCK + dc
+        rm = manifold_r(x)
+        parts.append(mesh.pipe([common.polar(x1 - 2.0, r_od + 20.0 + 14.0 * j, c),
+                                common.polar(x - 30.0, r_od + 20.0 + 14.0 * j, c),
+                                common.polar(x, rm + TUBE + 8.0, c),
+                                common.polar(x, rm + TUBE - 3.0, c)],
+                               6.0, 12, bend=16.0))
     return mesh.join(*parts)

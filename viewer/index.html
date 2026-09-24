@@ -70,7 +70,10 @@
   .seg button[aria-pressed="true"]{background:var(--ink); color:var(--night)}
   .toggle{background:rgba(20,26,38,.85); border:1px solid var(--line); border-radius:3px}
   .toggle[aria-pressed="true"]{border-color:var(--ink)}
-  button:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+  button:focus-visible, input:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+  .group > label{color:var(--muted); font-size:13px}
+  #swivel, #yaw{width:160px; accent-color:var(--ink)}
+  .val{min-width:3em; display:inline-block; color:var(--ink)}
 
   /* the one loud thing: how fast it turns */
   #turn{
@@ -139,6 +142,14 @@
     </div>
   </div>
   <div class="group">
+    <label for="swivel">Nozzles down <span class="val" id="swval">0°</span></label>
+    <input id="swivel" type="range" min="0" max="95" step="1" value="0">
+  </div>
+  <div class="group">
+    <label for="yaw">Nozzles yaw <span class="val" id="yawval">0°</span></label>
+    <input id="yaw" type="range" min="-12" max="12" step="1" value="0">
+  </div>
+  <div class="group">
     <span>Inside</span>
     <button class="toggle" id="xray" aria-pressed="false">See through the skin</button>
   </div>
@@ -169,7 +180,7 @@ import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 const matching = (...n) => n;
 // the outer skin the x-ray view makes see-through
 const SKIN = matching('fuselage_skin', 'wing_', 'canard_', 'fin_', 'rudder_',
-  'le_flap_', 'flaperon_', 'aft_closure', 'canopy_glass', 'bay_door_');
+  'le_flap_', 'flaperon_', 'canopy_glass', 'bay_door_');
 
 const MM = 0.001;
 const $ = (id) => document.getElementById(id);
@@ -363,6 +374,48 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   $('probe').classList.add('on');
 });
 
+/* ---------------- swivel nozzles ----------------
+   Each engine's three swivel bearings in a row, each carrying everything
+   behind it. Aircraft (x, y, z) is scene (x, z, -y), a proper rotation, so
+   an angle about an aircraft axis is the same angle about its image. */
+const NZ = M.nozzles;
+const toScene = (v) => new THREE.Vector3(v[0], v[2], -v[1]);
+const swivels = NZ.engines.map(eng => {
+  const groups = [];
+  let parent = gltf.scene, pc = new THREE.Vector3();
+  for (const b of eng.bearings) {
+    const c = toScene(b.c).multiplyScalar(MM);
+    const g = new THREE.Group();
+    parent.add(g); g.position.copy(c).sub(pc); g.updateMatrixWorld(true);
+    g.userData.axis = toScene(b.n).normalize();
+    for (const name of b.parts) for (const m of (meshes.get(name) || [])) g.attach(m);
+    groups.push(g); parent = g; pc = c;
+  }
+  return groups;
+});
+const rotAbout = (k, a, v) => v.clone().applyAxisAngle(new THREE.Vector3(...k).normalize(), a);
+function pose(pitch, yaw){
+  const b = NZ.engines[0].bearings;
+  const p = THREE.MathUtils.degToRad(pitch), y = THREE.MathUtils.degToRad(yaw);
+  const t = new THREE.Vector3(Math.cos(p) * Math.cos(y), Math.sin(y), -Math.sin(p) * Math.cos(y));
+  const want = THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(t.x, -1, 1)));
+  if (want < 1e-4) return [0, 0, 0];
+  const T = NZ.fold_table;
+  let i = 0; while (i < T.length - 2 && T[i + 1][1] < want) i++;
+  const f = THREE.MathUtils.clamp((want - T[i][1]) / ((T[i + 1][1] - T[i][1]) || 1), 0, 1);
+  const psi = THREE.MathUtils.degToRad(T[i][0] + (T[i + 1][0] - T[i][0]) * f);
+  const d = rotAbout(b[1].n, psi, rotAbout(b[2].n, -psi, new THREE.Vector3(1, 0, 0)));
+  let phi = Math.atan2(t.z, t.y) - Math.atan2(d.z, d.y);
+  return [Math.atan2(Math.sin(phi), Math.cos(phi)), psi, -psi];
+}
+const sw = {pitch: 0, yaw: 0, tp: 0, ty: 0};
+function applySwivel(){
+  const a = pose(sw.pitch, sw.yaw);
+  for (const groups of swivels) groups.forEach((g, k) => g.quaternion.setFromAxisAngle(g.userData.axis, a[k]));
+}
+$('swivel').addEventListener('input', (e) => { $('swval').textContent = `${e.target.value}°`; sw.tp = +e.target.value; });
+$('yaw').addEventListener('input', (e) => { $('yawval').textContent = `${e.target.value}°`; sw.ty = +e.target.value; });
+
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
 const clock = new THREE.Clock();
@@ -373,6 +426,13 @@ renderer.setAnimationLoop(() => {
     const k = flight.t < 0.5 ? 2 * flight.t * flight.t : 1 - Math.pow(-2 * flight.t + 2, 2) / 2;
     camera.position.lerpVectors(flight.from, flight.to, k);
     if (flight.t >= 1) flight = null;
+  }
+  // the bearings turn at a hydraulic motor's pace, not a slider's
+  if (sw.pitch !== sw.tp || sw.yaw !== sw.ty) {
+    const step = (cur, tgt, v) => Math.abs(tgt - cur) < v * dt ? tgt : cur + Math.sign(tgt - cur) * v * dt;
+    sw.pitch = reduced ? sw.tp : step(sw.pitch, sw.tp, 30);
+    sw.yaw = reduced ? sw.ty : step(sw.yaw, sw.ty, 12);
+    applySwivel();
   }
   controls.update();
   renderer.render(scene, camera);

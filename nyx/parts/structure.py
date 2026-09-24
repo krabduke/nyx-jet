@@ -60,7 +60,9 @@ def frame(x):
     instead."""
     x0, x1 = x - FRAME_T / 2, x + FRAME_T / 2
     Y = ARCH_Y * shapes.half_width(x0, spec.SKIN_T)
-    ys = [-Y + 2 * Y * i / 48 for i in range(49)]
+    # finely: aft, the skin is a valley between the nacelles, and a coarse
+    # chord across a valley stands proud of the skin in its bottom
+    ys = [-Y + 2 * Y * i / 160 for i in range(161)]
     ins = spec.SKIN_T + SEAT
     parts = []
     for surf, sgn in ((shapes.z_up, -1.0), (shapes.z_dn, 1.0)):
@@ -68,7 +70,7 @@ def frame(x):
         for y in ys:
             za = surf(x0, y, ins)
             zb = surf(x1, y, ins)
-            z_out = za if sgn < 0 and za < zb else (zb if sgn < 0 else max(za, zb))
+            z_out = (min(za, zb) - 2.5) if sgn < 0 else (max(za, zb) + 2.5)
             z_in = z_out + sgn * FRAME_DEPTH
             rings.append([(x0, y, z_in), (x1, y, z_in), (x1, y, z_out), (x0, y, z_out)])
         parts.append(shapes.loft_rings(rings))
@@ -90,10 +92,11 @@ def keel():
     xs = [x0 + (x1 - x0) * i / 20 for i in range(21)]
     rings = []
     for x in xs:
-        # at its faces, not its middle: the faceted skin rises either side
-        # of the centreline crease
-        zt = shapes.z_up(x, 15.0, spec.SKIN_T + SEAT)
-        zb = shapes.z_dn(x, 15.0, spec.SKIN_T + SEAT)
+        # the lowest of the skin over its faces and its middle: aft, the
+        # crown is a valley between the nacelles, lowest on the centreline
+        ins = spec.SKIN_T + SEAT
+        zt = min(shapes.z_up(x, y, ins) for y in (-15.0, 0.0, 15.0)) - 4.0
+        zb = max(shapes.z_dn(x, y, ins) for y in (-15.0, 0.0, 15.0)) + 4.0
         rings.append([(x, -15.0, zb), (x, 15.0, zb), (x, 15.0, zt), (x, -15.0, zt)])
     return shapes.loft_rings(rings)
 

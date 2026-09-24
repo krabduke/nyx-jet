@@ -87,12 +87,18 @@ def opening_cutter():
 def doors():
     """Two doors, each the patch of skin from the centreline split to the
     bay's side, one skin deep. Returns {name: part} and their hinge lines."""
-    x0, x1, hw = B["x0"] + SEAT, B["x1"] - SEAT, B["half_w"] - SEAT
+    # a millimetre short of the opening at each end: the skin's cut faces
+    # there are square across a curved surface, and a 0.15 mm seat is less
+    # than the curve's own chord error between the skin's stations
+    x0, x1, hw = B["x0"] + 1.0, B["x1"] - 1.0, B["half_w"] - SEAT
     out = {}
     for side, sy in (("r", 1.0), ("l", -1.0)):
         # stations across the door on every tooth's point and root, so the
         # serrated ends are sharp
-        ys = [sy * (2.0 + (hw - 2.0) * j / (2 * TEETH)) for j in range(2 * TEETH + 1)]
+        # -- the opening cutter's own stations, so the door's edge follows the
+        # hole's chord for chord rather than cutting across its teeth
+        ys = [sy * min(max(2.0, B["half_w"] * j / (2 * TEETH)), hw)
+              for j in range(2 * TEETH + 1)]
         rings = []
         for i in range(41):
             t = i / 40.0
@@ -104,7 +110,18 @@ def doors():
             inner = [(xat(y), y, shapes.z_dn(xat(y), y, spec.SKIN_T))
                      for y in reversed(ys)]
             rings.append(outer + inner)
-        out[f"bay_door_{side}"] = shapes.loft_rings(rings)
+        # each end is a thin strip along the serrated edge, capped quad by
+        # quad: one n-gon across a zigzag is triangulated straight over the
+        # notches between the teeth, and the door then claims the skin that
+        # stands in them
+        v, f = shapes.loft_rings(rings, cap_start=False, cap_end=False)
+        m, n = len(rings[0]), len(ys)
+        f = list(f)
+        for base, flip in ((0, True), ((len(rings) - 1) * m, False)):
+            for k in range(n - 1):
+                q = (base + k, base + k + 1, base + m - 2 - k, base + m - 1 - k)
+                f.append(tuple(reversed(q)) if flip else q)
+        out[f"bay_door_{side}"] = shapes.orient((v, f))
     return out
 
 

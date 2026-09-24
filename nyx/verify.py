@@ -115,12 +115,13 @@ def main():
         check("vendored engine matches its source", not stale,
               ", ".join(stale[:3]))
     tail = max(f(r, "x_max_mm") for r in rows
-               if r["name"].startswith(("fuselage_skin", "aft_closure")))
-    noz = max(f(r, "x_max_mm") for r in rows if r["name"].startswith("engine_"))
-    # 2D nozzles stand proud of the body so the flaps can swing: out of
-    # the tail, but by less than a flap length
-    check("nozzles exit just aft of the tail", 0.0 <= noz - tail <= 600.0,
-          f"nozzle exit {noz:.0f}, tail {tail:.0f}")
+               if r["name"].startswith("fuselage_skin"))
+    brg = spec.ENGINE_FAN_FACE_X + spec.ENGINE_BEARING_1
+    # everything behind the swivel's front bearing turns when the jet is
+    # vectored, so the airframe has to end ahead of it -- but not so far
+    # ahead that the fixed ring and its motor hang out in the air
+    check("the airframe ends just ahead of the swivels' front bearings",
+          0.0 <= brg - tail <= 60.0, f"bearing {brg:.0f}, tail {tail:.0f}")
 
     n_bad = results.count(False)
     print("\n" + "=" * 70)

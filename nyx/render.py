@@ -200,7 +200,7 @@ def mode_rear(samples):
     shoot("04_rear")
 
 
-XRAY = ("fuselage_skin", "canopy_glass", "aft_closure", "tail_stinger",
+XRAY = ("fuselage_skin", "canopy_glass",
         "wing", "le_flap", "flaperon", "canard", "fin", "rudder", "bay_door")
 
 
@@ -227,7 +227,7 @@ def mode_xray(samples):
 CLOSE = {
     "c1_cockpit": ((3.2, -4.2, 2.6), (4.4, 0.0, 0.6), 50),
     "c2_intake": ((2.8, -4.6, -0.9), (5.4, -1.3, -0.4), 42),
-    "c3_nozzles": ((17.8, 3.6, 1.6), (14.2, 0.0, 0.0), 45),
+    "c3_nozzles": ((17.6, 4.2, 1.8), (14.1, 0.0, 0.0), 45),
     "c4_bay": ((6.6, -4.8, -3.2), (7.0, 0.0, -0.9), 38),
     "c5_main_gear": ((8.0, -5.2, -1.4), (9.5, -1.5, -1.4), 40),
     "c6_wing": ((12.0, -10.0, 4.0), (10.5, -4.0, 0.0), 45),

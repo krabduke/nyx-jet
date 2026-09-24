@@ -11,7 +11,7 @@ is no straight line of sight into the duct that reaches the fan: the fan
 face, the brightest radar reflector on a fighter, is hidden.
 
 Where the duct runs outside the body it is the intake trunk you see under
-the chine; the skin is cut to the duct's shape (plus 0.2 mm), so the skin
+the chine; the skin is cut to the duct's shape (plus 1 mm), so the skin
 and the duct meet edge to face without either passing through the other.
 """
 
@@ -154,11 +154,18 @@ def duct(grow_in=0.0, grow_out=None, end_trim=0.15):
 
 
 def cutter():
-    """The duct's outside, 0.2 mm proud, as a solid: what comes out of the
+    """The duct's outside, 1 mm proud, as a solid: what comes out of the
     skin where the duct passes through it."""
     _, xs = _stations()
-    rings = [[(lip_x(y, z) - 30.0, y, z) for (y, z) in _shape(xs[0], I["wall"] + 0.2)]]
-    rings += [[(x, y, z) for (y, z) in _shape(x, I["wall"] + 0.2)] for x in xs[1:-1]]
+    first = _shape(xs[0], I["wall"] + 1.0)
+    # ahead of the lip, then ON the lip as the duct's own first ring is: a
+    # cutter lofted straight from 30 mm ahead of the swept lip to the next
+    # station leaves a skewed sliver of skin standing inside the duct's wall
+    rings = [[(lip_x(y, z) - 30.0, y, z) for (y, z) in first],
+             [(lip_x(y, z), y, z) for (y, z) in first]]
+    # a millimetre proud, not 0.2: the duct leaves the skin at a grazing
+    # angle along the chine, where 0.2 mm is inside the boolean's own error
+    rings += [[(x, y, z) for (y, z) in _shape(x, I["wall"] + 1.0)] for x in xs[1:-1]]
     return shapes.loft_rings(rings)
 
 

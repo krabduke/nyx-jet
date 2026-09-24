@@ -2,22 +2,22 @@
  "name": "Nyx",
  "role": "twin-engine canard-delta agile fighter",
  "figures": {
-  "length_mm": 14878.0,
+  "length_mm": 14890.0,
   "span_mm": 13200.0,
-  "combat_mass_kg": 17170.0,
-  "empty_mass_kg": 12820.0,
+  "combat_mass_kg": 17510.0,
+  "empty_mass_kg": 13160.0,
   "wing_area_m2": 68.2,
   "aspect_ratio": 2.55,
-  "wing_loading": 252.0,
-  "tw": 1.6,
-  "static_margin_pct": -5.6,
+  "wing_loading": 257.0,
+  "tw": 1.57,
+  "static_margin_pct": -5.0,
   "g_limit": 9.5,
-  "itr_sl": 35.0,
-  "corner_ms": 152.0,
-  "str_sl": 26.0,
-  "str_sl_g": 5.4,
-  "itr_15k": 27.7,
-  "str_15k": 17.3,
+  "itr_sl": 34.6,
+  "corner_ms": 153.0,
+  "str_sl": 25.5,
+  "str_sl_g": 5.3,
+  "itr_15k": 27.5,
+  "str_15k": 16.9,
   "engine_thrust_kn": 134.9
  },
  "palette": {
@@ -211,13 +211,524 @@
    "rough": 0.35
   }
  },
+ "nozzles": {
+  "engines": [
+   {
+    "side": "l",
+    "bearings": [
+     {
+      "c": [
+       13270.0,
+       -800.0,
+       0.0
+      ],
+      "n": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "parts": [
+       "engine_l_swivel_duct_fwd",
+       "engine_l_swivel_bearing_1",
+       "engine_l_swivel_drive_2"
+      ]
+     },
+     {
+      "c": [
+       13570.0,
+       -800.0,
+       0.0
+      ],
+      "n": [
+       0.915311,
+       0.402747,
+       0.0
+      ],
+      "parts": [
+       "engine_l_swivel_duct_mid",
+       "engine_l_swivel_bearing_2",
+       "engine_l_swivel_drive_3"
+      ]
+     },
+     {
+      "c": [
+       14090.0,
+       -800.0,
+       0.0
+      ],
+      "n": [
+       0.915311,
+       -0.402747,
+       0.0
+      ],
+      "parts": [
+       "engine_l_swivel_duct_aft",
+       "engine_l_swivel_bearing_3",
+       "engine_l_nozzle_static_ring",
+       "engine_l_nozzle_conv_flaps",
+       "engine_l_nozzle_conv_seals",
+       "engine_l_nozzle_div_flaps",
+       "engine_l_nozzle_div_seals",
+       "engine_l_nozzle_ext_flaps",
+       "engine_l_nozzle_hinges",
+       "engine_l_nozzle_div_links",
+       "engine_l_nozzle_unison_ring",
+       "engine_l_nozzle_actuators"
+      ]
+     }
+    ],
+    "exit": [
+     14890.0,
+     -800.0,
+     0.0
+    ]
+   },
+   {
+    "side": "r",
+    "bearings": [
+     {
+      "c": [
+       13270.0,
+       800.0,
+       0.0
+      ],
+      "n": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "parts": [
+       "engine_r_swivel_duct_fwd",
+       "engine_r_swivel_bearing_1",
+       "engine_r_swivel_drive_2"
+      ]
+     },
+     {
+      "c": [
+       13570.0,
+       800.0,
+       0.0
+      ],
+      "n": [
+       0.915311,
+       0.402747,
+       0.0
+      ],
+      "parts": [
+       "engine_r_swivel_duct_mid",
+       "engine_r_swivel_bearing_2",
+       "engine_r_swivel_drive_3"
+      ]
+     },
+     {
+      "c": [
+       14090.0,
+       800.0,
+       0.0
+      ],
+      "n": [
+       0.915311,
+       -0.402747,
+       0.0
+      ],
+      "parts": [
+       "engine_r_swivel_duct_aft",
+       "engine_r_swivel_bearing_3",
+       "engine_r_nozzle_static_ring",
+       "engine_r_nozzle_conv_flaps",
+       "engine_r_nozzle_conv_seals",
+       "engine_r_nozzle_div_flaps",
+       "engine_r_nozzle_div_seals",
+       "engine_r_nozzle_ext_flaps",
+       "engine_r_nozzle_hinges",
+       "engine_r_nozzle_div_links",
+       "engine_r_nozzle_unison_ring",
+       "engine_r_nozzle_actuators"
+      ]
+     }
+    ],
+    "exit": [
+     14890.0,
+     800.0,
+     0.0
+    ]
+   }
+  ],
+  "exit_r": 341.1,
+  "fold_table": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.611
+   ],
+   [
+    4.0,
+    3.221
+   ],
+   [
+    6.0,
+    4.831
+   ],
+   [
+    8.0,
+    6.44
+   ],
+   [
+    10.0,
+    8.046
+   ],
+   [
+    12.0,
+    9.651
+   ],
+   [
+    14.0,
+    11.253
+   ],
+   [
+    16.0,
+    12.853
+   ],
+   [
+    18.0,
+    14.449
+   ],
+   [
+    20.0,
+    16.041
+   ],
+   [
+    22.0,
+    17.63
+   ],
+   [
+    24.0,
+    19.213
+   ],
+   [
+    26.0,
+    20.792
+   ],
+   [
+    28.0,
+    22.366
+   ],
+   [
+    30.0,
+    23.933
+   ],
+   [
+    32.0,
+    25.495
+   ],
+   [
+    34.0,
+    27.049
+   ],
+   [
+    36.0,
+    28.597
+   ],
+   [
+    38.0,
+    30.138
+   ],
+   [
+    40.0,
+    31.67
+   ],
+   [
+    42.0,
+    33.194
+   ],
+   [
+    44.0,
+    34.71
+   ],
+   [
+    46.0,
+    36.216
+   ],
+   [
+    48.0,
+    37.713
+   ],
+   [
+    50.0,
+    39.2
+   ],
+   [
+    52.0,
+    40.676
+   ],
+   [
+    54.0,
+    42.142
+   ],
+   [
+    56.0,
+    43.596
+   ],
+   [
+    58.0,
+    45.039
+   ],
+   [
+    60.0,
+    46.469
+   ],
+   [
+    62.0,
+    47.887
+   ],
+   [
+    64.0,
+    49.292
+   ],
+   [
+    66.0,
+    50.684
+   ],
+   [
+    68.0,
+    52.062
+   ],
+   [
+    70.0,
+    53.425
+   ],
+   [
+    72.0,
+    54.774
+   ],
+   [
+    74.0,
+    56.108
+   ],
+   [
+    76.0,
+    57.426
+   ],
+   [
+    78.0,
+    58.729
+   ],
+   [
+    80.0,
+    60.015
+   ],
+   [
+    82.0,
+    61.284
+   ],
+   [
+    84.0,
+    62.536
+   ],
+   [
+    86.0,
+    63.77
+   ],
+   [
+    88.0,
+    64.986
+   ],
+   [
+    90.0,
+    66.184
+   ],
+   [
+    92.0,
+    67.363
+   ],
+   [
+    94.0,
+    68.522
+   ],
+   [
+    96.0,
+    69.662
+   ],
+   [
+    98.0,
+    70.782
+   ],
+   [
+    100.0,
+    71.881
+   ],
+   [
+    102.0,
+    72.959
+   ],
+   [
+    104.0,
+    74.015
+   ],
+   [
+    106.0,
+    75.05
+   ],
+   [
+    108.0,
+    76.063
+   ],
+   [
+    110.0,
+    77.053
+   ],
+   [
+    112.0,
+    78.021
+   ],
+   [
+    114.0,
+    78.965
+   ],
+   [
+    116.0,
+    79.885
+   ],
+   [
+    118.0,
+    80.781
+   ],
+   [
+    120.0,
+    81.653
+   ],
+   [
+    122.0,
+    82.5
+   ],
+   [
+    124.0,
+    83.322
+   ],
+   [
+    126.0,
+    84.118
+   ],
+   [
+    128.0,
+    84.889
+   ],
+   [
+    130.0,
+    85.633
+   ],
+   [
+    132.0,
+    86.351
+   ],
+   [
+    134.0,
+    87.043
+   ],
+   [
+    136.0,
+    87.707
+   ],
+   [
+    138.0,
+    88.344
+   ],
+   [
+    140.0,
+    88.953
+   ],
+   [
+    142.0,
+    89.534
+   ],
+   [
+    144.0,
+    90.087
+   ],
+   [
+    146.0,
+    90.612
+   ],
+   [
+    148.0,
+    91.108
+   ],
+   [
+    150.0,
+    91.575
+   ],
+   [
+    152.0,
+    92.013
+   ],
+   [
+    154.0,
+    92.422
+   ],
+   [
+    156.0,
+    92.801
+   ],
+   [
+    158.0,
+    93.15
+   ],
+   [
+    160.0,
+    93.47
+   ],
+   [
+    162.0,
+    93.76
+   ],
+   [
+    164.0,
+    94.02
+   ],
+   [
+    166.0,
+    94.249
+   ],
+   [
+    168.0,
+    94.448
+   ],
+   [
+    170.0,
+    94.616
+   ],
+   [
+    172.0,
+    94.754
+   ],
+   [
+    174.0,
+    94.862
+   ],
+   [
+    176.0,
+    94.939
+   ],
+   [
+    178.0,
+    94.985
+   ],
+   [
+    180.0,
+    95.0
+   ]
+  ]
+ },
  "modules": [
   {
    "key": "01 Airframe",
    "label": "Airframe",
    "color": "#C9CDD1",
-   "parts": 3,
-   "faces": 36317
+   "parts": 1,
+   "faces": 35865
   },
   {
    "key": "02 Flying surfaces",
@@ -245,7 +756,7 @@
    "label": "Weapons bay",
    "color": "#7D8570",
    "parts": 5,
-   "faces": 4922
+   "faces": 4982
   },
   {
    "key": "06 Landing gear",
@@ -258,44 +769,34 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 7,
-   "faces": 6446
+   "parts": 6,
+   "faces": 3054
   },
   {
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
-   "parts": 105,
-   "faces": 612348
+   "parts": 119,
+   "faces": 699020
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
-   "parts": 105,
-   "faces": 612348
+   "parts": 119,
+   "faces": 699020
   }
  ],
  "parts": {
-  "aft_closure": {
-   "m": "01 Airframe",
-   "mat": "skin",
-   "f": 140
-  },
-  "aft_fairing": {
-   "m": "07 Structure",
-   "mat": "skin",
-   "f": 5184
-  },
   "bay_door_l": {
    "m": "05 Weapons bay",
    "mat": "skin_dark",
-   "f": 1362
+   "f": 1392
   },
   "bay_door_r": {
    "m": "05 Weapons bay",
    "mat": "skin_dark",
-   "f": 1362
+   "f": 1392
   },
   "bay_structure": {
    "m": "05 Weapons bay",
@@ -347,10 +848,30 @@
    "mat": "cockpit",
    "f": 334
   },
+  "engine_l_ab_fuel_control": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 734
+  },
   "engine_l_ab_fuel_manifold": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 2112
+   "f": 5952
+  },
+  "engine_l_ab_igniter": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 54
+  },
+  "engine_l_ab_pilot_gutter": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 960
+  },
+  "engine_l_ab_spraybars": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 2496
   },
   "engine_l_augmentor_case": {
    "m": "08 Engine port",
@@ -455,7 +976,7 @@
   "engine_l_case_ribs": {
    "m": "08 Engine port",
    "mat": "casing",
-   "f": 7808
+   "f": 7776
   },
   "engine_l_case_turbine": {
    "m": "08 Engine port",
@@ -580,7 +1101,7 @@
   "engine_l_fuel_lines": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 1012
+   "f": 1048
   },
   "engine_l_fuel_manifold": {
    "m": "08 Engine port",
@@ -645,7 +1166,7 @@
   "engine_l_hydraulic_lines": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 4856
+   "f": 5300
   },
   "engine_l_hydraulic_pump": {
    "m": "08 Engine port",
@@ -700,57 +1221,52 @@
   "engine_l_nozzle_actuators": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 176
+   "f": 408
   },
-  "engine_l_nozzle_conv_flap_lower": {
+  "engine_l_nozzle_conv_flaps": {
    "m": "08 Engine port",
    "mat": "cmc",
-   "f": 42
+   "f": 3072
   },
-  "engine_l_nozzle_conv_flap_upper": {
+  "engine_l_nozzle_conv_seals": {
    "m": "08 Engine port",
    "mat": "cmc",
-   "f": 42
+   "f": 2432
   },
-  "engine_l_nozzle_div_flap_lower": {
+  "engine_l_nozzle_div_flaps": {
    "m": "08 Engine port",
    "mat": "cmc",
-   "f": 86
+   "f": 3072
   },
-  "engine_l_nozzle_div_flap_upper": {
+  "engine_l_nozzle_div_links": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 672
+  },
+  "engine_l_nozzle_div_seals": {
    "m": "08 Engine port",
    "mat": "cmc",
-   "f": 86
+   "f": 2432
   },
-  "engine_l_nozzle_ext_flap_lower": {
+  "engine_l_nozzle_ext_flaps": {
    "m": "08 Engine port",
    "mat": "inconel",
-   "f": 50
-  },
-  "engine_l_nozzle_ext_flap_upper": {
-   "m": "08 Engine port",
-   "mat": "inconel",
-   "f": 50
+   "f": 4288
   },
   "engine_l_nozzle_hinges": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 72
+   "f": 768
   },
-  "engine_l_nozzle_shroud": {
+  "engine_l_nozzle_static_ring": {
    "m": "08 Engine port",
    "mat": "inconel",
-   "f": 2880
+   "f": 4816
   },
-  "engine_l_nozzle_sidewalls": {
+  "engine_l_nozzle_unison_ring": {
    "m": "08 Engine port",
-   "mat": "casing",
-   "f": 12
-  },
-  "engine_l_nozzle_transition": {
-   "m": "08 Engine port",
-   "mat": "cmc",
-   "f": 2496
+   "mat": "inconel",
+   "f": 864
   },
   "engine_l_oil_lines": {
    "m": "08 Engine port",
@@ -796,6 +1312,61 @@
    "m": "08 Engine port",
    "mat": "nickel_hot",
    "f": 5472
+  },
+  "engine_l_swivel_bearing_1": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1540
+  },
+  "engine_l_swivel_bearing_2": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1540
+  },
+  "engine_l_swivel_bearing_3": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1540
+  },
+  "engine_l_swivel_drive_1": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 358
+  },
+  "engine_l_swivel_drive_2": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 358
+  },
+  "engine_l_swivel_drive_3": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 358
+  },
+  "engine_l_swivel_duct_aft": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 14752
+  },
+  "engine_l_swivel_duct_fwd": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 14752
+  },
+  "engine_l_swivel_duct_mid": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 14752
+  },
+  "engine_l_swivel_fixed_ring": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 11312
+  },
+  "engine_l_swivel_rotary_union": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 46
   },
   "engine_l_tailcone": {
    "m": "08 Engine port",
@@ -877,10 +1448,30 @@
    "mat": "steel",
    "f": 96
   },
+  "engine_r_ab_fuel_control": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 734
+  },
   "engine_r_ab_fuel_manifold": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 2112
+   "f": 5952
+  },
+  "engine_r_ab_igniter": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 54
+  },
+  "engine_r_ab_pilot_gutter": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 960
+  },
+  "engine_r_ab_spraybars": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 2496
   },
   "engine_r_augmentor_case": {
    "m": "09 Engine starboard",
@@ -985,7 +1576,7 @@
   "engine_r_case_ribs": {
    "m": "09 Engine starboard",
    "mat": "casing",
-   "f": 7808
+   "f": 7776
   },
   "engine_r_case_turbine": {
    "m": "09 Engine starboard",
@@ -1110,7 +1701,7 @@
   "engine_r_fuel_lines": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 1012
+   "f": 1048
   },
   "engine_r_fuel_manifold": {
    "m": "09 Engine starboard",
@@ -1175,7 +1766,7 @@
   "engine_r_hydraulic_lines": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 4856
+   "f": 5300
   },
   "engine_r_hydraulic_pump": {
    "m": "09 Engine starboard",
@@ -1230,57 +1821,52 @@
   "engine_r_nozzle_actuators": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 176
+   "f": 408
   },
-  "engine_r_nozzle_conv_flap_lower": {
+  "engine_r_nozzle_conv_flaps": {
    "m": "09 Engine starboard",
    "mat": "cmc",
-   "f": 42
+   "f": 3072
   },
-  "engine_r_nozzle_conv_flap_upper": {
+  "engine_r_nozzle_conv_seals": {
    "m": "09 Engine starboard",
    "mat": "cmc",
-   "f": 42
+   "f": 2432
   },
-  "engine_r_nozzle_div_flap_lower": {
+  "engine_r_nozzle_div_flaps": {
    "m": "09 Engine starboard",
    "mat": "cmc",
-   "f": 86
+   "f": 3072
   },
-  "engine_r_nozzle_div_flap_upper": {
+  "engine_r_nozzle_div_links": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 672
+  },
+  "engine_r_nozzle_div_seals": {
    "m": "09 Engine starboard",
    "mat": "cmc",
-   "f": 86
+   "f": 2432
   },
-  "engine_r_nozzle_ext_flap_lower": {
+  "engine_r_nozzle_ext_flaps": {
    "m": "09 Engine starboard",
    "mat": "inconel",
-   "f": 50
-  },
-  "engine_r_nozzle_ext_flap_upper": {
-   "m": "09 Engine starboard",
-   "mat": "inconel",
-   "f": 50
+   "f": 4288
   },
   "engine_r_nozzle_hinges": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 72
+   "f": 768
   },
-  "engine_r_nozzle_shroud": {
+  "engine_r_nozzle_static_ring": {
    "m": "09 Engine starboard",
    "mat": "inconel",
-   "f": 2880
+   "f": 4816
   },
-  "engine_r_nozzle_sidewalls": {
+  "engine_r_nozzle_unison_ring": {
    "m": "09 Engine starboard",
-   "mat": "casing",
-   "f": 12
-  },
-  "engine_r_nozzle_transition": {
-   "m": "09 Engine starboard",
-   "mat": "cmc",
-   "f": 2496
+   "mat": "inconel",
+   "f": 864
   },
   "engine_r_oil_lines": {
    "m": "09 Engine starboard",
@@ -1326,6 +1912,61 @@
    "m": "09 Engine starboard",
    "mat": "nickel_hot",
    "f": 5472
+  },
+  "engine_r_swivel_bearing_1": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1540
+  },
+  "engine_r_swivel_bearing_2": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1540
+  },
+  "engine_r_swivel_bearing_3": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1540
+  },
+  "engine_r_swivel_drive_1": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 358
+  },
+  "engine_r_swivel_drive_2": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 358
+  },
+  "engine_r_swivel_drive_3": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 358
+  },
+  "engine_r_swivel_duct_aft": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 14752
+  },
+  "engine_r_swivel_duct_fwd": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 14752
+  },
+  "engine_r_swivel_duct_mid": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 14752
+  },
+  "engine_r_swivel_fixed_ring": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 11312
+  },
+  "engine_r_swivel_rotary_union": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 46
   },
   "engine_r_tailcone": {
    "m": "09 Engine starboard",
@@ -1435,17 +2076,17 @@
   "frame_engine_aft": {
    "m": "07 Structure",
    "mat": "structure",
-   "f": 388
+   "f": 1284
   },
   "frame_engine_fwd": {
    "m": "07 Structure",
    "mat": "structure",
-   "f": 388
+   "f": 1284
   },
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35855
+   "f": 35865
   },
   "gear_bay_main_l": {
    "m": "06 Landing gear",
@@ -1551,11 +2192,6 @@
    "m": "04 Cockpit",
    "mat": "seat",
    "f": 42
-  },
-  "tail_stinger": {
-   "m": "01 Airframe",
-   "mat": "skin",
-   "f": 322
   },
   "tyre_main_l": {
    "m": "06 Landing gear",

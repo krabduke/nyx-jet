@@ -14,6 +14,7 @@ program would not pay it.)
 """
 
 import importlib
+import math
 import os
 import sys
 
@@ -84,14 +85,18 @@ def _build_engine():
             "palette": dict(espec.PALETTE),
             "materials": mats,
             "spools": {n: k for k, names in espec.SPOOLS.items() for n in names},
-            "nozzle": {"sw_out": noz.SW_OUT, "h_trans": noz.H_TRANS,
-                       "flap_t": espec.NOZZLE["flap_t"],
-                       "x_trans1": espec.NOZZLE["x_trans1"],
+            "nozzle": {"r_duct": noz.R_OUT, "x_brg1": espec.NOZZLE["x_brg1"],
+                       "x_static1": espec.NOZZLE["x_static1"],
                        "x_throat": espec.NOZZLE["x_throat"],
                        "x_exit": espec.NOZZLE["x_exit"],
-                       "h_throat": noz.H_THROAT, "h_exit": noz.H_EXIT,
-                       "lines": noz.flap_lines(),
-                       "b_shroud": noz.shroud_outer()[2]},
+                       "r_throat": noz.R8, "r_exit": noz.R9,
+                       "r_exit_out": noz.ext_inner_r(noz.X9) + espec.NOZZLE["ext_t"],
+                       "groups": noz.GROUPS,
+                       "bearings": [noz.square(espec.NOZZLE["x_brg1"])[:2],
+                                    noz.oblique(1)[:2], noz.oblique(2)[:2]],
+                       "fold_table": [[d, math.degrees(math.acos(max(-1.0, min(1.0,
+                                      noz.fold(math.radians(d))[0]))))]
+                                      for d in range(0, 181, 2)]},
             "thrust_ab": espec.THRUST_AB_N, "thrust_dry": espec.THRUST_DRY_N,
             "mass": espec.DRY_WEIGHT_KG, "name": espec.ENGINE_NAME,
             "trunnion_x": espec.MOUNTS["x_fwd"],
@@ -123,14 +128,6 @@ def _move(geom, off):
     v, f = geom
     dx, dy, dz = off
     return [(x + dx, y + dy, z + dz) for (x, y, z) in v], f
-
-
-def nozzle_box_half():
-    """Half-width and half-height, about the engine's axis, of what passes
-    the tail closure: the nozzle shroud, and the hydraulic lines that run
-    round its sides to the actuators."""
-    n = info()["nozzle"]
-    return n["sw_out"] + 62.0, n["b_shroud"] + 12.0
 
 
 # Cutters the installed engines leave out. The augmentor liner's 1,200

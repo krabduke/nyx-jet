@@ -17,8 +17,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # A part may be simple only if it really is simple.
 EXEMPT = {
-    "engine_l_nozzle_sidewalls": "two flat plates, which is what a 2D nozzle's sides are",
-    "engine_r_nozzle_sidewalls": "two flat plates, which is what a 2D nozzle's sides are",
 }
 
 FLOOR = 50            # vertices, for anything not exempt

@@ -18,7 +18,7 @@ external part is sliced at each station, the slices are rasterised on a
 10 mm grid and their UNION measured (the wing roots run inside the body and
 must not be counted twice). The air the intakes swallow is not body -- the
 capture streamtube is subtracted aft of the mouths, which is the usual
-treatment. The engines' nozzle boxes behind the body are counted.
+treatment. The engines' swivel ducts and nozzles behind the body are counted.
 
 This is the area rule, not a wave-drag calculation: it says whether the
 shape is well arranged, not what its drag coefficient is.
@@ -60,23 +60,21 @@ def _canopy_solid():
     return shapes.loft_rings(rings)
 
 
-def _nozzle_boxes():
-    """The engines' nozzle boxes behind the body, as two tapering boxes."""
+def _nozzles():
+    """The engines' swivel ducts and nozzles behind the body, stowed: a
+    round duct to the nozzle's static ring, then a cone to the exit."""
     from parts import engines
-    import mesh
     n = engines.info()["nozzle"]
-    x0 = spec.ENGINE_FAN_FACE_X + n["x_trans1"]
-    x1 = spec.ENGINE_FAN_FACE_X + n["x_exit"]
-    hw = n["sw_out"]
-    h0 = n["b_shroud"]
-    h1 = n["h_exit"] + n["flap_t"]
+    stations = ((spec.BODY_END_X, n["r_duct"]),
+                (spec.ENGINE_FAN_FACE_X + n["x_static1"], n["r_duct"]),
+                (spec.ENGINE_FAN_FACE_X + n["x_exit"], n["r_exit_out"]))
     out = []
     for sy in (1.0, -1.0):
         rings = []
-        for x, h in ((x0, h0), (x1, h1)):
-            yc = sy * spec.ENGINE_Y
-            rings.append([(x, yc - hw, -h), (x, yc + hw, -h), (x, yc + hw, h),
-                          (x, yc - hw, h)])
+        for x, r in stations:
+            rings.append([(x, sy * spec.ENGINE_Y + r * math.cos(2 * math.pi * k / 32),
+                           spec.ENGINE_Z + r * math.sin(2 * math.pi * k / 32))
+                          for k in range(32)])
         out.append(shapes.loft_rings(rings))
     return out
 
@@ -91,7 +89,7 @@ def external_parts():
             parts.append(g)
     c = intakes.cutter()
     parts += [c, intakes._mirror(c)]
-    parts += _nozzle_boxes()
+    parts += _nozzles()
     return parts
 
 

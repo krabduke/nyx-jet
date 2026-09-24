@@ -71,6 +71,25 @@ def palette():
             for k, v in p.items()}
 
 
+def nozzles():
+    """Each engine's swivel, in the aircraft's frame: every bearing's centre
+    and axis, the installed parts that turn on it, and the fold angle
+    against the middle bearing's turn, for the viewer to invert."""
+    n = engines.info()["nozzle"]
+    out = []
+    for side, sy in engines.SIDES:
+        off = engines.offset(sy)
+        brg = []
+        for (c, axis), key in zip(n["bearings"], ("fwd", "mid", "aft")):
+            brg.append({"c": [r1(c[i] + off[i], 3) for i in range(3)],
+                        "n": [r1(v, 6) for v in axis],
+                        "parts": [f"engine_{side}_{p}" for p in n["groups"][key]]})
+        out.append({"side": side, "bearings": brg,
+                    "exit": [r1(off[0] + n["x_exit"]), r1(off[1]), r1(off[2])]})
+    return {"engines": out, "exit_r": r1(n["r_exit"]),
+            "fold_table": [[r1(a, 2), r1(b, 3)] for a, b in n["fold_table"]]}
+
+
 def main():
     rows = list(csv.DictReader(open(os.path.join(ROOT, "build", "parts.csv"))))
     mods = []
@@ -87,6 +106,7 @@ def main():
         "name": spec.NAME, "role": spec.ROLE,
         "figures": figures(rows),
         "palette": palette(),
+        "nozzles": nozzles(),
         "modules": mods,
         "parts": parts,
     }

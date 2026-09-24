@@ -3,11 +3,11 @@
  "files": {
   "spec.py": {
    "from": "engine/spec.py",
-   "sha": "429598c41404"
+   "sha": "13d06d0cdcbb"
   },
   "cycle.py": {
    "from": "engine/cycle.py",
-   "sha": "c0eff83ea1c9"
+   "sha": "8cf0c984f12a"
   },
   "mesh.py": {
    "from": "engine/mesh.py",
@@ -19,7 +19,7 @@
   },
   "engine_joints.py": {
    "from": "tools/audit_intersect.py",
-   "sha": "f42eb3f79312"
+   "sha": "b74e199a5676"
   },
   "parts/__init__.py": {
    "from": "engine/parts/__init__.py",
@@ -47,11 +47,11 @@
   },
   "parts/augmentor.py": {
    "from": "engine/parts/augmentor.py",
-   "sha": "947fa0c16856"
+   "sha": "e482e51d0a0b"
   },
   "parts/nozzle.py": {
    "from": "engine/parts/nozzle.py",
-   "sha": "745e632a2d49"
+   "sha": "fba67f1efd17"
   },
   "parts/frames.py": {
    "from": "engine/parts/frames.py",
@@ -63,8 +63,8 @@
   },
   "parts/accessories.py": {
    "from": "engine/parts/accessories.py",
-   "sha": "e577489d281b"
+   "sha": "c0ea820e56ff"
   }
  },
- "commit": "f8bcb39"
+ "commit": "9e81af7"
 }

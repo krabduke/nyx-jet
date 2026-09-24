@@ -25,8 +25,9 @@ top speed (see the Nyx repo). That asks for
     fan;
   * a heat sink and electrical power for sensors -- the third stream carries
     a heat exchanger and the HP spool drives two generators;
-  * thrust vectoring for post-stall control -- so the exhaust ends in a
-    two-dimensional convergent-divergent nozzle that pitches +/-20 degrees.
+  * thrust vectoring for post-stall control, and a vertical landing -- so
+    the exhaust ends in a three-bearing swivel duct that folds the jet up
+    to 95 degrees down, with a round convergent-divergent nozzle on it.
 
 WHERE THE NUMBERS COME FROM
 ---------------------------
@@ -47,7 +48,7 @@ import cycle
 
 ENGINE_NAME = "Aether AX-1"
 ENGINE_TAGLINE = ("adaptive-cycle three-stream reheated turbofan "
-                  "with a 2D vectoring nozzle")
+                  "with a three-bearing swivel nozzle")
 
 # --------------------------------------------------------------------------
 # Headline figures -- taken from the cycle, not typed in
@@ -71,13 +72,16 @@ N_HPT_STAGES = 1
 N_LPT_STAGES = 1
 
 # Dry mass, estimated rather than measured, from the component-weight
-# fractions of a modern reheated turbofan scaled to 112 kg/s: 1,420 kg gives
-# a reheat thrust-to-weight of 9.7, the top of the current class. The CMC hot
-# section and the blisks are what buy the difference.
-DRY_WEIGHT_KG = 1420.0
+# fractions of a modern reheated turbofan scaled to 112 kg/s: 1,420 kg for
+# the engine to the augmentor's end, the CMC hot section and the blisks
+# buying the top of the current class. The three-bearing swivel duct and its
+# round C-D nozzle add 170 kg over the 2D nozzle they replaced -- three
+# bearings with ring gears and three motors, and a metre of double-walled
+# duct -- which is the price of landing vertically.
+DRY_WEIGHT_KG = 1590.0
 
-# Pitch vectoring range of the 2D nozzle.
-VECTOR_DEG = 20.0
+# How far the swivel duct folds the jet off the axis: 4 * beta.
+SWIVEL_DEG = 95.0
 
 # --------------------------------------------------------------------------
 # Resolution
@@ -453,31 +457,67 @@ AUGMENTOR = {
     "screech_per_row": 60,
     "screech_hole_r": 3.5,
     "ab_manifold_x": 2340.0,
+    # staged reheat: zone 1 sprays from inside the flameholder vanes; zones
+    # 2 and 3 from radial spraybars ahead of them, outer and inner halves of
+    # the stream, each off its own manifold, lit in turn as reheat comes in
+    "zone_x": (2340.0, 2250.0, 2285.0),
+    "spraybar_r": (300.0, 226.0),       # how far in zones 2 and 3 reach
+    "pilot_x": 2438.0,                  # the pilot gutter behind the vanes
+    "pilot_r": 200.0,
+    "igniter_x": 2462.0,
+    "fuel_control_x": (2080.0, 2200.0),
 }
 
-# 2D convergent-divergent vectoring nozzle, drawn at maximum reheat (throat
-# and exit fully open) and zero vector. The throat and exit heights are not
-# chosen: they are the cycle's choked throat area at max reheat, and its
-# fully-expanded exit/throat area ratio, over a fixed width.
+# The nozzle: a three-bearing swivel duct and an axisymmetric convergent-
+# divergent nozzle on the end of it, drawn at maximum reheat and stowed.
+#
+# The swivel is three short round ducts in a row joined by three bearings.
+# The first bearing is square to the engine axis; the other two are cut
+# obliquely at `beta`, leaning opposite ways, so the middle duct is a wedge.
+# Turning the middle duct half a turn one way and the aft duct half a turn
+# the other folds the jet down through 4 * beta -- 95 degrees, straight down
+# and a little forward, for a vertical landing -- and the front bearing
+# steers the plane the fold happens in, so every direction in a 95 degree
+# cone round the axis is reachable, including yaw for hover control.
+#
+# The throat and exit radii are not chosen: they are the cycle's choked
+# throat area at max reheat and its fully-expanded exit/throat area ratio.
 _A8 = CYCLE["a8_wet"] * 1e6            # mm^2
 _A9A8 = CYCLE["a9_a8_wet"]
 NOZZLE = {
-    "x_trans0": 2850.0,       # round-to-rectangular transition begins
-    "x_trans1": 3100.0,       # ... and ends at the convergent-flap hinges
-    "x_throat": 3310.0,
-    "x_exit": 3560.0,
-    "width": 720.0,           # inner width between sidewalls, constant
-    "h_throat": _A8 / 720.0,
-    "h_exit": _A8 * _A9A8 / 720.0,
-    "h_trans": 620.0,         # duct height where the convergent flaps start
-    "trans_t": 8.0,
-    "flap_t": 22.0,
-    "sidewall_t": 24.0,
-    "shroud_t": 6.0,
+    "beta_deg": 23.75,        # oblique cut: 4 * beta = 95 degrees
+    "x_fixed0": 2850.0,       # fixed ring bolted to the outer case's end
+    "x_brg1": 2880.0,         # front bearing, square to the axis
+    "x_cut1": 3180.0,         # the oblique bearings' centres on the axis
+    "x_cut2": 3700.0,
+    "x_aft": 4000.0,          # aft duct ends square at the nozzle's static ring
+    "duct_r_in": 418.0,       # liner bore: the augmentor liner's
+    "liner_t": 4.0,
+    "duct_r_out": 470.0,      # structural shell outside: the outer case's
+    "shell_t": 8.0,
+    "flange_t": 14.0,         # each half of a bearing housing
+    "flange_r": 490.0,
+    "race_r": 500.0,          # the bearing race and the ring gear on it
+    "gear_r": 510.0,
+    "n_gear_teeth": 150,
+    # axisymmetric C-D nozzle
+    "x_static1": 4100.0,      # static ring ends: convergent flap hinges
+    "x_throat": 4280.0,
+    "x_exit": 4500.0,
+    "r_throat": math.sqrt(_A8 / math.pi),
+    "r_exit": math.sqrt(_A8 * _A9A8 / math.pi),
+    "n_flaps": 16,
+    "flap_w": 94.0,           # every convergent and divergent flap, mm
+    "seal_w": 92.0,
+    "seal_t": 6.0,
+    "conv_t": 14.0,
+    "div_t": 12.0,
     "ext_t": 8.0,
-    "hinge_r": 16.0,
-    "actuator_r": 26.0,
+    "saw": 60.0,              # depth of the external flaps' serrations
+    "actuator_r": 18.0,
+    "n_actuators": 4,
 }
+NOZZLE_EXIT_X = NOZZLE["x_exit"]
 
 # The outer case over the third stream, in three pieces. The bore follows
 # the fan tip line over the fan and the third stream's outer line after it.
@@ -531,7 +571,9 @@ GEARBOX = {
 # Mounts: trunnions on the fan frame's outer ring at 3 and 9 o'clock, and a
 # thrust link lug on top of the rear case.
 MOUNTS = {"x_fwd": 490.0, "trunnion_r": 36.0, "trunnion_len": 56.0,
-          "x_aft": 2250.0}
+          # forward of the reheat zone manifolds, which ring the case at
+          # 2250-2340 and cannot pass through a thrust lug
+          "x_aft": 2150.0}
 
 # Third-stream heat exchanger: the aircraft's heat load goes into the third
 # stream here. Twelve plate-fin segments filling the duct.
@@ -547,7 +589,8 @@ CASE_RIBS = {
     "x0": 446.0, "x1": 2836.0,
     "gaps": ((1344.0, 1376.0),     # the mid flange
              (1380.0, 1422.0),     # fuel manifold and nozzle flanges
-             (2322.0, 2358.0)),    # reheat manifold
+             (2232.0, 2303.0),     # reheat zone 2 and 3 manifolds
+             (2322.0, 2358.0)),    # reheat zone 1 manifold
 }
 
 # Mode valve: petals round the third stream's entrance that set how much air
@@ -607,11 +650,16 @@ MATERIAL_MAP = {
     "augmentor": "cmc",
     "flameholder": "cmc",
     "nozzle": "cmc",
-    "nozzle_sidewall": "casing",
-    "nozzle_shroud": "inconel",
+    "nozzle_static_ring": "inconel",
     "nozzle_ext": "inconel",
     "nozzle_actuator": "steel",
     "nozzle_hinge": "steel",
+    "nozzle_div_link": "steel",
+    "nozzle_unison": "inconel",
+    "swivel_": "inconel",
+    "swivel_bearing": "steel",
+    "swivel_drive": "steel",
+    "swivel_rotary_union": "steel",
     "mode_valve": "titanium",
     "mode_valve_actuators": "steel",
     "hydraulic": "steel",

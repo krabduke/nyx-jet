@@ -29,9 +29,10 @@ from that one requirement.
     wing trim the unstable airframe with a lifting force (a tail would trim
     with a download), and their vortex energises the wing at high angle of
     attack.
-  * Thrust vectoring. The engines' 2D nozzles swing +/-20 degrees in pitch,
-    and together or differentially they give control where the surfaces
-    have none -- past the stall.
+  * Thrust vectoring. Each engine ends in a three-bearing swivel duct and a
+    round C-D nozzle behind the airframe: the jet points anywhere in a cone
+    round the axis, together or differentially, which gives control where
+    the surfaces have none -- past the stall.
   * Stealth shaping that does not cost agility: chined nose, caret intakes
     with serpentine ducts hiding the fans, internal weapons, canted fins,
     and sawtooth edges.
@@ -55,13 +56,16 @@ ROLE = "twin-engine canard-delta agile fighter"
 # --------------------------------------------------------------------------
 
 # The engine's own frame has its fan face at x = 0 on its axis. It is placed
-# with the fan face here, so the nozzle exit lands at the body's tail.
-ENGINE_FAN_FACE_X = 10990.0
+# so the body ends just ahead of the swivel duct's front bearing: everything
+# behind that bearing turns when the jet is vectored, so the airframe has to
+# stop there and leave the swivel and the nozzle out in the air behind it.
+ENGINE_FAN_FACE_X = 10390.0
+ENGINE_BEARING_1 = 2880.0     # the engine's front swivel bearing, from the fan
 ENGINE_Y = 800.0              # each engine's axis is this far off centre
 ENGINE_Z = 0.0
 # the vendored engine's key figures, read from its own spec at import time
 # by nyx/parts/engines.py; repeated here only for the mass table
-ENGINE_MASS = 1420.0
+ENGINE_MASS = 1590.0
 ENGINE_CG_FROM_FAN = 1650.0   # mm aft of the fan face
 
 # --------------------------------------------------------------------------
@@ -94,15 +98,12 @@ BODY = [
     (7200.0, 2280.0,  10.0, 730.0, -740.0),
     (8400.0, 2320.0,   0.0, 680.0, -760.0),
     (9800.0, 2360.0,   0.0, 700.0, -780.0),
-    (11200.0, 2240.0,  0.0, 730.0, -800.0),
-    # The tail closes in round the two nozzle boxes -- 780 mm wide on axes
-    # 800 mm off the centreline, so 1,190 mm to their outside -- with the
-    # actuators and hydraulic lines along their sides. The section's
-    # rounded shoulders are what set how far in it can come: at the boxes'
-    # outer corners it has to be 1,190 wide and 400 high.
-    (12400.0, 2000.0,  0.0, 740.0, -810.0),
-    (13400.0, 1800.0,  0.0, 712.0, -780.0),
-    (14100.0, 1620.0,  0.0, 680.0, -740.0),
+    (11200.0, 2200.0,  0.0, 730.0, -800.0),
+    # Aft of the wing the body closes in on the two nacelles (shapes.py):
+    # 1,560 mm from the centreline is the outside of a nacelle, which is as
+    # far as the chine can come in.
+    (12200.0, 1840.0,  0.0, 720.0, -790.0),
+    (13240.0, 1560.0,  0.0, 690.0, -800.0),
 ]
 BODY_END_X = BODY[-1][0]
 M_UP, N_UP = 2.2, 1.6
@@ -171,7 +172,7 @@ CANARD = {
 
 FIN = {
     "y_root": 1380.0,
-    "x_le_root": 11150.0,
+    "x_le_root": 10550.0,
     "c_root": 2450.0,
     "span": 2050.0,           # along the cant
     "c_tip": 820.0,
@@ -342,9 +343,6 @@ def mac():
 
 MATERIAL_MAP = {
     "fuselage": "skin",
-    "aft_closure": "skin",
-    "aft_fairing": "skin",
-    "tail_stinger": "skin",
     "wing": "skin",
     "flaperon": "skin_dark",
     "le_flap": "skin_dark",
