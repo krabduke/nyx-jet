@@ -1,0 +1,70 @@
+{
+ "source": "aether-ax1",
+ "files": {
+  "spec.py": {
+   "from": "engine/spec.py",
+   "sha": "429598c41404"
+  },
+  "cycle.py": {
+   "from": "engine/cycle.py",
+   "sha": "c0eff83ea1c9"
+  },
+  "mesh.py": {
+   "from": "engine/mesh.py",
+   "sha": "6ad53a2c3e5a"
+  },
+  "blades.py": {
+   "from": "engine/blades.py",
+   "sha": "7d2e8ede4867"
+  },
+  "engine_joints.py": {
+   "from": "tools/audit_intersect.py",
+   "sha": "f42eb3f79312"
+  },
+  "parts/__init__.py": {
+   "from": "engine/parts/__init__.py",
+   "sha": "e3b0c44298fc"
+  },
+  "parts/common.py": {
+   "from": "engine/parts/common.py",
+   "sha": "6224643af0ac"
+  },
+  "parts/fan.py": {
+   "from": "engine/parts/fan.py",
+   "sha": "3b4a1de6bed6"
+  },
+  "parts/compressor.py": {
+   "from": "engine/parts/compressor.py",
+   "sha": "cd08fe211bd8"
+  },
+  "parts/combustor.py": {
+   "from": "engine/parts/combustor.py",
+   "sha": "7118689a6807"
+  },
+  "parts/turbine.py": {
+   "from": "engine/parts/turbine.py",
+   "sha": "7034122b08cc"
+  },
+  "parts/augmentor.py": {
+   "from": "engine/parts/augmentor.py",
+   "sha": "947fa0c16856"
+  },
+  "parts/nozzle.py": {
+   "from": "engine/parts/nozzle.py",
+   "sha": "745e632a2d49"
+  },
+  "parts/frames.py": {
+   "from": "engine/parts/frames.py",
+   "sha": "e1698171d506"
+  },
+  "parts/spools.py": {
+   "from": "engine/parts/spools.py",
+   "sha": "4208f135583b"
+  },
+  "parts/accessories.py": {
+   "from": "engine/parts/accessories.py",
+   "sha": "e501c05726cf"
+  }
+ },
+ "commit": "7e847a8"
+}

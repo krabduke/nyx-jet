@@ -1,0 +1,1596 @@
+{
+ "name": "Nyx",
+ "role": "twin-engine canard-delta agile fighter",
+ "figures": {
+  "length_mm": 14878.0,
+  "span_mm": 13200.0,
+  "combat_mass_kg": 17170.0,
+  "empty_mass_kg": 12820.0,
+  "wing_area_m2": 68.2,
+  "aspect_ratio": 2.55,
+  "wing_loading": 252.0,
+  "tw": 1.6,
+  "static_margin_pct": -5.6,
+  "g_limit": 9.5,
+  "itr_sl": 35.0,
+  "corner_ms": 152.0,
+  "str_sl": 26.0,
+  "str_sl_g": 5.4,
+  "itr_15k": 27.7,
+  "str_15k": 17.3,
+  "engine_thrust_kn": 134.9
+ },
+ "palette": {
+  "titanium": {
+   "rgb": [
+    0.38,
+    0.39,
+    0.41
+   ],
+   "metal": 1.0,
+   "rough": 0.3
+  },
+  "nickel": {
+   "rgb": [
+    0.47,
+    0.46,
+    0.44
+   ],
+   "metal": 1.0,
+   "rough": 0.3
+  },
+  "nickel_hot": {
+   "rgb": [
+    0.33,
+    0.24,
+    0.18
+   ],
+   "metal": 1.0,
+   "rough": 0.46
+  },
+  "steel": {
+   "rgb": [
+    0.52,
+    0.53,
+    0.55
+   ],
+   "metal": 1.0,
+   "rough": 0.2
+  },
+  "casing": {
+   "rgb": [
+    0.3,
+    0.31,
+    0.325
+   ],
+   "metal": 1.0,
+   "rough": 0.42
+  },
+  "inconel": {
+   "rgb": [
+    0.3,
+    0.265,
+    0.23
+   ],
+   "metal": 1.0,
+   "rough": 0.4
+  },
+  "cmc": {
+   "rgb": [
+    0.13,
+    0.12,
+    0.11
+   ],
+   "metal": 0.0,
+   "rough": 0.62
+  },
+  "composite": {
+   "rgb": [
+    0.05,
+    0.055,
+    0.062
+   ],
+   "metal": 0.0,
+   "rough": 0.42
+  },
+  "copper": {
+   "rgb": [
+    0.6,
+    0.33,
+    0.2
+   ],
+   "metal": 1.0,
+   "rough": 0.32
+  },
+  "rubber": {
+   "rgb": [
+    0.03,
+    0.03,
+    0.032
+   ],
+   "metal": 0.0,
+   "rough": 0.9
+  },
+  "skin": {
+   "rgb": [
+    0.105,
+    0.115,
+    0.128
+   ],
+   "metal": 0.1,
+   "rough": 0.62
+  },
+  "skin_dark": {
+   "rgb": [
+    0.07,
+    0.076,
+    0.086
+   ],
+   "metal": 0.1,
+   "rough": 0.58
+  },
+  "duct": {
+   "rgb": [
+    0.72,
+    0.72,
+    0.7
+   ],
+   "metal": 0.0,
+   "rough": 0.6
+  },
+  "structure": {
+   "rgb": [
+    0.42,
+    0.43,
+    0.45
+   ],
+   "metal": 1.0,
+   "rough": 0.4
+  },
+  "missile": {
+   "rgb": [
+    0.62,
+    0.63,
+    0.62
+   ],
+   "metal": 0.0,
+   "rough": 0.45
+  },
+  "canopy": {
+   "rgb": [
+    0.6,
+    0.45,
+    0.2
+   ],
+   "metal": 0.6,
+   "rough": 0.06
+  },
+  "cockpit": {
+   "rgb": [
+    0.04,
+    0.042,
+    0.046
+   ],
+   "metal": 0.0,
+   "rough": 0.7
+  },
+  "seat": {
+   "rgb": [
+    0.1,
+    0.1,
+    0.09
+   ],
+   "metal": 0.0,
+   "rough": 0.75
+  },
+  "wheel": {
+   "rgb": [
+    0.4,
+    0.41,
+    0.42
+   ],
+   "metal": 1.0,
+   "rough": 0.35
+  },
+  "tank": {
+   "rgb": [
+    0.3,
+    0.3,
+    0.2
+   ],
+   "metal": 0.0,
+   "rough": 0.6
+  },
+  "radar": {
+   "rgb": [
+    0.35,
+    0.33,
+    0.3
+   ],
+   "metal": 0.8,
+   "rough": 0.35
+  }
+ },
+ "modules": [
+  {
+   "key": "01 Airframe",
+   "label": "Airframe",
+   "color": "#C9CDD1",
+   "parts": 3,
+   "faces": 35935
+  },
+  {
+   "key": "02 Flying surfaces",
+   "label": "Flying surfaces",
+   "color": "#8E979E",
+   "parts": 16,
+   "faces": 18714
+  },
+  {
+   "key": "03 Intakes",
+   "label": "Intakes",
+   "color": "#6F7B84",
+   "parts": 2,
+   "faces": 11808
+  },
+  {
+   "key": "04 Cockpit",
+   "label": "Cockpit",
+   "color": "#B58A3C",
+   "parts": 6,
+   "faces": 3666
+  },
+  {
+   "key": "05 Weapons bay",
+   "label": "Weapons bay",
+   "color": "#7D8570",
+   "parts": 5,
+   "faces": 4922
+  },
+  {
+   "key": "06 Landing gear",
+   "label": "Landing gear",
+   "color": "#5C6166",
+   "parts": 15,
+   "faces": 4220
+  },
+  {
+   "key": "07 Structure",
+   "label": "Structure",
+   "color": "#9A8F7E",
+   "parts": 6,
+   "faces": 1262
+  },
+  {
+   "key": "08 Engine port",
+   "label": "Engine, port",
+   "color": "#B8562E",
+   "parts": 105,
+   "faces": 609612
+  },
+  {
+   "key": "09 Engine starboard",
+   "label": "Engine, starboard",
+   "color": "#B8562E",
+   "parts": 105,
+   "faces": 609612
+  }
+ ],
+ "parts": {
+  "aft_closure": {
+   "m": "01 Airframe",
+   "mat": "skin",
+   "f": 142
+  },
+  "bay_door_l": {
+   "m": "05 Weapons bay",
+   "mat": "skin_dark",
+   "f": 1362
+  },
+  "bay_door_r": {
+   "m": "05 Weapons bay",
+   "mat": "skin_dark",
+   "f": 1362
+  },
+  "bay_structure": {
+   "m": "05 Weapons bay",
+   "mat": "structure",
+   "f": 398
+  },
+  "canard_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin",
+   "f": 1201
+  },
+  "canard_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin",
+   "f": 1201
+  },
+  "canard_spindle_l": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 98
+  },
+  "canard_spindle_r": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 98
+  },
+  "canopy_glass": {
+   "m": "04 Cockpit",
+   "mat": "canopy",
+   "f": 2954
+  },
+  "cockpit_controls": {
+   "m": "04 Cockpit",
+   "mat": "cockpit",
+   "f": 100
+  },
+  "cockpit_hud": {
+   "m": "04 Cockpit",
+   "mat": "cockpit",
+   "f": 32
+  },
+  "cockpit_panel": {
+   "m": "04 Cockpit",
+   "mat": "cockpit",
+   "f": 204
+  },
+  "cockpit_tub": {
+   "m": "04 Cockpit",
+   "mat": "cockpit",
+   "f": 334
+  },
+  "engine_l_ab_fuel_manifold": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2112
+  },
+  "engine_l_augmentor_case": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 5760
+  },
+  "engine_l_augmentor_liner": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 2880
+  },
+  "engine_l_blades_hpc_r1": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 7560
+  },
+  "engine_l_blades_hpc_r2": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 8820
+  },
+  "engine_l_blades_hpc_r3": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 10080
+  },
+  "engine_l_blades_hpc_r4": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 11340
+  },
+  "engine_l_blades_hpc_r5": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 13440
+  },
+  "engine_l_blades_hpc_r6": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 15960
+  },
+  "engine_l_blades_hpt_r": {
+   "m": "08 Engine port",
+   "mat": "nickel_hot",
+   "f": 30744
+  },
+  "engine_l_blades_lpt_r": {
+   "m": "08 Engine port",
+   "mat": "nickel_hot",
+   "f": 9660
+  },
+  "engine_l_brg_1_lp_roller": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2180
+  },
+  "engine_l_brg_2_lp_ball": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 3440
+  },
+  "engine_l_brg_3_hp_ball": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 4448
+  },
+  "engine_l_brg_4_hp_roller": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2660
+  },
+  "engine_l_brg_5_lp_roller": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2240
+  },
+  "engine_l_case_combustor": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 14720
+  },
+  "engine_l_case_fan": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 9600
+  },
+  "engine_l_case_hpc": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 9600
+  },
+  "engine_l_case_outer_aft": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 13120
+  },
+  "engine_l_case_outer_fwd": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 8320
+  },
+  "engine_l_case_ribs": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 7808
+  },
+  "engine_l_case_turbine": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 13440
+  },
+  "engine_l_cdfs_blisk": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 11720
+  },
+  "engine_l_combustor_dome": {
+   "m": "08 Engine port",
+   "mat": "nickel_hot",
+   "f": 1192
+  },
+  "engine_l_combustor_inner_case": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 1920
+  },
+  "engine_l_combustor_liner_inner": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 5952
+  },
+  "engine_l_combustor_liner_outer": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 5944
+  },
+  "engine_l_combustor_mount_pins": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 504
+  },
+  "engine_l_containment_wrap": {
+   "m": "08 Engine port",
+   "mat": "composite",
+   "f": 7040
+  },
+  "engine_l_coolant_lines": {
+   "m": "08 Engine port",
+   "mat": "copper",
+   "f": 700
+  },
+  "engine_l_core_cowl": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 4800
+  },
+  "engine_l_core_splitter": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 3200
+  },
+  "engine_l_diffuser": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 14220
+  },
+  "engine_l_fadec_a": {
+   "m": "08 Engine port",
+   "mat": "composite",
+   "f": 258
+  },
+  "engine_l_fadec_b": {
+   "m": "08 Engine port",
+   "mat": "composite",
+   "f": 258
+  },
+  "engine_l_fan_blisk_1": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 8900
+  },
+  "engine_l_fan_blisk_2": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 10300
+  },
+  "engine_l_fan_drum": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 3520
+  },
+  "engine_l_fan_frame_hub": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 1920
+  },
+  "engine_l_fan_frame_struts": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 1456
+  },
+  "engine_l_flameholder_vanes": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 3872
+  },
+  "engine_l_flange_fan_aft": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 2440
+  },
+  "engine_l_flange_inlet": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 2440
+  },
+  "engine_l_flange_outer_aft": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 2640
+  },
+  "engine_l_flange_outer_mid": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 2640
+  },
+  "engine_l_fuel_lines": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1012
+  },
+  "engine_l_fuel_manifold": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2240
+  },
+  "engine_l_fuel_metering_unit": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 162
+  },
+  "engine_l_fuel_nozzles": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 5796
+  },
+  "engine_l_fuel_pump": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 128
+  },
+  "engine_l_gearbox": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 1452
+  },
+  "engine_l_gearbox_mounts": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 56
+  },
+  "engine_l_generator_l": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 1440
+  },
+  "engine_l_generator_r": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 1440
+  },
+  "engine_l_harnesses": {
+   "m": "08 Engine port",
+   "mat": "rubber",
+   "f": 144
+  },
+  "engine_l_hp_front_drum": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 960
+  },
+  "engine_l_hpc_drum": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 18240
+  },
+  "engine_l_hpt_disc": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 3840
+  },
+  "engine_l_hydraulic_lines": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2120
+  },
+  "engine_l_hydraulic_pump": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 128
+  },
+  "engine_l_igniters": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 72
+  },
+  "engine_l_inlet_case": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 1600
+  },
+  "engine_l_intermediate_case": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 28800
+  },
+  "engine_l_lpt_disc": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 4000
+  },
+  "engine_l_mixer": {
+   "m": "08 Engine port",
+   "mat": "nickel_hot",
+   "f": 8832
+  },
+  "engine_l_mode_valve": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 2352
+  },
+  "engine_l_mode_valve_actuators": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 532
+  },
+  "engine_l_mount_aft_lug": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 36
+  },
+  "engine_l_mount_trunnions": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 120
+  },
+  "engine_l_nozzle_actuators": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 176
+  },
+  "engine_l_nozzle_conv_flap_lower": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 42
+  },
+  "engine_l_nozzle_conv_flap_upper": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 42
+  },
+  "engine_l_nozzle_div_flap_lower": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 86
+  },
+  "engine_l_nozzle_div_flap_upper": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 86
+  },
+  "engine_l_nozzle_ext_flap_lower": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 50
+  },
+  "engine_l_nozzle_ext_flap_upper": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 50
+  },
+  "engine_l_nozzle_hinges": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 72
+  },
+  "engine_l_nozzle_shroud": {
+   "m": "08 Engine port",
+   "mat": "inconel",
+   "f": 2880
+  },
+  "engine_l_nozzle_sidewalls": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 12
+  },
+  "engine_l_nozzle_transition": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 2496
+  },
+  "engine_l_oil_lines": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 382
+  },
+  "engine_l_oil_tank": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 396
+  },
+  "engine_l_service_struts": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 728
+  },
+  "engine_l_shaft_hp": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 3256
+  },
+  "engine_l_shaft_lp": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 3520
+  },
+  "engine_l_spinner": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 4960
+  },
+  "engine_l_sump_front": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 4160
+  },
+  "engine_l_sump_rear": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1920
+  },
+  "engine_l_swirlers": {
+   "m": "08 Engine port",
+   "mat": "nickel_hot",
+   "f": 5472
+  },
+  "engine_l_tailcone": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 5280
+  },
+  "engine_l_tms_hx": {
+   "m": "08 Engine port",
+   "mat": "copper",
+   "f": 3360
+  },
+  "engine_l_towershaft": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 118
+  },
+  "engine_l_vanes_cdfs": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 15480
+  },
+  "engine_l_vanes_fan_s1": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 11920
+  },
+  "engine_l_vanes_fan_s2": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 14440
+  },
+  "engine_l_vanes_hpc_igv": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 15000
+  },
+  "engine_l_vanes_hpc_s1": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 13260
+  },
+  "engine_l_vanes_hpc_s2": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 14200
+  },
+  "engine_l_vanes_hpc_s3": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 15460
+  },
+  "engine_l_vanes_hpc_s4": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 16820
+  },
+  "engine_l_vanes_hpc_s5": {
+   "m": "08 Engine port",
+   "mat": "nickel",
+   "f": 19760
+  },
+  "engine_l_vanes_hpt_ngv": {
+   "m": "08 Engine port",
+   "mat": "cmc",
+   "f": 25264
+  },
+  "engine_l_vanes_mtf": {
+   "m": "08 Engine port",
+   "mat": "nickel_hot",
+   "f": 11680
+  },
+  "engine_l_vsv_actuation": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 3514
+  },
+  "engine_mounts": {
+   "m": "07 Structure",
+   "mat": "steel",
+   "f": 96
+  },
+  "engine_r_ab_fuel_manifold": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2112
+  },
+  "engine_r_augmentor_case": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 5760
+  },
+  "engine_r_augmentor_liner": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 2880
+  },
+  "engine_r_blades_hpc_r1": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 7560
+  },
+  "engine_r_blades_hpc_r2": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 8820
+  },
+  "engine_r_blades_hpc_r3": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 10080
+  },
+  "engine_r_blades_hpc_r4": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 11340
+  },
+  "engine_r_blades_hpc_r5": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 13440
+  },
+  "engine_r_blades_hpc_r6": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 15960
+  },
+  "engine_r_blades_hpt_r": {
+   "m": "09 Engine starboard",
+   "mat": "nickel_hot",
+   "f": 30744
+  },
+  "engine_r_blades_lpt_r": {
+   "m": "09 Engine starboard",
+   "mat": "nickel_hot",
+   "f": 9660
+  },
+  "engine_r_brg_1_lp_roller": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2180
+  },
+  "engine_r_brg_2_lp_ball": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 3440
+  },
+  "engine_r_brg_3_hp_ball": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 4448
+  },
+  "engine_r_brg_4_hp_roller": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2660
+  },
+  "engine_r_brg_5_lp_roller": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2240
+  },
+  "engine_r_case_combustor": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 14720
+  },
+  "engine_r_case_fan": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 9600
+  },
+  "engine_r_case_hpc": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 9600
+  },
+  "engine_r_case_outer_aft": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 13120
+  },
+  "engine_r_case_outer_fwd": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 8320
+  },
+  "engine_r_case_ribs": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 7808
+  },
+  "engine_r_case_turbine": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 13440
+  },
+  "engine_r_cdfs_blisk": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 11720
+  },
+  "engine_r_combustor_dome": {
+   "m": "09 Engine starboard",
+   "mat": "nickel_hot",
+   "f": 1192
+  },
+  "engine_r_combustor_inner_case": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 1920
+  },
+  "engine_r_combustor_liner_inner": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 5952
+  },
+  "engine_r_combustor_liner_outer": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 5944
+  },
+  "engine_r_combustor_mount_pins": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 504
+  },
+  "engine_r_containment_wrap": {
+   "m": "09 Engine starboard",
+   "mat": "composite",
+   "f": 7040
+  },
+  "engine_r_coolant_lines": {
+   "m": "09 Engine starboard",
+   "mat": "copper",
+   "f": 700
+  },
+  "engine_r_core_cowl": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 4800
+  },
+  "engine_r_core_splitter": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 3200
+  },
+  "engine_r_diffuser": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 14220
+  },
+  "engine_r_fadec_a": {
+   "m": "09 Engine starboard",
+   "mat": "composite",
+   "f": 258
+  },
+  "engine_r_fadec_b": {
+   "m": "09 Engine starboard",
+   "mat": "composite",
+   "f": 258
+  },
+  "engine_r_fan_blisk_1": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 8900
+  },
+  "engine_r_fan_blisk_2": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 10300
+  },
+  "engine_r_fan_drum": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 3520
+  },
+  "engine_r_fan_frame_hub": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 1920
+  },
+  "engine_r_fan_frame_struts": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 1456
+  },
+  "engine_r_flameholder_vanes": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 3872
+  },
+  "engine_r_flange_fan_aft": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 2440
+  },
+  "engine_r_flange_inlet": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 2440
+  },
+  "engine_r_flange_outer_aft": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 2640
+  },
+  "engine_r_flange_outer_mid": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 2640
+  },
+  "engine_r_fuel_lines": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1012
+  },
+  "engine_r_fuel_manifold": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2240
+  },
+  "engine_r_fuel_metering_unit": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 162
+  },
+  "engine_r_fuel_nozzles": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 5796
+  },
+  "engine_r_fuel_pump": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 128
+  },
+  "engine_r_gearbox": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 1452
+  },
+  "engine_r_gearbox_mounts": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 56
+  },
+  "engine_r_generator_l": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 1440
+  },
+  "engine_r_generator_r": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 1440
+  },
+  "engine_r_harnesses": {
+   "m": "09 Engine starboard",
+   "mat": "rubber",
+   "f": 144
+  },
+  "engine_r_hp_front_drum": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 960
+  },
+  "engine_r_hpc_drum": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 18240
+  },
+  "engine_r_hpt_disc": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 3840
+  },
+  "engine_r_hydraulic_lines": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2120
+  },
+  "engine_r_hydraulic_pump": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 128
+  },
+  "engine_r_igniters": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 72
+  },
+  "engine_r_inlet_case": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 1600
+  },
+  "engine_r_intermediate_case": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 28800
+  },
+  "engine_r_lpt_disc": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 4000
+  },
+  "engine_r_mixer": {
+   "m": "09 Engine starboard",
+   "mat": "nickel_hot",
+   "f": 8832
+  },
+  "engine_r_mode_valve": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 2352
+  },
+  "engine_r_mode_valve_actuators": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 532
+  },
+  "engine_r_mount_aft_lug": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 36
+  },
+  "engine_r_mount_trunnions": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 120
+  },
+  "engine_r_nozzle_actuators": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 176
+  },
+  "engine_r_nozzle_conv_flap_lower": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 42
+  },
+  "engine_r_nozzle_conv_flap_upper": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 42
+  },
+  "engine_r_nozzle_div_flap_lower": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 86
+  },
+  "engine_r_nozzle_div_flap_upper": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 86
+  },
+  "engine_r_nozzle_ext_flap_lower": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 50
+  },
+  "engine_r_nozzle_ext_flap_upper": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 50
+  },
+  "engine_r_nozzle_hinges": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 72
+  },
+  "engine_r_nozzle_shroud": {
+   "m": "09 Engine starboard",
+   "mat": "inconel",
+   "f": 2880
+  },
+  "engine_r_nozzle_sidewalls": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 12
+  },
+  "engine_r_nozzle_transition": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 2496
+  },
+  "engine_r_oil_lines": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 382
+  },
+  "engine_r_oil_tank": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 396
+  },
+  "engine_r_service_struts": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 728
+  },
+  "engine_r_shaft_hp": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 3256
+  },
+  "engine_r_shaft_lp": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 3520
+  },
+  "engine_r_spinner": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 4960
+  },
+  "engine_r_sump_front": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 4160
+  },
+  "engine_r_sump_rear": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1920
+  },
+  "engine_r_swirlers": {
+   "m": "09 Engine starboard",
+   "mat": "nickel_hot",
+   "f": 5472
+  },
+  "engine_r_tailcone": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 5280
+  },
+  "engine_r_tms_hx": {
+   "m": "09 Engine starboard",
+   "mat": "copper",
+   "f": 3360
+  },
+  "engine_r_towershaft": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 118
+  },
+  "engine_r_vanes_cdfs": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 15480
+  },
+  "engine_r_vanes_fan_s1": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 11920
+  },
+  "engine_r_vanes_fan_s2": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 14440
+  },
+  "engine_r_vanes_hpc_igv": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 15000
+  },
+  "engine_r_vanes_hpc_s1": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 13260
+  },
+  "engine_r_vanes_hpc_s2": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 14200
+  },
+  "engine_r_vanes_hpc_s3": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 15460
+  },
+  "engine_r_vanes_hpc_s4": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 16820
+  },
+  "engine_r_vanes_hpc_s5": {
+   "m": "09 Engine starboard",
+   "mat": "nickel",
+   "f": 19760
+  },
+  "engine_r_vanes_hpt_ngv": {
+   "m": "09 Engine starboard",
+   "mat": "cmc",
+   "f": 25264
+  },
+  "engine_r_vanes_mtf": {
+   "m": "09 Engine starboard",
+   "mat": "nickel_hot",
+   "f": 11680
+  },
+  "engine_r_vsv_actuation": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 3514
+  },
+  "fin_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin",
+   "f": 1456
+  },
+  "fin_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin",
+   "f": 1456
+  },
+  "flaperon_in_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 796
+  },
+  "flaperon_in_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 796
+  },
+  "flaperon_out_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 796
+  },
+  "flaperon_out_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 796
+  },
+  "frame_engine_aft": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 388
+  },
+  "frame_engine_fwd": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 388
+  },
+  "fuselage_skin": {
+   "m": "01 Airframe",
+   "mat": "skin",
+   "f": 35471
+  },
+  "gear_bay_main_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 206
+  },
+  "gear_bay_main_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 206
+  },
+  "gear_bay_nose": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 206
+  },
+  "gear_door_main_l": {
+   "m": "06 Landing gear",
+   "mat": "skin_dark",
+   "f": 84
+  },
+  "gear_door_main_r": {
+   "m": "06 Landing gear",
+   "mat": "skin_dark",
+   "f": 84
+  },
+  "gear_door_nose": {
+   "m": "06 Landing gear",
+   "mat": "skin_dark",
+   "f": 84
+  },
+  "gear_main_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 96
+  },
+  "gear_main_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 96
+  },
+  "gear_nose": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 86
+  },
+  "intake_duct_l": {
+   "m": "03 Intakes",
+   "mat": "skin",
+   "f": 5904
+  },
+  "intake_duct_r": {
+   "m": "03 Intakes",
+   "mat": "skin",
+   "f": 5904
+  },
+  "keel": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 82
+  },
+  "launchers": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 72
+  },
+  "le_flap_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 1578
+  },
+  "le_flap_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 1578
+  },
+  "missiles": {
+   "m": "05 Weapons bay",
+   "mat": "missile",
+   "f": 1728
+  },
+  "radar_array": {
+   "m": "07 Structure",
+   "mat": "radar",
+   "f": 210
+  },
+  "radar_bulkhead": {
+   "m": "07 Structure",
+   "mat": "radar",
+   "f": 98
+  },
+  "rudder_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 990
+  },
+  "rudder_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin_dark",
+   "f": 990
+  },
+  "seat": {
+   "m": "04 Cockpit",
+   "mat": "seat",
+   "f": 42
+  },
+  "tail_stinger": {
+   "m": "01 Airframe",
+   "mat": "skin",
+   "f": 322
+  },
+  "tyre_main_l": {
+   "m": "06 Landing gear",
+   "mat": "rubber",
+   "f": 624
+  },
+  "tyre_main_r": {
+   "m": "06 Landing gear",
+   "mat": "rubber",
+   "f": 624
+  },
+  "tyres_nose": {
+   "m": "06 Landing gear",
+   "mat": "rubber",
+   "f": 1248
+  },
+  "wheel_main_l": {
+   "m": "06 Landing gear",
+   "mat": "wheel",
+   "f": 144
+  },
+  "wheel_main_r": {
+   "m": "06 Landing gear",
+   "mat": "wheel",
+   "f": 144
+  },
+  "wheels_nose": {
+   "m": "06 Landing gear",
+   "mat": "wheel",
+   "f": 288
+  },
+  "wing_l": {
+   "m": "02 Flying surfaces",
+   "mat": "skin",
+   "f": 2442
+  },
+  "wing_r": {
+   "m": "02 Flying surfaces",
+   "mat": "skin",
+   "f": 2442
+  }
+ }
+}

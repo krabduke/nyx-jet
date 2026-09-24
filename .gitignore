@@ -1,0 +1,10 @@
+.playwright-mcp/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Build outputs. The decimated web GLB and the part table are committed so
+# the viewer works from a clone; the .blend and the full GLB are rebuilt.
+build/*
+!build/nyx_web.glb
+!build/parts.csv
