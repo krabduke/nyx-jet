@@ -52,18 +52,33 @@ def bay_cutter(x0, x1, y0, y1, z_roof):
                     x1 - x0, y1 - y0, z_roof + 2000.0)
 
 
-def door(x0, x1, y, t, height):
+def door(x0, x1, y, t, height, tooth=110.0, depth=46.0):
     """A door standing open, hanging from the bay's edge at y: its top edge
-    is its hinge, let 2 mm into the skin's outside."""
-    xs = [x0 + (x1 - x0) * i / 10 for i in range(11)]
+    is its hinge, let 2 mm into the skin's outside, and its free edge is
+    serrated, as every door on a low-observable airframe is -- a straight
+    edge across the flow is a bright return, a sawtooth scatters it."""
+    n_t = max(2, int(round((x1 - x0) / tooth)))
+    xs = []
+    for i in range(n_t):
+        a = x0 + (x1 - x0) * i / n_t
+        xs += [a, a + (x1 - x0) / n_t * 0.5]
+    xs.append(x1)
     rings = []
-    for x in xs:
+    for k, x in enumerate(xs):
         # under the skin's outside across the door's whole thickness: the
         # skin slopes, and the door's top is its lowest point, not its middle
         zt = min(shapes.z_dn(x, y - t / 2), shapes.z_dn(x, y + t / 2)) + 2.0
+        zb = zt - height + (depth if k % 2 == 0 else 0.0)
         rings.append([(x, y - t / 2, zt), (x, y + t / 2, zt),
-                      (x, y + t / 2, zt - height), (x, y - t / 2, zt - height)])
+                      (x, y + t / 2, zb), (x, y - t / 2, zb)])
     return shapes.loft_rings(rings)
+
+
+def _about_z(part, cx, cy, cz):
+    """A solid of revolution built about +X, stood upright about +Z at
+    (cx, cy, cz)."""
+    v, f = part
+    return [(cx + y, cy + z, cz + x) for (x, y, z) in v], f
 
 
 def _about_y(part, cx, cy, cz):
@@ -103,7 +118,15 @@ def nose():
         mesh.pipe([(x_ax, -w - 60.0, z_ax), (x_ax, w + 60.0, z_ax)], 28.0, 14),  # axle
         # torque link
         mesh.pipe([(xc - 20.0, 0.0, -1040.0), (xc + 90.0, 0.0, -1250.0),
-                   (x_ax, 0.0, z_ax + 90.0)], 12.0, 10, bend=0.0))
+                   (x_ax, 0.0, z_ax + 90.0)], 12.0, 10, bend=0.0),
+        # the gland nut where the piston enters the oleo, and the steering
+        # collar above it
+        _about_z(mesh.revolve_ring([(-12.0, 38.0), (12.0, 38.0), (12.0, 62.0),
+                                    (-12.0, 62.0)], 32), xc - 18.0, 0.0, -1108.0),
+        _about_z(mesh.revolve_ring([(-30.0, 50.0), (30.0, 50.0), (30.0, 70.0),
+                                    (-30.0, 70.0)], 32), xc - 8.0, 0.0, -560.0),
+        # taxi light on the collar, looking forward
+        mesh.box(xc - 82.0, 0.0, -560.0, 34.0, 60.0, 40.0))
     tyres, hubs = [], []
     for sy in (1.0, -1.0):
         t, h = wheel(x_ax, sy * (0.5 * w + 45.0), z_ax, r, w)
@@ -128,7 +151,15 @@ def main(sy):
         # drag brace from the bay's front to the leg
         mesh.pipe([(x0 + 60.0, yc, zr - 2.0), (xc - 60.0, yc, -900.0)], 30.0, 14),
         # side brace to the bay's inboard wall
-        mesh.pipe([(xc, y0 + 40.0, zr - 2.0), (xc, yc - 50.0, -760.0)], 26.0, 14))
+        mesh.pipe([(xc, y0 + 40.0, zr - 2.0), (xc, yc - 50.0, -760.0)], 26.0, 14),
+        # the gland nut where the chrome piston enters the oleo
+        _about_z(mesh.revolve_ring([(-14.0, 58.0), (14.0, 58.0), (14.0, 88.0),
+                                    (-14.0, 88.0)], 40), xc, yc, -1040.0),
+        # the torque link: a scissor on the leg's front, cylinder to axle
+        mesh.pipe([(xc - 70.0, yc, -1010.0), (xc - 170.0, yc, -1130.0),
+                   (xc - 58.0, yc, z_ax + 70.0)], 13.0, 10, bend=0.0),
+        # the fork the axle runs through
+        mesh.box(xc, yc + 10.0, z_ax, 150.0, 110.0, 120.0))
     t, h = wheel(xc, yw, z_ax, r, w)
     doors = mesh.join(door(x0 + 10.0, x1 - 10.0, y1 + 5.0, 8.0, 520.0),
                       door(x0 + 10.0, x1 - 10.0, y0 - 5.0, 8.0, 300.0))

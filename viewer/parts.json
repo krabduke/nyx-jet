@@ -252,7 +252,7 @@
    "label": "Landing gear",
    "color": "#5C6166",
    "parts": 15,
-   "faces": 4220
+   "faces": 5018
   },
   {
    "key": "07 Structure",
@@ -1465,32 +1465,32 @@
   "gear_door_main_l": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 84
+   "f": 148
   },
   "gear_door_main_r": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 84
+   "f": 148
   },
   "gear_door_nose": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 84
+   "f": 116
   },
   "gear_main_l": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 96
+   "f": 284
   },
   "gear_main_r": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 96
+   "f": 284
   },
   "gear_nose": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 86
+   "f": 348
   },
   "intake_duct_l": {
    "m": "03 Intakes",
