@@ -95,11 +95,14 @@ BODY = [
     (8400.0, 2320.0,   0.0, 680.0, -760.0),
     (9800.0, 2360.0,   0.0, 700.0, -780.0),
     (11200.0, 2240.0,  0.0, 730.0, -800.0),
-    # the tail has to close round two nozzle boxes 780 mm wide and the
-    # hydraulic lines that run round their sides, so it stays deep and wide
-    (12400.0, 2020.0,  0.0, 745.0, -815.0),
-    (13400.0, 1840.0,  0.0, 725.0, -795.0),
-    (14100.0, 1730.0,  0.0, 705.0, -775.0),
+    # The tail closes in round the two nozzle boxes -- 780 mm wide on axes
+    # 800 mm off the centreline, so 1,190 mm to their outside -- with the
+    # actuators and hydraulic lines along their sides. The section's
+    # rounded shoulders are what set how far in it can come: at the boxes'
+    # outer corners it has to be 1,190 wide and 400 high.
+    (12400.0, 2000.0,  0.0, 740.0, -810.0),
+    (13400.0, 1800.0,  0.0, 712.0, -780.0),
+    (14100.0, 1620.0,  0.0, 680.0, -740.0),
 ]
 BODY_END_X = BODY[-1][0]
 M_UP, N_UP = 2.2, 1.6

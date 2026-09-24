@@ -16,6 +16,7 @@ jet built around the GE F110 — is kept at
 | | |
 |---|---|
 | ![plan](renders/02_plan.png) | ![side](renders/03_side.png) |
+| ![rear](renders/04_rear.png) | ![inside](renders/05_xray.png) |
 
 ## Why this shape
 
