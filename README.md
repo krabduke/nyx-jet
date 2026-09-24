@@ -3,7 +3,7 @@
 An original fighter designed for one thing: turning. It is short, wide and
 lightly loaded; it is unstable in pitch on purpose; and it carries two
 [Aether AX-1](https://github.com/Krabduke/aether-ax1) adaptive-cycle engines
-with two-dimensional vectoring nozzles. The whole aircraft is generated
+that end in three-bearing swivel nozzles. The whole aircraft is generated
 procedurally in Blender from one specification file, and every number below
 is computed by the code in this repository, not typed in.
 
@@ -31,7 +31,7 @@ The brief was agility over top speed. Each choice follows from it.
   14.9 m long and 13.2 m across, Nyx is almost as wide as it is long, and the
   width goes into a lifting body — the fuselage between the wings makes lift —
   rather than into length.
-- **Relaxed stability.** The centre of gravity is 5.6 % of the mean chord
+- **Relaxed stability.** The centre of gravity is 5.0 % of the mean chord
   behind the neutral point, so the aircraft wants to pitch on its own and the
   flight control system only has to let it. That is where instant pitch
   response comes from. Supersonic, the neutral point moves aft and it is
@@ -39,9 +39,12 @@ The brief was agility over top speed. Each choice follows from it.
 - **Close-coupled canards.** All-moving foreplanes just ahead of and above
   the wing trim the unstable airframe with lift rather than a tail's
   download, and their vortex keeps the wing working at high angle of attack.
-- **Thrust vectoring.** The nozzles swing ±20° in pitch, together or
+- **Thrust vectoring.** Each engine ends in a three-bearing swivel duct and
+  a round convergent-divergent nozzle, out in the air behind its nacelle:
+  the jet points anywhere in a cone round the axis, together or
   differentially, which gives control where the surfaces have none — past
-  the stall.
+  the stall. The body stops just ahead of each swivel's front bearing,
+  because everything behind it turns.
 - **Stealth shaping that costs no agility.** A chined nose, caret intakes
   with serpentine ducts that hide the engine faces, an internal weapons bay,
   canted fins and sawtooth edges.
@@ -52,8 +55,8 @@ From `aero/agility.py`, at combat weight (half fuel, four missiles):
 
 | | Sea level | 15,000 ft |
 |---|---|---|
-| Instantaneous turn | **35.0 °/s** at 9.5 g, 547 km/h | 27.7 °/s |
-| Sustained turn | **26.0 °/s** at 5.4 g | 17.3 °/s |
+| Instantaneous turn | **34.6 °/s** at 9.5 g, 552 km/h | 27.5 °/s |
+| Sustained turn | **25.5 °/s** at 5.3 g | 16.9 °/s |
 
 The sustained figures barely move across a band of zero-lift drag
 coefficients (0.016 to 0.022), so they do not rest on one guessed number.
@@ -64,10 +67,10 @@ coefficients (0.016 to 0.022), so they do not rest on one guessed number.
 |---|---|
 | Length × span | 14.9 × 13.2 m |
 | Wing | 68.2 m², aspect ratio 2.55, 48° leading-edge sweep, 5 % thick at the root |
-| Combat mass | 17,170 kg (12,820 kg empty) |
-| Engines | 2 × Aether AX-1, 90.5 kN dry and 134.9 kN reheat each, 2D vectoring nozzles |
-| Thrust / weight | 1.60 at combat weight |
-| Static margin | −5.6 % MAC, from a vortex-lattice solve |
+| Combat mass | 17,510 kg (13,160 kg empty) |
+| Engines | 2 × Aether AX-1, 90.5 kN dry and 134.9 kN reheat each, three-bearing swivel nozzles |
+| Thrust / weight | 1.57 at combat weight |
+| Static margin | −5.0 % MAC, from a vortex-lattice solve |
 | Load limit | 9.5 g |
 | Weapons | four medium-range missiles in an internal bay |
 

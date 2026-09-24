@@ -35,7 +35,9 @@ def opening_half_width(x):
 def canopy_top(x):
     """Height of the canopy's crown: rising steeply off the windscreen to
     its highest over the pilot's head, then a long fall to the spine."""
-    x0, x1, xe = CK["x0"], CK["x1"], CK["eye_x"] + 250.0
+    # measured from the canopy's own ends, 120 mm inside the opening's, so
+    # it comes down to the skin there instead of ending in a tall open arch
+    x0, x1, xe = CK["x0"] + 120.0, CK["x1"] - 120.0, CK["eye_x"] + 250.0
     base = shapes.z_up(x, 0.0)
     if x <= xe:
         t = (x - x0) / (xe - x0)
@@ -43,7 +45,7 @@ def canopy_top(x):
     else:
         t = (x - xe) / (x1 - xe)
         f = math.cos(0.5 * math.pi * min(1.0, t)) ** 0.7
-    return base + (CK["canopy_top_z"] - base) * f
+    return base + (CK["canopy_top_z"] - base) * max(f, 0.015)
 
 
 def _arch(u):
@@ -70,7 +72,8 @@ def _canopy_section(x, n=40):
     for y in reversed(_canopy_ys(ai, n)):
         zb = shapes.z_up(x, y) + SEAT
         f = _arch(abs(y) / ai)
-        pts_i.append((x, y, zb + (top - GLASS_T - zb) * f))
+        # never under the skin: at the ends the glass is solid to its seat
+        pts_i.append((x, y, max(zb, zb + (top - GLASS_T - zb) * f)))
     return pts_o + pts_i
 
 
@@ -80,6 +83,19 @@ def canopy():
           for i in range(37)]
     rings = [_canopy_section(x) for x in xs]
     return shapes.loft_rings(rings)
+
+
+def sill_rail(sy):
+    """The canopy's sill rail on one side: the seal carrier along the rim,
+    half let into the skin, the glass's edge pressed into it."""
+    x0, x1 = CK["x0"], CK["x1"]
+    xs = [x0 + 150.0 + (x1 - x0 - 300.0) * (0.5 - 0.5 * math.cos(math.pi * i / 30))
+          for i in range(31)]
+    path = []
+    for x in xs:
+        y = sy * (opening_half_width(x) + OVERLAP + 3.0)
+        path.append((x, y, shapes.z_up(x, y) + 2.0))
+    return mesh.pipe(path, 9.0, 16, subdiv=2)
 
 
 def opening_cutter():
@@ -200,6 +216,8 @@ def stick():
 def build():
     return {
         "canopy_glass": canopy(),
+        "canopy_frame_r": sill_rail(1.0),
+        "canopy_frame_l": sill_rail(-1.0),
         "cut:fuselage_skin": opening_cutter(),
         "cockpit_tub": tub(),
         "seat": seat(),

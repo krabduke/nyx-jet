@@ -19,6 +19,10 @@
                       fin tips
     static wicks      discharge wicks on the trailing edges of the wing tips
                       and fin tips, where static bleeds off in flight
+    gun               a six-barrel rotary cannon in the starboard shoulder,
+                      above the intake duct, firing through a trough in the
+                      skin ahead of the wing root, hung from the skin on two
+                      posts
 
 Everything here is placed on the surface it stands on by asking shapes (the
 body) or surfaces (the wing and fins) where that surface is.
@@ -74,47 +78,44 @@ def _aft_closure():
 # --------------------------------------------------------------------------
 # IRST
 
-IRST_X = (2540.0, 2960.0)
-IRST_H = 118.0
-IRST_A = 125.0
+IRST_X = (2560.0, 3000.0)    # ball centre to the housing's tail
+IRST_R = 72.0                # the sensor ball
+IRST_A = 112.0               # the housing's half-width and height at its
+IRST_H = 168.0               # fullest, just behind the ball
 
 
 def _irst():
+    """A teardrop housing that starts at the sensor ball's centre and
+    swallows its back half -- the ball looks out ahead and to the sides --
+    then fines away along the spine to the windscreen."""
     x0, x1 = IRST_X
+    z_ball = shapes.z_up(x0, 0.0) - 3.0 + IRST_R + 6.0
     rings = []
     n_ring = 32
-    for i in range(1, 24):
+    for i in range(0, 25):
         t = i / 24.0
         x = x0 + (x1 - x0) * t
-        # blunt at the front, where the sensor ball is, long and fine aft
-        f = (min(1.0, t / 0.22) ** 0.5) * (1.0 - max(0.0, (t - 0.22) / 0.78) ** 1.6)
-        a, h = IRST_A * f + 2.0, IRST_H * f + 2.0
+        # from just inside the ball's silhouette to its fullest, then a
+        # long fine taper to a point on the skin
+        grow = min(1.0, t / 0.18)
+        a = (IRST_R * 0.92) + (IRST_A - IRST_R * 0.92) * (grow ** 0.5)
+        h = (IRST_R * 2.0 + 2.0) + (IRST_H - IRST_R * 2.0 - 2.0) * (grow ** 0.5)
+        fade = 1.0 - max(0.0, (t - 0.18) / 0.82) ** 1.5
+        a, h = a * fade + 2.0, h * fade + 2.0
         ring = []
         for k in range(n_ring + 1):
             ph = math.pi * k / n_ring
             y = a * math.cos(ph)
             ring.append((x, y, shapes.z_up(x, y) - 3.0 + h * math.sin(ph)))
-        # back along the skin underneath, 3 mm into it
         for k in range(n_ring - 1, 0, -1):
             y = a * math.cos(math.pi * k / n_ring)
             ring.append((x, y, shapes.z_up(x, y) - 3.0))
         rings.append(ring)
-    tip0 = (x0, 0.0, shapes.z_up(x0, 0.0) - 1.0)
-    tip1 = (x1, 0.0, shapes.z_up(x1, 0.0) - 1.0)
-    v, f = shapes.loft_tip(tip0, rings, cap_end=False)
-    m = len(rings[0])
-    base = 1 + (len(rings) - 1) * m
-    iv = len(v)
-    v = list(v) + [tip1]
-    f = list(f) + [(base + (k + 1) % m, base + k, iv) for k in range(m)]
-    fairing = shapes.orient((v, f))
-    # the window: a glass ball in the housing's nose, turned to look ahead
-    xw = x0 + 0.20 * (x1 - x0)
-    zw = shapes.z_up(xw, 0.0) - 3.0 + IRST_H * 0.62
-    wv, wf = mesh.revolve_closed([(xw - 84.0 + 84.0 * (1 - math.cos(math.pi * k / 24)),
-                                   max(0.5, 84.0 * math.sin(math.pi * k / 24)))
+    fairing = shapes.loft_rings(rings)
+    wv, wf = mesh.revolve_closed([(x0 - IRST_R * math.cos(math.pi * k / 24),
+                                   max(0.5, IRST_R * math.sin(math.pi * k / 24)))
                                   for k in range(25)], 48)
-    window = ([(x, y, z + zw) for (x, y, z) in wv], wf)
+    window = ([(x, y, z + z_ball) for (x, y, z) in wv], wf)
     return {"irst_fairing": fairing, "irst_window": window}
 
 
@@ -225,8 +226,63 @@ def _wicks():
     return mesh.join(*parts)
 
 
+# --------------------------------------------------------------------------
+# gun
+
+GUN_Y = 1050.0
+GUN_X = (6420.0, 8150.0)     # muzzles to the back of the drive
+GUN_DEPTH = (100.0, 120.0)   # the axis this far under the skin at each end
+
+
+def gun_axis_z(x):
+    """The gun's axis: straight, from GUN_DEPTH[0] under the skin at the
+    muzzles to GUN_DEPTH[1] under it at the back -- the skin falls away
+    aft, so it is pitched about two degrees nose-up to stay inside."""
+    x0, x1 = GUN_X
+    z0 = shapes.z_up(x0, GUN_Y) - GUN_DEPTH[0]
+    z1 = shapes.z_up(x1, GUN_Y) - GUN_DEPTH[1]
+    return z0 + (z1 - z0) * (x - x0) / (x1 - x0)
+
+
+def _gun():
+    x0, x1 = GUN_X
+    zc = gun_axis_z
+    parts = []
+    # six barrels round the axis, held by two clamp rings
+    for k in range(6):
+        a = 2.0 * math.pi * k / 6
+        dy, dz = 34.0 * math.cos(a), 34.0 * math.sin(a)
+        xb = x0 + 1500.0
+        parts.append(mesh.pipe([(x0, GUN_Y + dy, zc(x0) + dz),
+                                (xb, GUN_Y + dy, zc(xb) + dz)], 12.0, 16))
+    for xc in (x0 + 60.0, x0 + 620.0):
+        parts.append(mesh.pipe([(xc - 14.0, GUN_Y, zc(xc - 14.0)),
+                                (xc + 14.0, GUN_Y, zc(xc + 14.0))], 52.0, 32))
+    # the rotor housing and the drive and feed at the back
+    xa, xb = x0 + 1460.0, x1 - 160.0
+    parts.append(mesh.pipe([(xa, GUN_Y, zc(xa)), (xb, GUN_Y, zc(xb))], 64.0, 40))
+    parts.append(mesh.box(x1 - 80.0, GUN_Y, zc(x1 - 80.0), 160.0, 150.0, 120.0))
+    # two mounting posts up to the skin's inside
+    for xp in (x0 + 900.0, x1 - 250.0):
+        top = shapes.z_up(xp, GUN_Y, spec.SKIN_T) + 2.0
+        parts.append(mesh.pipe([(xp, GUN_Y, zc(xp) + 40.0), (xp, GUN_Y, top)], 14.0, 16))
+    return mesh.join(*parts)
+
+
+def _gun_port():
+    """The trough the gun fires along: open from the muzzles forward, cut
+    through the skin down to the barrels' axis."""
+    x0 = GUN_X[0]
+    zc = gun_axis_z(x0)
+    return mesh.join(
+        mesh.pipe([(x0 - 420.0, GUN_Y, zc), (x0 + 40.0, GUN_Y, zc)], 62.0, 32),
+        mesh.box(x0 - 190.0, GUN_Y, zc + 200.0, 460.0, 124.0, 400.0))
+
+
 def build():
     out = {}
+    out["gun"] = _gun()
+    out["cut:fuselage_skin"] = _gun_port()
     out.update(_aft_closure())
     out.update(_irst())
     probe = _pitot(620.0, 0.55)

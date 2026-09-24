@@ -52,7 +52,7 @@ def collection_for(name):
         return "03 Intakes"
     if name.startswith(("canopy", "cockpit", "seat")):
         return "04 Cockpit"
-    if name.startswith(("bay", "missile", "launcher")):
+    if name.startswith(("bay", "missile", "launcher", "gun")):
         return "05 Weapons bay"
     if name.startswith(("gear", "tyre", "wheel")):
         return "06 Landing gear"

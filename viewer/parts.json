@@ -764,7 +764,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 17,
-   "faces": 39941
+   "faces": 39944
   },
   {
    "key": "02 Flying surfaces",
@@ -784,15 +784,15 @@
    "key": "04 Cockpit",
    "label": "Cockpit",
    "color": "#B58A3C",
-   "parts": 6,
-   "faces": 3666
+   "parts": 8,
+   "faces": 9302
   },
   {
    "key": "05 Weapons bay",
    "label": "Weapons bay",
    "color": "#7D8570",
-   "parts": 5,
-   "faces": 4982
+   "parts": 6,
+   "faces": 5242
   },
   {
    "key": "06 Landing gear",
@@ -898,6 +898,16 @@
    "m": "02 Flying surfaces",
    "mat": "steel",
    "f": 98
+  },
+  "canopy_frame_l": {
+   "m": "04 Cockpit",
+   "mat": "skin_dark",
+   "f": 2818
+  },
+  "canopy_frame_r": {
+   "m": "04 Cockpit",
+   "mat": "skin_dark",
+   "f": 2818
   },
   "canopy_glass": {
    "m": "04 Cockpit",
@@ -2162,7 +2172,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35865
+   "f": 35866
   },
   "gear_bay_main_l": {
    "m": "06 Landing gear",
@@ -2209,6 +2219,11 @@
    "mat": "steel",
    "f": 348
   },
+  "gun": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 260
+  },
   "intake_duct_l": {
    "m": "03 Intakes",
    "mat": "skin",
@@ -2222,7 +2237,7 @@
   "irst_fairing": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 1536
+   "f": 1538
   },
   "irst_window": {
    "m": "01 Airframe",

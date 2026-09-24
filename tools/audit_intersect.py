@@ -59,6 +59,9 @@ AIRFRAME = [
     ("tyres_nose", "wheels_nose"), ("tyre_main_", "wheel_main_"),
     # the canopy's rim is pressed into its seal on the skin
     ("canopy_glass", "fuselage_skin"),
+    # and the sill rails either side carry that seal: let into the skin,
+    # the glass's edge pressed into them
+    ("canopy_frame_", "fuselage_skin"), ("canopy_frame_", "canopy_glass"),
     # the gear doors' hinges are let into the skin at the bay edges
     ("gear_door_", "fuselage_skin"),
     # cockpit furniture is bolted to the tub
@@ -75,6 +78,8 @@ AIRFRAME = [
     ("antenna_", "fuselage_skin"),
     ("nav_light_", "wing_"), ("tail_light_", "fin_"),
     ("static_wicks_", "wing_"), ("static_wicks_", "fin_"),
+    # the gun hangs from the skin on two posts let into it
+    ("gun", "fuselage_skin"),
 ]
 
 EXPECTED = AIRFRAME + _engine_rules()
