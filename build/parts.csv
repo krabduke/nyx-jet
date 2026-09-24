@@ -89,6 +89,7 @@ engine_l_hydraulic_pump,08 Engine port,engines,steel,128,128,10820.0,10910.0,-83
 engine_l_igniters,08 Engine port,engines,steel,128,72,11839.0,11865.0,-1233.0,-367.0,166.3,255.3,,
 engine_l_inlet_case,08 Engine port,engines,casing,1600,1600,10200.0,10382.0,-1246.0,-354.0,-446.0,446.0,,
 engine_l_intermediate_case,08 Engine port,engines,titanium,28800,28800,10815.0,12410.0,-1226.0,-374.0,-426.0,426.0,,
+engine_l_line_clamps,08 Engine port,engines,steel,2304,1296,10961.4,13021.5,-1160.9,-439.1,-505.1,-307.6,,
 engine_l_lpt_disc,08 Engine port,engines,nickel,4000,4000,12331.5,12402.0,-1050.9,-549.1,-250.8,250.8,lp,1.0
 engine_l_mixer,08 Engine port,engines,nickel_hot,8832,8832,12410.0,12590.0,-1214.5,-385.5,-414.5,414.5,,
 engine_l_mode_valve,08 Engine port,engines,titanium,2400,2352,11008.0,11077.9,-1223.8,-376.2,-423.8,423.8,,
@@ -209,6 +210,7 @@ engine_r_hydraulic_pump,09 Engine starboard,engines,steel,128,128,10820.0,10910.
 engine_r_igniters,09 Engine starboard,engines,steel,128,72,11839.0,11865.0,367.0,1233.0,166.3,255.3,,
 engine_r_inlet_case,09 Engine starboard,engines,casing,1600,1600,10200.0,10382.0,354.0,1246.0,-446.0,446.0,,
 engine_r_intermediate_case,09 Engine starboard,engines,titanium,28800,28800,10815.0,12410.0,374.0,1226.0,-426.0,426.0,,
+engine_r_line_clamps,09 Engine starboard,engines,steel,2304,1296,10961.4,13021.5,439.1,1160.9,-505.1,-307.6,,
 engine_r_lpt_disc,09 Engine starboard,engines,nickel,4000,4000,12331.5,12402.0,549.1,1050.9,-250.8,250.8,lp,1.0
 engine_r_mixer,09 Engine starboard,engines,nickel_hot,8832,8832,12410.0,12590.0,385.5,1214.5,-414.5,414.5,,
 engine_r_mode_valve,09 Engine starboard,engines,titanium,2400,2352,11008.0,11077.9,376.2,1223.8,-423.8,423.8,,

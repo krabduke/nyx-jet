@@ -136,6 +136,11 @@ EXPECTED = [
     ("swivel_bearing_1", "swivel_fixed_ring"),
     ("swivel_bearing_", "swivel_duct_"),
     ("swivel_drive_", "swivel_bearing_"),
+    # every line on the case is held in P-clamps: a band round the line on a
+    # foot let into the case
+    ("line_clamps", "case_outer_"),
+    ("line_clamps", "hydraulic_lines"), ("line_clamps", "fuel_lines"),
+    ("line_clamps", "oil_lines"),
     ("swivel_drive_1", "case_outer_aft"),
     # the oblique bearings' motors stand on pads welded to the sloping shell
     # of the duct in front, let into it at their low end

@@ -653,6 +653,7 @@ MATERIAL_MAP = {
     "nozzle_static_ring": "inconel",
     "nozzle_ext": "inconel",
     "nozzle_actuator": "steel",
+    "line_clamps": "steel",
     "nozzle_hinge": "steel",
     "nozzle_div_link": "steel",
     "nozzle_unison": "inconel",

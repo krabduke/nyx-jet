@@ -812,15 +812,15 @@
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
-   "parts": 119,
-   "faces": 699020
+   "parts": 120,
+   "faces": 700316
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
-   "parts": 119,
-   "faces": 699020
+   "parts": 120,
+   "faces": 700316
   }
  ],
  "parts": {
@@ -1273,6 +1273,11 @@
    "m": "08 Engine port",
    "mat": "titanium",
    "f": 28800
+  },
+  "engine_l_line_clamps": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1296
   },
   "engine_l_lpt_disc": {
    "m": "08 Engine port",
@@ -1873,6 +1878,11 @@
    "m": "09 Engine starboard",
    "mat": "titanium",
    "f": 28800
+  },
+  "engine_r_line_clamps": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1296
   },
   "engine_r_lpt_disc": {
    "m": "09 Engine starboard",

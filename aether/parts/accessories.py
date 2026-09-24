@@ -62,6 +62,7 @@ def _rounded_box(x0, x1, yc, zc, a, b, n_exp=5.0, m=48, taper=18.0):
 
 
 def build():
+    RUNS.clear()
     out = {}
     out["gearbox"] = _gearbox()
     out["gearbox_mounts"] = _gearbox_mounts()
@@ -76,7 +77,62 @@ def build():
     out["coolant_lines"] = _coolant()
     out["mode_valve_actuators"] = _mode_valve_actuators()
     out.update(_hydraulics())
+    # last: the clamps need every line's run
+    out["line_clamps"] = _line_clamps()
     return out
+
+
+# Every long line on the case, as (path, radius, bend), recorded as it is
+# built so the clamps can follow it.
+RUNS = []
+CLAMP_PITCH = 300.0
+# stations where nothing is clamped to the case: the flanges and the rings
+# of manifolds round it, where a line is lifted over them anyway
+CLAMP_KEEP_OFF = ((820.0, 980.0), (1310.0, 1450.0), (2200.0, 2390.0),
+                  (2800.0, 2900.0))
+
+
+def _line_clamps():
+    """A P-clamp every CLAMP_PITCH along every line that runs along the
+    case: a band round the line and a stand-off foot down to the case,
+    where the line is close enough to the case to be clamped to it."""
+    parts = []
+    band_t = 2.6
+    for path, r, bend in RUNS:
+        pts, _ = mesh.fillet_path(path, [r] * len(path), bend)
+        # walk the centreline and drop a clamp every CLAMP_PITCH
+        acc, next_at = 0.0, CLAMP_PITCH * 0.5
+        for i in range(len(pts) - 1):
+            a, b = pts[i], pts[i + 1]
+            L = math.dist(a, b)
+            while acc + L >= next_at:
+                f = (next_at - acc) / L
+                p = tuple(a[k] + (b[k] - a[k]) * f for k in range(3))
+                next_at += CLAMP_PITCH
+                x = p[0]
+                if any(lo <= x <= hi for lo, hi in CLAMP_KEEP_OFF):
+                    continue
+                rp = math.hypot(p[1], p[2])
+                rc = outer_od(x)
+                gap = rp - r - rc
+                if not 8.0 <= gap <= 70.0:
+                    continue
+                t = mesh._normalise(tuple(b[k] - a[k] for k in range(3)))
+                # the band round the line, 14 mm wide
+                band = mesh.pipe([tuple(p[j] - t[j] * 7.0 for j in range(3)),
+                                  tuple(p[j] + t[j] * 7.0 for j in range(3))],
+                                 r + band_t, 20)
+                # the foot, radial, from the case to the band's underside
+                rad = (0.0, p[1] / rp, p[2] / rp)
+                foot0 = tuple(p[j] - rad[j] * (rp - rc + 1.0) for j in range(3))
+                foot1 = tuple(p[j] - rad[j] * (r + band_t - 1.0) for j in range(3))
+                parts.append(band)
+                parts.append(mesh.pipe([foot0, foot1], 4.5, 12))
+                pad0 = tuple(p[j] - rad[j] * (rp - rc + 1.0) for j in range(3))
+                pad1 = tuple(p[j] - rad[j] * (rp - rc - 3.0) for j in range(3))
+                parts.append(mesh.pipe([pad0, pad1], 10.0, 16))
+            acc += L
+    return mesh.join(*parts)
 
 
 def _mode_valve_actuators():
@@ -149,6 +205,7 @@ def _hydraulics():
             path += [common.polar(xp, rp + 30.0, cp),
                      common.polar(xp, rp - 1.0, cp)]
             lines.append(mesh.pipe(path, 6.0, 12, bend=30.0))
+            RUNS.append((path, 6.0, 30.0))
     out["hydraulic_lines"] = mesh.join(*lines)
     return out
 
@@ -265,10 +322,11 @@ def _oil_lines():
     xw = spec.BEARINGS[3][1] + spec.BEARING_WIDTH["roller"] / 2 + 5.0 + spec.SUMP_T / 2
     r_run = 495.0
     xt = G["x1"] + 180.0
-    parts.append(mesh.pipe([(xt - 10.0, 0.0, zc), (xt + 60.0, 0.0, zc),
-                            (xt + 140.0, 0.0, -r_run), (xw, 0.0, -r_run),
-                            (xw, 0.0, -(spec.BEARINGS[3][3] - 6.0))],
-                           6.0, PIPE, bend=40.0))
+    scav = [(xt - 10.0, 0.0, zc), (xt + 60.0, 0.0, zc),
+            (xt + 140.0, 0.0, -r_run), (xw, 0.0, -r_run),
+            (xw, 0.0, -(spec.BEARINGS[3][3] - 6.0))]
+    parts.append(mesh.pipe(scav, 6.0, PIPE, bend=40.0))
+    RUNS.append((scav, 6.0, 40.0))
     return mesh.join(*parts)
 
 
@@ -286,17 +344,19 @@ def _fuel_lines():
     r_run = 500.0
     # out of the metering unit's side, under the generator, then up to the
     # run at seven o'clock
-    main = mesh.pipe([(800.0, -40.0, z_fmu), (800.0, -195.0, z_fmu - 30.0),
+    main_path = [(800.0, -40.0, z_fmu), (800.0, -195.0, z_fmu - 30.0),
                       (960.0, *common.polar(0.0, r_run, clock)[1:]),
-                      common.polar(c["manifold_x"] - 60.0, r_run, clock),
-                      common.polar(c["manifold_x"], rm + 8.0, clock)],
-                     8.0, PIPE, bend=40.0)
+                 common.polar(c["manifold_x"] - 60.0, r_run, clock),
+                 common.polar(c["manifold_x"], rm + 8.0, clock)]
+    main = mesh.pipe(main_path, 8.0, PIPE, bend=40.0)
     # the reheat feed runs on aft to the reheat fuel control on the case
-    reheat = mesh.pipe([(770.0, -40.0, z_fmu), (770.0, -212.0, z_fmu - 52.0),
-                        (950.0, *common.polar(0.0, r_run + 18.0, clock)[1:]),
-                        common.polar(fc[0] - 90.0, r_run + 18.0, clock),
-                        (fc[0] - 30.0, fc[1], fc[2]), fc],
-                       9.0, PIPE, bend=40.0)
+    reheat_path = [(770.0, -40.0, z_fmu), (770.0, -212.0, z_fmu - 52.0),
+                   (950.0, *common.polar(0.0, r_run + 18.0, clock)[1:]),
+                   common.polar(fc[0] - 90.0, r_run + 18.0, clock),
+                   (fc[0] - 30.0, fc[1], fc[2]), fc]
+    reheat = mesh.pipe(reheat_path, 9.0, PIPE, bend=40.0)
+    RUNS.append((main_path, 8.0, 40.0))
+    RUNS.append((reheat_path, 9.0, 40.0))
     return mesh.join(main, reheat)
 
 
