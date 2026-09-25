@@ -48,6 +48,11 @@ The brief was agility over top speed. Each choice follows from it.
 - **Stealth shaping that costs no agility.** A chined nose, caret intakes
   with serpentine ducts that hide the engine faces, an internal weapons bay,
   canted fins and sawtooth edges.
+- **Every moving surface is driven.** Each canard turns on a spindle in two
+  bearings on a beam off the cockpit tub, through a crank and a linear
+  actuator. Each flaperon, leading-edge flap and rudder has its actuator in
+  a pocket in the fixed surface beside its hinge, sized to the section's
+  depth there, pushing on a horn below the hinge line.
 
 ## What that buys
 

@@ -410,6 +410,9 @@ MATERIAL_MAP = {
     "gun": "steel",
     "canard_spindle": "steel",
     "canard_drive": "steel",
+    "flaperon_act": "steel",
+    "le_flap_act": "steel",
+    "rudder_act": "steel",
 }
 DEFAULT_MATERIAL = "structure"
 

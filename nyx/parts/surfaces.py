@@ -125,16 +125,127 @@ def wing_parts():
                              lambda y: (0.0, 1.0), P))
     out["wing"] = mesh.join(*segs)
 
-    # leading-edge flap, on four hinge fittings
+    # leading-edge flap, on four hinge fittings, driven by two actuators in
+    # pockets in the wing just aft of its hinge, between the fittings
     flap = loft_surface(_span(le0 + GAP / 2, le1 - GAP / 2, 16),
                         lambda y: (0.0, lf - g(y) / 2), P)
-    out["le_flap"] = mesh.join(flap, *_fittings(P, le0, le1, lf, 4))
-    # flaperons
+    le_cuts, le_acts, le_lugs = [], [], []
+    for k in (1, 3):
+        ya = le0 + (le1 - le0) * k / 4.0
+        cut, act, lug = pocket_actuator_fwd(P, spec.wing_chord, ya, lf, g(ya))
+        le_cuts.append(cut)
+        le_acts.append(act)
+        le_lugs.append(lug)
+    out["le_flap"] = mesh.join(flap, *le_lugs, *_fittings(P, le0, le1, lf, 4))
+    out["le_flap_act"] = mesh.join(*le_acts)
+    # flaperons, each driven by an actuator in a pocket in the wing ahead of
+    # its hinge, between its first two hinge fittings
+    cuts = []
     for name, (a, b) in (("flaperon_in", (fa0, fa1)), ("flaperon_out", (fb0, fb1))):
         surf = loft_surface(_span(a + GAP / 2, b - GAP / 2, 8),
                             lambda y: (1.0 - cf + g(y) / 2, 1.0), P)
-        out[name] = mesh.join(surf, *_fittings(P, a, b, 1.0 - cf, 3))
+        ya = a + (b - a) / 3.0
+        cut, act, lug = pocket_actuator(P, spec.wing_chord, ya, cf, g(ya))
+        cuts.append(cut)
+        out[name] = mesh.join(surf, lug, *_fittings(P, a, b, 1.0 - cf, 3))
+        out[name.replace("flaperon", "flaperon_act")] = act
+    out["cut:wing"] = mesh.join(*cuts, *le_cuts)
     return out
+
+
+def pocket_actuator_fwd(P, chord, s, u_hinge, g, hs=45.0):
+    """The same for a surface AHEAD of its hinge (a leading-edge flap): the
+    pocket is in the wing just aft of the hinge, open forward into the
+    gap, and the rod pushes forward to a horn on the flap's back face."""
+    c = chord(s)
+    tc = P.tc(s)
+    cam = lambda u: 4.0 * P.camber * u * (1.0 - u)
+    u_gap = u_hinge + g / 2.0                # the wing's front face
+    u_f = u_hinge - g / 2.0                  # the flap's back face
+    L = min(260.0, 0.2 * c)
+    u1 = u_gap + L / c
+    h = min(shapes.naca_t(u, tc) for u in (u_gap, u1)) - 6.0 / c
+    vc = cam(u_gap)
+    rings = []
+    for yy in (s - hs, s + hs):
+        rings.append([P(yy, u_gap - 3.0 / c, vc - h), P(yy, u1, vc - h),
+                      P(yy, u1, vc + h), P(yy, u_gap - 3.0 / c, vc + h)])
+    cut = shapes.loft_rings(rings)
+    ra = min(24.0, 0.55 * h * c)
+    rr = max(6.0, 0.42 * ra)
+    va = vc - 0.35 * h
+    pt = lambda u, yy=s: P(yy, u, va)
+    parts = [mesh.pipe([pt(u1 + 6.0 / c), pt(u1 - 16.0 / c)], ra + 4.0, 16,
+                       bend=0.0)]
+    u_body0 = u_gap + 70.0 / c
+    parts.append(mesh.pipe([pt(u1 - 16.0 / c), pt(u_body0)], ra, 20, bend=0.0))
+    u_pin = u_gap + 20.0 / c
+    parts.append(mesh.pipe([pt(u_body0), pt(u_pin)], rr, 14, bend=0.0))
+    parts.append(mesh.pipe([pt(u_pin, s - 11.0), pt(u_pin, s + 11.0)], rr + 4.0,
+                           14, bend=0.0))
+    lug_rings = []
+    for yy in (s - 8.0, s + 8.0):
+        lug_rings.append([P(yy, u_f - 6.0 / c, va - (rr + 4.0) / c),
+                          P(yy, u_pin + 14.0 / c, va - (rr + 4.0) / c),
+                          P(yy, u_pin + 14.0 / c, va + (rr + 4.0) / c),
+                          P(yy, u_f - 6.0 / c, va + (rr + 4.0) / c)])
+    return cut, mesh.join(*parts), shapes.loft_rings(lug_rings)
+
+
+def pocket_actuator(P, chord, s, cf, g, hs=45.0):
+    """A control surface's actuator, in a pocket in the fixed surface just
+    ahead of its hinge.
+
+    The wing and the fins are solid lofts here, so the bay an actuator lives
+    in is a pocket cut out of the inside: closed above and below by the
+    skins, open only aft into the hinge gap. The actuator's body is pinned
+    to the pocket's front wall (the spar); its rod runs aft to a horn on
+    the moving surface -- a lug that reaches forward out of the surface's
+    nose, across the gap and into the pocket, below the hinge line, so the
+    rod has a moment arm about the hinge. Its size is what the section's
+    thickness there allows: an outboard flaperon's pocket is 50 mm deep.
+
+    Returns (pocket cutter, actuator, the surface's horn lug)."""
+    c = chord(s)
+    tc = P.tc(s)
+    cam = lambda u: 4.0 * P.camber * u * (1.0 - u)
+    ht = lambda u: shapes.naca_t(u, tc)
+    u_gap = 1.0 - cf - g / 2.0
+    u_f = 1.0 - cf + g / 2.0
+    L = min(300.0, 0.3 * c)
+    u0 = u_gap - L / c
+    h = ht(u_gap) - 6.0 / c                 # half-depth, in chord units
+    vc = cam(u_gap)
+    rings = []
+    for yy in (s - hs, s + hs):
+        rings.append([P(yy, u0, vc - h), P(yy, u_gap + 3.0 / c, vc - h),
+                      P(yy, u_gap + 3.0 / c, vc + h), P(yy, u0, vc + h)])
+    cut = shapes.loft_rings(rings)
+    ra = min(24.0, 0.55 * h * c)            # the body's radius, mm
+    rr = max(6.0, 0.42 * ra)                # the rod's
+    va = vc - 0.35 * h                      # its axis, below the hinge line
+    pt = lambda u, yy=s: P(yy, u, va)
+    parts = []
+    # the trunnion block on the pocket's front wall, 6 mm into it
+    parts.append(mesh.pipe([pt(u0 - 6.0 / c), pt(u0 + 16.0 / c)], ra + 4.0, 16,
+                           bend=0.0))
+    u_body1 = u_gap - 70.0 / c
+    parts.append(mesh.pipe([pt(u0 + 16.0 / c), pt(u_body1)], ra, 20, bend=0.0))
+    u_pin = u_gap - 20.0 / c
+    parts.append(mesh.pipe([pt(u_body1), pt(u_pin)], rr, 14, bend=0.0))
+    # the rod end's eye, on a pin across the lug
+    parts.append(mesh.pipe([pt(u_pin, s - 11.0), pt(u_pin, s + 11.0)], rr + 4.0,
+                           14, bend=0.0))
+    act = mesh.join(*parts)
+    # the horn: out of the surface's nose, forward past the pin
+    lug_rings = []
+    for yy in (s - 8.0, s + 8.0):
+        lug_rings.append([P(yy, u_pin - 14.0 / c, va - (rr + 4.0) / c),
+                          P(yy, u_f + 6.0 / c, va - (rr + 4.0) / c),
+                          P(yy, u_f + 6.0 / c, va + (rr + 4.0) / c),
+                          P(yy, u_pin - 14.0 / c, va + (rr + 4.0) / c)])
+    lug = shapes.loft_rings(lug_rings)
+    return cut, act, lug
 
 
 def _fittings(P, y0, y1, u_hinge, n):
@@ -332,14 +443,19 @@ def fin_parts():
     ]
     rudder = loft_surface(_span(s0 + GAP / 2, s1 - GAP / 2, 10),
                           lambda s: (1.0 - cf + g(s) / 2, 1.0), P)
-    fits = []
+    # the rudder's actuator, low in the fin where it is thickest, below the
+    # first hinge fitting
+    sa = s0 + 95.0
+    cut, act, lug = pocket_actuator(P, P.chord, sa, cf, g(sa), hs=40.0)
+    fits = [lug]
     for i in range(3):
         s = s0 + (s1 - s0) * (i + 0.5) / 3
         x, y, z = P(s, 1.0 - cf, 0.0)
         c = P.chord(s)
         fits.append(mesh.box(x, y, z, GAP + 24.0, max(10.0, F["tc"] * c * 0.45),
                              26.0))
-    return {"fin": mesh.join(*segs), "rudder": mesh.join(rudder, *fits)}
+    return {"fin": mesh.join(*segs), "rudder": mesh.join(rudder, *fits),
+            "rudder_act": act, "cut:fin": cut}
 
 
 def build():

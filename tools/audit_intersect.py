@@ -38,6 +38,10 @@ AIRFRAME = [
     ("wing_", "fuselage_skin"),
     # control surfaces hang on hinge fittings let into the surface they move on
     ("le_flap_", "wing_"), ("flaperon_", "wing_"), ("rudder_", "fin_"),
+    # each flaperon's and rudder's actuator: its trunnion is let into its
+    # pocket's front wall, and its rod end's eye is on the horn lug
+    ("flaperon_act_in_", "flaperon_in_"), ("flaperon_act_out_", "flaperon_out_"),
+    ("rudder_act_", "rudder_"), ("le_flap_act_", "le_flap_"),
     # fin roots are let into the skin, and their front spars into the frames
     ("fin_", "fuselage_skin"), ("fin_", "frame_"),
     # each canard turns on a spindle through the skin into its root

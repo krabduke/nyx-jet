@@ -934,8 +934,8 @@
    "key": "02 Flying surfaces",
    "label": "Flying surfaces",
    "color": "#8E979E",
-   "parts": 18,
-   "faces": 20554
+   "parts": 26,
+   "faces": 21732
   },
   {
    "key": "03 Intakes",
@@ -2356,32 +2356,52 @@
   "fin_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 1456
+   "f": 1625
   },
   "fin_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 1456
+   "f": 1636
+  },
+  "flaperon_act_in_l": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 72
+  },
+  "flaperon_act_in_r": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 72
+  },
+  "flaperon_act_out_l": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 72
+  },
+  "flaperon_act_out_r": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 72
   },
   "flaperon_in_l": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 796
+   "f": 802
   },
   "flaperon_in_r": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 796
+   "f": 802
   },
   "flaperon_out_l": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 796
+   "f": 802
   },
   "flaperon_out_r": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 796
+   "f": 802
   },
   "formation_light_l": {
    "m": "07 Structure",
@@ -2513,15 +2533,25 @@
    "mat": "steel",
    "f": 72
   },
+  "le_flap_act_l": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 144
+  },
+  "le_flap_act_r": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 144
+  },
   "le_flap_l": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 1578
+   "f": 1590
   },
   "le_flap_r": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 1578
+   "f": 1590
   },
   "missiles": {
    "m": "05 Weapons bay",
@@ -2553,15 +2583,25 @@
    "mat": "radar",
    "f": 98
   },
+  "rudder_act_l": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 72
+  },
+  "rudder_act_r": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 72
+  },
   "rudder_l": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 990
+   "f": 996
   },
   "rudder_r": {
    "m": "02 Flying surfaces",
    "mat": "skin_dark",
-   "f": 990
+   "f": 996
   },
   "seat": {
    "m": "04 Cockpit",
@@ -2621,12 +2661,12 @@
   "wing_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 2854
+   "f": 2880
   },
   "wing_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 2854
+   "f": 2877
   }
  }
 }
