@@ -55,6 +55,11 @@ AIRFRAME = [
     ("canard_drive_", "frame_5119"),
     # every frame is riveted to the skin: its outer face is let into it
     ("frame_", "fuselage_skin"),
+    # the fuselage's fuel cells hang from the frames at their ends, let into
+    # them; the wing tanks are integral, half a millimetre into the skins
+    # that close them
+    ("fuel_tank_fwd_", "frame_"), ("fuel_tank_centre", "frame_9000"),
+    ("fuel_tank_wing_", "wing_"),
     # the seat's rails are bolted to the bulkhead behind it, which is set
     # into the tub's walls and floor
     ("seat", "seat_bulkhead"), ("seat_bulkhead", "cockpit_tub"),

@@ -4,15 +4,15 @@
  "figures": {
   "length_mm": 14890.0,
   "span_mm": 13236.0,
-  "combat_mass_kg": 17510.0,
+  "combat_mass_kg": 17475.0,
   "empty_mass_kg": 13160.0,
   "wing_area_m2": 68.2,
   "aspect_ratio": 2.55,
-  "wing_loading": 257.0,
+  "wing_loading": 256.0,
   "tw": 1.57,
-  "static_margin_pct": -5.0,
+  "static_margin_pct": -4.8,
   "g_limit": 9.5,
-  "itr_sl": 34.6,
+  "itr_sl": 34.7,
   "corner_ms": 153.0,
   "str_sl": 25.5,
   "str_sl_g": 5.3,
@@ -935,7 +935,7 @@
    "label": "Flying surfaces",
    "color": "#8E979E",
    "parts": 26,
-   "faces": 21732
+   "faces": 22572
   },
   {
    "key": "03 Intakes",
@@ -969,22 +969,22 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 15,
-   "faces": 10260
+   "parts": 21,
+   "faces": 19662
   },
   {
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
    "parts": 124,
-   "faces": 740834
+   "faces": 741760
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
    "parts": 124,
-   "faces": 740834
+   "faces": 741760
   }
  ],
  "parts": {
@@ -1361,7 +1361,7 @@
   "engine_l_fuel_lines": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 1048
+   "f": 1734
   },
   "engine_l_fuel_manifold": {
    "m": "08 Engine port",
@@ -1381,7 +1381,7 @@
   "engine_l_fuel_pump": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 128
+   "f": 368
   },
   "engine_l_gearbox": {
    "m": "08 Engine port",
@@ -1986,7 +1986,7 @@
   "engine_r_fuel_lines": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 1048
+   "f": 1734
   },
   "engine_r_fuel_manifold": {
    "m": "09 Engine starboard",
@@ -2006,7 +2006,7 @@
   "engine_r_fuel_pump": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 128
+   "f": 368
   },
   "engine_r_gearbox": {
    "m": "09 Engine starboard",
@@ -2458,6 +2458,36 @@
    "mat": "structure",
    "f": 1284
   },
+  "fuel_tank_centre": {
+   "m": "07 Structure",
+   "mat": "tank",
+   "f": 3088
+  },
+  "fuel_tank_fwd_1": {
+   "m": "07 Structure",
+   "mat": "tank",
+   "f": 1598
+  },
+  "fuel_tank_fwd_2": {
+   "m": "07 Structure",
+   "mat": "tank",
+   "f": 1888
+  },
+  "fuel_tank_fwd_3": {
+   "m": "07 Structure",
+   "mat": "tank",
+   "f": 2008
+  },
+  "fuel_tank_wing_l": {
+   "m": "07 Structure",
+   "mat": "tank",
+   "f": 410
+  },
+  "fuel_tank_wing_r": {
+   "m": "07 Structure",
+   "mat": "tank",
+   "f": 410
+  },
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
@@ -2701,12 +2731,12 @@
   "wing_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 2880
+   "f": 3302
   },
   "wing_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 2877
+   "f": 3295
   }
  }
 }

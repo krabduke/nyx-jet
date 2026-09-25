@@ -293,12 +293,27 @@ MASS_EMPTY = [
     ("radar and avionics", 870.0, 2100.0),
     ("cockpit and ejection seat", 260.0, 4300.0),
 ]
-FUEL_TANKS = [
-    # tank, full kg, x_cg
-    ("forward fuselage", 1700.0, 7000.0),
-    ("centre, over the bay", 2700.0, 9300.0),
-    ("wing (2)", 2800.0, 9600.0),
-]
+def _fuel_tanks():
+    """[(tank, full kg, x_cg)] -- what the built tanks hold, as measured by
+    tools/measure_fuel.py into fuel_tanks.json. This was three typed-in
+    numbers, and the wings between their spars hold a third of the 2,800 kg
+    they were given, while the three cells over the bay hold more than twice
+    the 1,700 kg the forward fuselage was."""
+    import json
+    t = json.load(open(os.path.join(HERE, "fuel_tanks.json")))
+    return [(n, v["kg"], v["x_cg_mm"]) for n, v in sorted(t.items())]
+
+
+FUEL_TANKS = _fuel_tanks()
+
+# The order the tanks are used in, which is how the CG is kept where the
+# control laws want it: the forwardmost cell first, then the wings, then the
+# other cells, and last the centre tank, which is the collector the engines
+# feed from. Burned evenly, the CG ran from -1.5 % of the mean chord full to
+# -4 % nearly empty and was -2.7 % at combat weight; in this order it is
+# -4.7 to -6.1 % from three-quarters full down, and -4.8 % at combat weight.
+BURN_ORDER = ["fuel_tank_fwd_1", "fuel_tank_wing_l", "fuel_tank_wing_r",
+              "fuel_tank_fwd_2", "fuel_tank_fwd_3", "fuel_tank_centre"]
 PAYLOAD = [
     ("pilot", 110.0, 4200.0),
     ("4 medium-range missiles", 4 * 160.0, 7850.0),
@@ -308,8 +323,16 @@ G_LIMIT = 9.5
 
 
 def mass_table(fuel_fraction=COMBAT_FUEL_FRACTION):
+    """The aircraft's masses with this fraction of its fuel left, the fuel
+    burned in BURN_ORDER: the tanks used last are the ones still full."""
     rows = list(MASS_EMPTY) + list(PAYLOAD)
-    rows += [(n, m * fuel_fraction, x) for (n, m, x) in FUEL_TANKS]
+    tanks = {n: (m, x) for (n, m, x) in FUEL_TANKS}
+    left = fuel_fraction * sum(m for (m, _) in tanks.values())
+    for n in reversed(BURN_ORDER):
+        m, x = tanks[n]
+        kg = min(left, m)
+        left -= kg
+        rows.append((n, kg, x))
     return rows
 
 

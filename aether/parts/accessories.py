@@ -287,7 +287,17 @@ def _gearbox_units():
     # fuel pump on the front face
     pv, pf = mesh.revolve_ring([(G["x0"] - 52.0, 6.0), (G["x0"] + 6.0, 6.0),
                                 (G["x0"] + 6.0, 40.0), (G["x0"] - 52.0, 40.0)], 32)
-    out["fuel_pump"] = ([(px, py, pz + zc - 16.0) for (px, py, pz) in pv], pf)
+    # and on its front face, on its axis, the aircraft's fuel inlet: a
+    # beaded union, the airframe's feed line's end. The engine had no inlet
+    # for its fuel at all.
+    iv, if_ = mesh.revolve_closed(
+        [(G["x0"] - 48.0, 0.0), (G["x0"] - 48.0, 16.0), (G["x0"] - 60.0, 16.0),
+         (G["x0"] - 60.0, 12.0), (G["x0"] - 84.0, 12.0), (G["x0"] - 87.0, 14.5),
+         (G["x0"] - 91.0, 14.5), (G["x0"] - 94.0, 12.0), (G["x0"] - 98.0, 12.0),
+         (G["x0"] - 98.0, 0.0)], 24)
+    out["fuel_pump"] = mesh.join(
+        ([(px, py, pz + zc - 16.0) for (px, py, pz) in pv], pf),
+        ([(px, py, pz + zc - 16.0) for (px, py, pz) in iv], if_))
     # fuel metering unit under the gearbox
     out["fuel_metering_unit"] = _rounded_box(
         700.0, 860.0, 0.0, zc - G["depth"] / 2.0 - 26.0, 70.0, 30.0, 4.0, 32,
@@ -359,7 +369,17 @@ def _fuel_lines():
     reheat = mesh.pipe(reheat_path, 9.0, PIPE, bend=40.0)
     RUNS.append((main_path, 8.0, 40.0))
     RUNS.append((reheat_path, 9.0, 40.0))
-    return mesh.join(main, reheat)
+    # and the pump's delivery to the metering unit: out of the pump's side,
+    # down and aft under the gearbox into the unit's front face -- the path
+    # tools/route_solve found clear of the hydraulic pump. The pump and the
+    # metering unit had nothing between them.
+    zp = zc - 16.0
+    x_fmu = 700.0
+    supply = mesh.pipe([(G["x0"] - 23.0, 36.0, zp), (G["x0"] - 23.0, 50.0, zp - 12.0),
+                        (G["x0"] - 25.0, 50.0, zp - 27.0), (425.0, 50.0, zp - 97.0),
+                        (640.0, 50.0, zp - 97.0), (x_fmu - 12.0, 8.0, zp - 70.0),
+                        (x_fmu + 4.0, 0.0, zp - 70.0)], 8.0, PIPE, bend=18.0)
+    return mesh.join(main, reheat, supply)
 
 
 def _fadec():

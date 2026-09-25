@@ -110,6 +110,7 @@ EXPECTED = [
     ("fuel_metering_unit", "gearbox"), ("oil_tank", "gearbox"),
     # fuel lines leave the metering unit and end in the manifolds
     ("fuel_lines", "fuel_metering_unit"), ("fuel_lines", "fuel_manifold"),
+    ("fuel_lines", "fuel_pump"),
     # the FADECs stand on posts let into the case; the looms plug into
     # the FADECs and the gearbox
     ("fadec_", "case_outer_fwd"), ("harnesses", "fadec_"),

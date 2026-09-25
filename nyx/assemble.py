@@ -22,7 +22,7 @@ import spec              # noqa: E402
 import mesh as meshlib   # noqa: E402
 import materials         # noqa: E402
 from parts import (fuselage, surfaces, intakes, cockpit, bay, gear,  # noqa: E402
-                   structure, engines, details)
+                   structure, engines, details, fuel)
 
 MM = 0.001
 
@@ -30,6 +30,7 @@ MODULES = [
     ("fuselage", fuselage), ("surfaces", surfaces), ("intakes", intakes),
     ("cockpit", cockpit), ("bay", bay), ("gear", gear),
     ("structure", structure), ("details", details), ("engines", engines),
+    ("fuel", fuel),
 ]
 
 COLLECTIONS = ["01 Airframe", "02 Flying surfaces", "03 Intakes",

@@ -15,8 +15,7 @@
                   its thrust lug up to the aft frame
     radar         an AESA array on a bulkhead behind the radome
 
-The fuel tanks are accounted for in the mass table (spec.FUEL_TANKS) but
-are not modelled as parts.
+The fuel tanks are in parts/fuel.py.
 """
 
 import math
