@@ -685,6 +685,7 @@ MATERIAL_MAP = {
     "oil": "steel",
     "fadec": "composite",
     "harness": "rubber",
+    "sensor": "steel",
     "mount": "steel",
     "igniter": "steel",
     "vsv": "steel",

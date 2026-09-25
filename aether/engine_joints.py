@@ -114,6 +114,11 @@ EXPECTED = [
     # the FADECs and the gearbox
     ("fadec_", "case_outer_fwd"), ("harnesses", "fadec_"),
     ("harnesses", "gearbox"),
+    # each channel's instrumentation loom plugs into its FADEC's aft face,
+    # and each probe's pigtail into the probe's connector; the probes'
+    # bosses are let into the case
+    ("harness_looms", "fadec_"), ("harness_looms", "sensor_probes"),
+    ("sensor_probes", "case_outer_"),
     # mounts are let into the case, the trunnions over the frame's struts
     ("mount_trunnions", "case_outer_fwd"),
     ("mount_trunnions", "fan_frame_struts"),
@@ -140,7 +145,7 @@ EXPECTED = [
     # foot let into the case
     ("line_clamps", "case_outer_"),
     ("line_clamps", "hydraulic_lines"), ("line_clamps", "fuel_lines"),
-    ("line_clamps", "oil_lines"),
+    ("line_clamps", "oil_lines"), ("line_clamps", "harness_looms"),
     ("swivel_drive_1", "case_outer_aft"),
     # the oblique bearings' motors stand on pads welded to the sloping shell
     # of the duct in front, let into it at their low end

@@ -77,6 +77,7 @@ def build():
     out["coolant_lines"] = _coolant()
     out["mode_valve_actuators"] = _mode_valve_actuators()
     out.update(_hydraulics())
+    out.update(_instrumentation(out))
     # last: the clamps need every line's run
     out["line_clamps"] = _line_clamps()
     return out
@@ -443,3 +444,150 @@ def _coolant():
                                     (-4.0, 20.0)], 24)
         parts.append(([(px + e[0], py + e[1], pz + e[2]) for (px, py, pz) in fv], ff))
     return mesh.join(*parts)
+
+
+# --------------------------------------------------------------------------
+# Instrumentation: the probes the FADEC reads and the looms that carry them.
+#
+# The two FADEC channels had a loom each down to the gearbox's sensors and
+# nothing else, so the control was flying the engine blind: no compressor
+# delivery pressure, no turbine exit temperature, no flame detection. Each
+# channel now has its own loom up the case to the upper flank on its side
+# -- channel A at 67.5 degrees, B at 112.5, each in the bay between two
+# orthogrid stringers -- then fore and aft along the case, with a probe at
+# every station the control schedules on. Two channels, two looms, two sets
+# of probes: a loom or a probe lost takes out one channel, not the engine.
+#
+# The looms stand off the case on the P-clamps like every other line, and
+# lift over each flange, rib ring and manifold they cross: their height is
+# taken from the case as built, not assumed.
+
+LOOM_R = 6.5          # a channel's loom, in its braided sleeve
+PIG_R = 3.2           # a probe's pigtail
+LOOM_CLEAR = 8.0      # loom surface to anything under it
+ARC_X = 1290.0        # where each loom climbs from its FADEC to its run
+# (station, what it measures) -- clear of the rib rings, the flanges, the
+# manifolds and the igniters
+PROBES = ((800.0, "P25 / T25  fan exit"),
+          (1000.0, "PS3 bleed  compressor mid-stage"),
+          (1540.0, "P3 / T3    compressor delivery"),
+          (1840.0, "T45        turbine exit, EGT"),
+          (2150.0, "P6 / T6    mixer"),
+          (2420.0, "flame      reheat flame detector"),
+          (2620.0, "P7         nozzle inlet"))
+PROBE_OFF = 6.0       # degrees from the loom, toward the lower stringer
+CHANNELS = (("a", -32.0, 67.5, -1.0), ("b", -148.0, -247.5, 1.0))
+
+
+def _case_envelope(built, clock, half_mm, x0, x1, bin_mm=5.0):
+    """The highest thing standing on the case within half_mm either side of
+    a clock line, in x bins from x0 to x1: a list of radii. Only what is
+    within 90 mm of the case counts -- a line well above can be passed
+    under."""
+    from parts import frames, augmentor, combustor, fan
+    n = int((x1 - x0) / bin_mm) + 1
+    top = [outer_od(x0 + i * bin_mm) for i in range(n)]
+    parts = [v for m in (frames, augmentor, combustor, fan)
+             for k, (v, f) in m.build().items() if not k.startswith("cut:")]
+    parts += [v for k, (v, f) in built.items()]
+    ca, sa = math.cos(math.radians(clock)), math.sin(math.radians(clock))
+    for verts in parts:
+        for (x, y, z) in verts:
+            if not x0 - 60.0 <= x <= x1 + 60.0:
+                continue
+            r = math.hypot(y, z)
+            if r < 300.0:
+                continue
+            # distance across the clock line, and along it
+            across = abs(-y * sa + z * ca)
+            if across > half_mm or y * ca + z * sa <= 0.0:
+                continue
+            if r - outer_od(min(max(x, x0), x1)) > 90.0:
+                continue
+            i = int(round((x - x0) / bin_mm))
+            for j in (i - 1, i, i + 1):
+                if 0 <= j < n and r > top[j]:
+                    top[j] = r
+    return top
+
+
+def _loom_radius(top, x0, bin_mm, reach=40.0, ease=25.0):
+    """Radius of a loom's centreline over an envelope: clear of the highest
+    thing within `reach` of each station, then eased so it ramps over a
+    flange instead of stepping."""
+    n = len(top)
+    k = int(reach / bin_mm)
+    need = [max(top[max(0, i - k):i + k + 1]) + LOOM_CLEAR + LOOM_R
+            for i in range(n)]
+    need = [max(v, outer_od(x0 + i * bin_mm) + 22.0) for i, v in enumerate(need)]
+    e = int(ease / bin_mm)
+    return [sum(need[max(0, i - e):i + e + 1]) / len(need[max(0, i - e):i + e + 1])
+            for i in range(n)]
+
+
+def _simplify(pts, tol=0.8):
+    """Douglas-Peucker on (x, r) points."""
+    if len(pts) < 3:
+        return pts
+    (xa, ra), (xb, rb) = pts[0], pts[-1]
+    best, bi = 0.0, 0
+    for i in range(1, len(pts) - 1):
+        x, r = pts[i]
+        t = (x - xa) / (xb - xa) if xb != xa else 0.0
+        d = abs(r - (ra + (rb - ra) * t))
+        if d > best:
+            best, bi = d, i
+    if best <= tol:
+        return [pts[0], pts[-1]]
+    return _simplify(pts[:bi + 1], tol)[:-1] + _simplify(pts[bi:], tol)
+
+
+def _instrumentation(built):
+    out = {}
+    looms, probes = [], []
+    bin_mm = 5.0
+    xs_lo = min(p[0] for p in PROBES) - 40.0
+    xs_hi = max(p[0] for p in PROBES) + 60.0
+    for tag, c_fadec, c_run, sgn in CHANNELS:
+        top = _case_envelope(built, c_run, LOOM_R + LOOM_CLEAR + 4.0,
+                             xs_lo, xs_hi, bin_mm)
+        rr = _loom_radius(top, xs_lo, bin_mm)
+        r_at = lambda x: rr[min(len(rr) - 1, max(0, int(round((x - xs_lo) / bin_mm))))]
+        # the run, fore and aft of the climb
+        for xa, xb in ((ARC_X, xs_lo), (ARC_X, xs_hi)):
+            step = bin_mm if xb > xa else -bin_mm
+            n = int(abs(xb - xa) / bin_mm)
+            xr = [(xa + step * i, r_at(xa + step * i)) for i in range(n + 1)]
+            xr = _simplify(xr)
+            path = [common.polar(x, r, c_run) for (x, r) in xr]
+            looms.append(mesh.pipe(path, LOOM_R, PIPE, bend=30.0))
+            RUNS.append((path, LOOM_R, 30.0))
+        # the climb: out of the FADEC's aft face, round the case at ARC_X
+        r_box = outer_od(920.0) + 12.0 + 30.0
+        r_run = r_at(ARC_X)
+        arc = [common.polar(1255.0, r_box, c_fadec),
+               common.polar(ARC_X - 12.0, r_box, c_fadec)]
+        n = 24
+        for i in range(n + 1):
+            t = i / n
+            c = c_fadec + (c_run - c_fadec) * t
+            r = r_box + (r_run - r_box) * min(1.0, t * 5.0)
+            arc.append(common.polar(ARC_X, r, c))
+        looms.append(mesh.pipe(arc, LOOM_R, PIPE, bend=25.0))
+        # a probe at each station, a little down the flank from the loom,
+        # with its pigtail up and over into the loom
+        c_p = c_run + sgn * PROBE_OFF
+        for (xp, _what) in PROBES:
+            od = outer_od(xp)
+            probes.append(common.radial_pin(xp, od - 3.0, od + 6.0, 15.0, c_p, 20))
+            probes.append(common.radial_pin(xp, od + 6.0, od + 18.0, 11.0, c_p, 6))
+            probes.append(common.radial_pin(xp, od + 18.0, od + 34.0, 8.5, c_p, 16))
+            probes.append(common.radial_pin(xp, od + 24.0, od + 31.0, 10.5, c_p, 20))
+            xl = xp + 40.0
+            pig = [common.polar(xp, od + 30.0, c_p), common.polar(xp, od + 44.0, c_p),
+                   common.polar(xp + 20.0, r_at(xl) + 8.0, c_p - sgn * PROBE_OFF * 0.6),
+                   common.polar(xl, r_at(xl), c_run)]
+            looms.append(mesh.pipe(pig, PIG_R, 12, bend=8.0))
+    out["harness_looms"] = mesh.join(*looms)
+    out["sensor_probes"] = mesh.join(*probes)
+    return out

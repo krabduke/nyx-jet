@@ -967,15 +967,15 @@
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
-   "parts": 120,
-   "faces": 729436
+   "parts": 122,
+   "faces": 738700
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
-   "parts": 120,
-   "faces": 729436
+   "parts": 122,
+   "faces": 738700
   }
  ],
  "parts": {
@@ -1384,6 +1384,11 @@
    "mat": "casing",
    "f": 1440
   },
+  "engine_l_harness_looms": {
+   "m": "08 Engine port",
+   "mat": "rubber",
+   "f": 7852
+  },
   "engine_l_harnesses": {
    "m": "08 Engine port",
    "mat": "rubber",
@@ -1432,7 +1437,7 @@
   "engine_l_line_clamps": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 1296
+   "f": 1728
   },
   "engine_l_lpt_disc": {
    "m": "08 Engine port",
@@ -1523,6 +1528,11 @@
    "m": "08 Engine port",
    "mat": "steel",
    "f": 396
+  },
+  "engine_l_sensor_probes": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 980
   },
   "engine_l_service_struts": {
    "m": "08 Engine port",
@@ -1989,6 +1999,11 @@
    "mat": "casing",
    "f": 1440
   },
+  "engine_r_harness_looms": {
+   "m": "09 Engine starboard",
+   "mat": "rubber",
+   "f": 7852
+  },
   "engine_r_harnesses": {
    "m": "09 Engine starboard",
    "mat": "rubber",
@@ -2037,7 +2052,7 @@
   "engine_r_line_clamps": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 1296
+   "f": 1728
   },
   "engine_r_lpt_disc": {
    "m": "09 Engine starboard",
@@ -2128,6 +2143,11 @@
    "m": "09 Engine starboard",
    "mat": "steel",
    "f": 396
+  },
+  "engine_r_sensor_probes": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 980
   },
   "engine_r_service_struts": {
    "m": "09 Engine starboard",
