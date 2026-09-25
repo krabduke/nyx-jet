@@ -10,6 +10,8 @@ aoa_vane_r,01 Airframe,details,steel,56,32,1420.0,1484.0,433.8,483.0,-134.8,-39.
 bay_door_l,05 Weapons bay,bay,skin_dark,1394,1392,5251.0,9049.0,-404.9,-2.0,-769.4,-590.3,,
 bay_door_r,05 Weapons bay,bay,skin_dark,1394,1392,5251.0,9049.0,2.0,404.9,-769.4,-590.3,,
 bay_structure,05 Weapons bay,bay,structure,408,398,5242.0,9058.0,-413.0,413.0,-758.5,-142.0,,
+canard_drive_l,02 Flying surfaces,surfaces,steel,580,508,4710.0,5169.0,-1382.4,-462.0,189.0,410.0,,
+canard_drive_r,02 Flying surfaces,surfaces,steel,580,508,4710.0,5169.0,462.0,1382.4,189.0,410.0,,
 canard_l,02 Flying surfaces,surfaces,skin,1248,1201,4586.4,7362.7,-3100.0,-1238.7,298.3,363.7,,
 canard_r,02 Flying surfaces,surfaces,skin,1248,1201,4586.4,7362.7,1238.7,3100.0,298.3,363.7,,
 canard_spindle_l,02 Flying surfaces,surfaces,steel,120,98,5089.0,5149.0,-1520.0,-620.0,300.0,360.0,,

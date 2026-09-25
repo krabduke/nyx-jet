@@ -42,6 +42,11 @@ AIRFRAME = [
     ("fin_", "fuselage_skin"), ("fin_", "frame_"),
     # each canard turns on a spindle through the skin into its root
     ("canard_spindle_", "canard_"), ("canard_spindle_", "fuselage_skin"),
+    # its drive: the pivot beam is let into the tub wall and the skin, the
+    # bearings and the crank are on the spindle, and the actuator's anchor
+    # bracket is let into the tub wall
+    ("canard_drive_", "canard_spindle_"), ("canard_drive_", "cockpit_tub"),
+    ("canard_drive_", "fuselage_skin"),
     # the keel passes through the frames' arches
     ("frame_", "keel"),
     # engine mounts: beams from the keel and the forward frame to the

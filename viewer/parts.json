@@ -934,8 +934,8 @@
    "key": "02 Flying surfaces",
    "label": "Flying surfaces",
    "color": "#8E979E",
-   "parts": 16,
-   "faces": 19538
+   "parts": 18,
+   "faces": 20554
   },
   {
    "key": "03 Intakes",
@@ -1042,6 +1042,16 @@
    "m": "05 Weapons bay",
    "mat": "structure",
    "f": 398
+  },
+  "canard_drive_l": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 508
+  },
+  "canard_drive_r": {
+   "m": "02 Flying surfaces",
+   "mat": "steel",
+   "f": 508
   },
   "canard_l": {
    "m": "02 Flying surfaces",

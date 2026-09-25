@@ -409,6 +409,7 @@ MATERIAL_MAP = {
     "pitot": "steel",
     "gun": "steel",
     "canard_spindle": "steel",
+    "canard_drive": "steel",
 }
 DEFAULT_MATERIAL = "structure"
 

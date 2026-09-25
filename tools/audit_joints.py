@@ -38,6 +38,8 @@ CIRCUITS += mirrored("its flaps and flaperons hang on it",
 CIRCUITS += mirrored("", ["wing_{s}", "flaperon_out_{s}"])
 CIRCUITS += mirrored("each canard turns on its spindle in the body",
                      ["fuselage_skin", "canard_spindle_{s}", "canard_{s}"])
+CIRCUITS += mirrored("and is carried and driven off the cockpit tub",
+                     ["cockpit_tub", "canard_drive_{s}", "canard_spindle_{s}"])
 CIRCUITS += mirrored("each fin stands on the body and carries its rudder",
                      ["fuselage_skin", "fin_{s}", "rudder_{s}"])
 CIRCUITS += mirrored("each intake duct runs from its mouth to its engine's face",

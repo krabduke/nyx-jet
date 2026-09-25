@@ -216,7 +216,74 @@ def canard_parts():
     spindle = mesh.pipe([(xp, C["y_root"] - 380.0, C["z"]),
                          (xp, C["y_root"] + 520.0, C["z"])], 30.0, 24,
                         subdiv=4)
-    return {"canard": surf, "canard_spindle": spindle}
+    return {"canard": surf, "canard_spindle": spindle,
+            "canard_drive": canard_drive(xp)}
+
+
+CANARD_DRIVE = {
+    "beam_z": (360.0, 410.0),      # the pivot beam over the spindle
+    "beam_w": 56.0,                # its width fore and aft
+    "bearings_y": (700.0, 1330.0),
+    "crank_y": 640.0, "crank_len": 115.0,
+    "act_x": (4760.0, 5010.0),     # the actuator's body; its rod reaches
+    "act_r": 26.0,                 # back to the crank
+}
+
+
+def canard_drive(xp):
+    """What turns a canard, and what holds its spindle.
+
+    The spindle ran 860 mm into the body and ended there, held by nothing
+    and driven by nothing: an all-moving foreplane with no bearing and no
+    actuator. Now a box beam runs over the spindle from the cockpit tub's
+    side wall, which is primary structure, out to the skin; two bearing
+    housings hang from it round the spindle; a crank arm on the spindle's
+    inboard end points down, and a linear actuator, anchored on a bracket
+    off the tub wall ahead, pushes it through +/-30 degrees."""
+    D = CANARD_DRIVE
+    zc = C["z"]
+    zb0, zb1 = D["beam_z"]
+    w = D["beam_w"]
+    tub_y = spec.COCKPIT["half_w"] + 40.0          # the tub's side wall
+    parts = []
+    # the beam: from 8 mm into the tub wall out to 4 mm into the skin
+    zm = 0.5 * (zb0 + zb1)
+    y_skin = body_side_y(xp, zb1) - spec.SKIN_T + 4.0
+    y0 = tub_y - 8.0
+    parts.append(mesh.box(xp, 0.5 * (y0 + y_skin), zm, w, y_skin - y0,
+                          zb1 - zb0))
+    # the bearing housings round the spindle, each on a pedestal up to it
+    for yb in D["bearings_y"]:
+        hv, hf = mesh.revolve_closed(
+            [(-22.0, 31.0), (-22.0, 50.0), (22.0, 50.0), (22.0, 31.0)], 28)
+        parts.append(([(xp + pz, yb + px, zc + py) for (px, py, pz) in hv], hf))
+        parts.append(mesh.box(xp, yb, 0.5 * (zc + 44.0 + zb0 + 2.0), 44.0, 40.0,
+                              zb0 + 2.0 - (zc + 44.0)))
+    # the crank on the spindle's inboard end, and its pin
+    yc = D["crank_y"]
+    L = D["crank_len"]
+    cv, cf = mesh.revolve_closed(
+        [(-16.0, 29.0), (-16.0, 48.0), (16.0, 48.0), (16.0, 29.0)], 24)
+    parts.append(([(xp + pz, yc + px, zc + py) for (px, py, pz) in cv], cf))
+    parts.append(mesh.box(xp, yc, zc - L / 2 - 20.0, 44.0, 26.0, L - 10.0))
+    pin = (xp, yc, zc - L)
+    parts.append(mesh.pipe([(pin[0], yc - 24.0, pin[2]), (pin[0], yc + 24.0, pin[2])],
+                           9.0, 14, bend=0.0))
+    # the actuator: anchor bracket off the tub wall, body, rod, rod end
+    xa0, xa1 = D["act_x"]
+    ra = D["act_r"]
+    parts.append(mesh.box(xa0 - 30.0, 0.5 * (tub_y - 8.0 + yc + 20.0), pin[2],
+                          40.0, yc + 20.0 - (tub_y - 8.0), 44.0))
+    parts.append(mesh.pipe([(xa0 - 30.0, yc, pin[2]), (xa0, yc, pin[2])], 14.0, 16,
+                           bend=0.0))
+    parts.append(mesh.pipe([(xa0, yc, pin[2]), (xa1, yc, pin[2])], ra, 24,
+                           bend=0.0))
+    parts.append(mesh.pipe([(xa1, yc, pin[2]), (pin[0] - 14.0, yc, pin[2])], 11.0,
+                           16, bend=0.0))
+    ev, ef = mesh.revolve_closed(
+        [(-12.0, 0.0), (-12.0, 20.0), (12.0, 20.0), (12.0, 0.0)], 20)
+    parts.append(([(pin[0] + pz, yc + px, pin[2] + py) for (px, py, pz) in ev], ef))
+    return mesh.join(*parts)
 
 
 # --------------------------------------------------------------------------
