@@ -1,5 +1,5 @@
-"""Lobed mixer, tail cone, augmentor case and liner, and the integrated
-flameholders.
+"""Lobed mixer, tail cone, augmentor case and liner, spray rings and the
+V-gutter flameholder.
 
 The core and the bypass air arrive at the mixer at the same total pressure
 -- the cycle solves the bypass ratio for exactly that -- and sixteen lobes
@@ -49,10 +49,10 @@ def build():
         A["x_mixer0"], A["x_liner1"], lambda x: third_in(x) - A["case_t"],
         third_in, (P["third"],), step=50.0)
     out.update(_liner())
-    out["flameholder_vanes"] = _vanes()
+    out["flameholder"] = _flameholder()
     out["ab_fuel_manifold"] = _ab_fuel()
     out["ab_spraybars"] = _spraybars()
-    out["ab_pilot_gutter"] = _pilot()
+    out["ab_spray_rings"] = _spray_rings()
     out["ab_igniter"] = _igniter()
     out["ab_fuel_control"] = _fuel_control()
     return out
@@ -122,8 +122,11 @@ def _liner():
     r = A["liner_r"]
     t = A["liner_t"]
     case_bore = lambda x: third_in(x) - A["case_t"]
+    # corrugated along its length, as a reheat liner is: the corrugations
+    # let it grow hot without buckling and stiffen it against the screech
     out["augmentor_liner"] = mesh.join(
-        common.ring(x0, x1, r, r + t, step=100.0),
+        common.ring(x0, x1, lambda x: liner_r(x), lambda x: liner_r(x) + t,
+                    step=A["liner_pitch"] / 8.0),
         common.ring(x0, x0 + 10.0, r + t - 1.0, case_bore(x0 + 5.0)))
     holes = []
     nr, nc = A["screech_rows"], A["screech_per_row"]
@@ -131,22 +134,66 @@ def _liner():
         x = x0 + 60.0 + (x1 - x0 - 120.0) * i / (nr - 1)
         for k in range(nc):
             clock = 360.0 * (k + 0.5 * (i % 2)) / nc
-            holes.append(common.radial_pin(x, r - 3.0, r + t + 3.0,
+            holes.append(common.radial_pin(x, r - 6.0, r + t + 6.0,
                                            A["screech_hole_r"], clock, 8))
     out["cut:augmentor_liner"] = mesh.join(*holes)
     return out
 
 
-def _vanes():
-    """Sixteen radial flameholder vanes from the tail cone to the liner: a
-    thick symmetric section whose wake is where the flame sits."""
-    row = spec.BladeRow("flameholder", "core", A["vane_x0"], A["vane_chord"],
-                        A["n_vanes"], 0.0, 0.0,
-                        thickness=A["vane_t"] / A["vane_chord"], camber=0.0,
-                        rotor=False)
-    one = blades.loft(row, lambda x: tailcone_r(x) - spec.ROOT_EMBED,
-                      lambda x: A["liner_r"] + spec.ROOT_EMBED, 30, 9)
-    return mesh.replicate(*one, row.count)
+def liner_r(x):
+    """The corrugated liner's bore: a whole number of waves along it, so it
+    meets the nozzle's liner on its nominal radius."""
+    return A["liner_r"] + A["liner_wave"] * math.sin(
+        2.0 * math.pi * (x - A["x_liner0"]) / A["liner_pitch"])
+
+
+def _plate_arm(x0, a0, x1, a1, r0, r1, t, clock):
+    """One flat arm of a radial gutter: a plate from (x0, tangential a0) to
+    (x1, a1) in the gutter's own section, extruded from r0 to r1, t thick,
+    turned to its clock angle. Convex, so its ends cap cleanly."""
+    L = math.hypot(x1 - x0, a1 - a0)
+    nx, na = -(a1 - a0) / L * t / 2, (x1 - x0) / L * t / 2
+    sect = [(x0 - nx, a0 - na), (x1 - nx, a1 - na), (x1 + nx, a1 + na),
+            (x0 + nx, a0 + na)]
+    c = math.radians(clock)
+    cc, sc = math.cos(c), math.sin(c)
+    rings = []
+    for r in (r0, r1):
+        rings.append([(x, r * cc - a * sc, r * sc + a * cc) for (x, a) in sect])
+    v = [p for rg in rings for p in rg]
+    f = [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3),
+         (3, 7, 4, 0)]
+    return common.orient((v, f))
+
+
+def _flameholder():
+    """The flameholder: V-gutters, open aft, in whose wake the flame holds.
+
+    Three concentric rings, tied together and held by sixteen radial gutters
+    that run from the tail cone to the liner -- which is also what carries
+    the tail cone. A gutter makes a pocket of slow recirculating gas behind
+    its open mouth; fuel sprayed ahead of it burns there steadily and lights
+    the stream going past. The inner ring, closest to the tail cone where
+    the stream is slowest, is the pilot."""
+    x0, dep = A["vane_x0"], A["vane_chord"]
+    w, t = A["gutter_w"], A["gutter_t"]
+    parts = []
+    n = A["n_vanes"]
+    r_in = tailcone_r(x0 + dep) - 3.0
+    r_out = A["liner_r"] + A["liner_wave"] + 1.0
+    for k in range(n):
+        clock = 360.0 * k / n
+        for sgn in (1.0, -1.0):
+            parts.append(_plate_arm(x0, 0.0, x0 + dep, sgn * w / 2, r_in, r_out,
+                                    t, clock))
+    # the rings: a V in the meridional plane, apex forward
+    rw, rd = A["ring_w"], A["ring_depth"]
+    xa = x0 + 4.0
+    for r in A["ring_r"]:
+        loop = [(xa - 1.5, r), (xa + rd, r + rw / 2), (xa + rd, r + rw / 2 - t),
+                (xa + 2.5, r), (xa + rd, r - rw / 2 + t), (xa + rd, r - rw / 2)]
+        parts.append(mesh.revolve_ring(loop, SEG))
+    return mesh.join(*parts)
 
 
 TUBE = 9.0
@@ -157,17 +204,17 @@ def manifold_r(x):
 
 
 def _ab_fuel():
-    """The three reheat zone manifolds round the outer case. Zone 1's feeds
-    run down into every flameholder vane, where its spraybar is; zones 2
-    and 3 feed the spraybars ahead of the vanes."""
+    """The three reheat zone manifolds round the outer case, and zone 1's
+    feeds down through the case and liner to its spray ring."""
     parts = []
     for x in A["zone_x"]:
         parts.append(mesh.ring_torus(x, manifold_r(x), TUBE, SEG, 12))
     x = A["zone_x"][0]
     n = A["n_vanes"]
     for k in range(n):
-        parts.append(common.radial_pin(x, A["liner_r"] - 30.0, manifold_r(x) + 3.0,
-                                       5.0, 360.0 * k / n, 10))
+        parts.append(common.radial_pin(x, A["spray_ring_r"][0] - 2.0,
+                                       manifold_r(x) + 3.0, 5.0,
+                                       360.0 * (k + 0.5) / n, 10))
     return mesh.join(*parts)
 
 
@@ -192,23 +239,30 @@ def _spraybars():
     return mesh.join(*parts)
 
 
-def _pilot():
-    """A pilot gutter: a V-section ring round the tail cone, open aft, sitting
-    on the flameholder vanes' trailing edges. It holds a small steady flame
-    that relights the main zones through a reheat transient."""
-    x, r = A["pilot_x"], A["pilot_r"]
-    loop = [(x - 2.0, r), (x + 34.0, r + 15.0), (x + 34.0, r + 11.5),
-            (x + 3.0, r), (x + 34.0, r - 11.5), (x + 34.0, r - 15.0)]
-    return mesh.revolve_ring(loop, SEG)
+def _spray_rings():
+    """A spray ring in the stream for each zone, on the ends of its feeds:
+    a tube with orifices round its aft face, spraying into the gutters'
+    wake. Zone 1 is the outer ring, just ahead of the gutters; zones 2 and 3
+    further forward, on the tips of their spraybars."""
+    parts = []
+    tr = A["spray_tube_r"]
+    for x, r in zip(A["zone_x"], A["spray_ring_r"]):
+        parts.append(mesh.ring_torus(x, r, tr, SEG, 12))
+        for k in range(48):
+            clock = 360.0 * (k + 0.25) / 48
+            parts.append(mesh.pipe([common.polar(x + tr - 2.0, r, clock),
+                                    common.polar(x + tr + 4.0, r, clock)], 2.0, 8))
+    return mesh.join(*parts)
 
 
 def _igniter():
     """The reheat igniter: through a boss on the case at two o'clock, its
-    tip in the pilot gutter's wake, and the lead's connector on top."""
+    tip in the wake of the middle gutter ring, and the lead's connector on
+    top."""
     x, clock = A["igniter_x"], 60.0
     r_od = spec.annulus(P["third"], x)[1] + spec.WALL["outer_case"]
     return mesh.join(
-        common.radial_pin(x, A["pilot_r"] + 40.0, r_od + 34.0, 7.0, clock, 14),
+        common.radial_pin(x, A["ring_r"][1] + 30.0, r_od + 34.0, 7.0, clock, 14),
         common.radial_pin(x, r_od - 2.0, r_od + 16.0, 17.0, clock, 18),
         common.radial_pin(x, r_od + 30.0, r_od + 52.0, 11.0, clock, 16))
 

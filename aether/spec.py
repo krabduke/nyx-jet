@@ -446,24 +446,33 @@ AUGMENTOR = {
     "case_t": 6.0,            # its outside is the third stream's inner wall
     "tailcone_x0": 2016.0,
     "tailcone_x1": 2560.0,
-    # integrated flameholders: radial vane-gutters in the mixed stream with
-    # the spraybars inside them, no separate V-gutter rings to block the view
-    # of the turbine or drag in dry power
-    "n_vanes": 16,
-    "vane_x0": 2290.0,
-    "vane_chord": 150.0,
-    "vane_t": 24.0,
+    # the flameholder: V-gutters open aft, in whose wake the flame holds --
+    # three concentric rings tied by sixteen radial gutters from the tail
+    # cone to the liner, the spider web you see looking up a reheat nozzle
+    "n_vanes": 16,                      # radial gutters
+    "vane_x0": 2400.0,                  # the gutters' apex
+    "vane_chord": 45.0,                 # apex to trailing edge
+    "gutter_w": 44.0,                   # radial gutters, across the mouth
+    "gutter_t": 3.0,
+    "ring_r": (215.0, 290.0, 365.0),    # the concentric gutters
+    "ring_w": 38.0,
+    "ring_depth": 40.0,
+    # the liner is corrugated for cooling film: pitch divides its length
+    "liner_wave": 3.0,
+    "liner_pitch": 65.0,
     "screech_rows": 20,
     "screech_per_row": 60,
     "screech_hole_r": 3.5,
     "ab_manifold_x": 2340.0,
-    # staged reheat: zone 1 sprays from inside the flameholder vanes; zones
-    # 2 and 3 from radial spraybars ahead of them, outer and inner halves of
-    # the stream, each off its own manifold, lit in turn as reheat comes in
+    # staged reheat: three zones, each off its own manifold and lit in turn
+    # as reheat comes in -- zone 1 outer, zones 2 and 3 on radial spraybars
+    # reaching into the middle and the inner stream
     "zone_x": (2340.0, 2250.0, 2285.0),
     "spraybar_r": (300.0, 226.0),       # how far in zones 2 and 3 reach
-    "pilot_x": 2438.0,                  # the pilot gutter behind the vanes
-    "pilot_r": 200.0,
+    # each zone sprays from a ring in the stream: zone 1 outer, ahead of
+    # the gutters; zones 2 and 3 on their spraybars' tips
+    "spray_ring_r": (360.0, 300.0, 226.0),
+    "spray_tube_r": 6.0,
     "igniter_x": 2462.0,
     "fuel_control_x": (2080.0, 2200.0),
 }
@@ -671,6 +680,8 @@ MATERIAL_MAP = {
     "generator": "casing",
     "fuel": "steel",
     "ab_fuel": "steel",
+    "ab_spray": "inconel",
+    "ab_igniter": "steel",
     "oil": "steel",
     "fadec": "composite",
     "harness": "rubber",

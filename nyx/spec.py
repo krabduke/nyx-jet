@@ -233,22 +233,43 @@ BAY = {
 }
 
 # --------------------------------------------------------------------------
-# Landing gear -- drawn down, on the ground
+# Landing gear -- built down, on the ground; it retracts (parts/gear.py)
 # --------------------------------------------------------------------------
 
-GROUND_Z = -2050.0
+# The stance is set by where the gear can go when it is up. At 2.05 m to the
+# chine plane the legs were too long to stow anywhere in the airframe; at
+# 1.54 m the main legs fold into the wing roots and the nose leg under the
+# nose, the belly is still 0.74 m off the ground, and the tail clears it by
+# 12 degrees of rotation at take-off.
+GROUND_Z = -1540.0
 GEAR = {
     "nose_x": 3350.0,
-    # about 700 mm behind the aft-most CG: an 18 degree tip-back angle and
-    # 11 % of the weight on the nose wheel, both inside the usual bands
-    # (verify.py measures both)
+    # about 700 mm behind the aft-most CG and 11 % of the weight on the nose
+    # wheel, both inside the usual bands (verify.py measures both)
     "main_x": 9500.0,
-    "main_y": 1480.0,          # between the duct and the wing root
-    "main_bay": (9000.0, 10000.0, 1360.0, 1620.0),   # x0, x1, y0, y1
-    "nose_bay": (2950.0, 3750.0, 170.0),              # x0, x1, half-width
-    "nose_wheel_r": 290.0, "nose_wheel_w": 170.0,
-    "main_wheel_r": 400.0, "main_wheel_w": 250.0,
-    "strut_r_nose": 55.0, "strut_r_main": 80.0,
+    # the nose leg pivots under the cockpit floor and folds forward; its
+    # bay is tall forward of the split, where the wheels go, and shallow
+    # aft of it, under the floor, where only the leg lies
+    "nose_pivot_z": 40.0,
+    "nose_bay": (1750.0, 3440.0, 205.0),      # x0, x1, half-width
+    "nose_bay_split": 2330.0,
+    "nose_roofs": (335.0, 100.0),       # the cockpit floor is at 115
+    # each main leg pivots in the wing root and folds inboard; its wheel
+    # lies in a well in the wing-body blend, between the intake duct and
+    # the wing's root, the leg in a slot in the wing
+    # the pivot high in the wing, so the stowed leg stays inside the wing's
+    # thickness all the way in, and far enough out that the wheel lands in
+    # its well clear of the duct
+    "main_pivot": (2968.0, 128.0),            # y, z
+    "main_stow_z": -150.0,                    # the wheel's centre, stowed
+    # (its fore and aft edges are serrated 70 deep, and the teeth must clear
+    # the 700 mm wheel lying in it)
+    "main_well": (9070.0, 9930.0, 1318.0, 2050.0),   # x0, x1, y0, y1
+    "main_slot_hw": 118.0,
+    "main_roofs": (172.0, 152.0),             # well, slot
+    "nose_wheel_r": 260.0, "nose_wheel_w": 150.0,
+    "main_wheel_r": 350.0, "main_wheel_w": 230.0,
+    "strut_r_nose": 50.0, "strut_r_main": 62.0,
 }
 
 # --------------------------------------------------------------------------
@@ -374,6 +395,8 @@ MATERIAL_MAP = {
     "tyre": "rubber",
     "wheel": "wheel",
     "gear_door": "skin_dark",
+    "gear_leg_door": "skin_dark",
+    "gear_pivot_door": "skin_dark",
     "frame": "structure",
     "longeron": "structure",
     "keel": "structure",

@@ -62,14 +62,20 @@ CIRCUITS += [
     ("", ["fuselage_skin", "bay_door_l"]),
     ("the nose gear stands in its bay",
      ["fuselage_skin", "gear_bay_nose", "gear_nose", "wheels_nose", "tyres_nose"]),
-    ("", ["fuselage_skin", "gear_door_nose"]),
+    ("and closes behind two doors", ["fuselage_skin", "gear_door_nose_r"]),
+    ("", ["fuselage_skin", "gear_door_nose_l"]),
     ("the radar is on its bulkhead",
      ["fuselage_skin", "radar_bulkhead", "radar_array"]),
 ]
-CIRCUITS += mirrored("each main gear stands in its bay",
-                     ["fuselage_skin", "gear_bay_main_{s}", "gear_main_{s}",
-                      "wheel_main_{s}", "tyre_main_{s}"])
+CIRCUITS += mirrored("each main gear hangs from its wing root",
+                     ["wing_{s}", "gear_main_{s}", "wheel_main_{s}",
+                      "tyre_main_{s}"])
+CIRCUITS += mirrored("and its doors: on the leg, over the pivot, over the well",
+                     ["gear_main_{s}", "gear_leg_door_main_{s}"])
+CIRCUITS += mirrored("", ["wing_{s}", "gear_pivot_door_main_{s}"])
 CIRCUITS += mirrored("", ["fuselage_skin", "gear_door_main_{s}"])
+CIRCUITS += mirrored("the well is built into the body",
+                     ["fuselage_skin", "gear_bay_main_{s}"])
 
 
 def main():

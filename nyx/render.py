@@ -243,8 +243,47 @@ def mode_close(name, samples):
     shoot(name)
 
 
+def pose_gear_up():
+    """Raise the gear and shut its doors, from the same kinematics the
+    viewer uses (parts/gear.py): each leg turned about its pivot, each door
+    about its hinge."""
+    from mathutils import Matrix, Vector
+    from parts import gear
+    k = gear.kinematics()
+
+    def turn(names, point, axis, ang):
+        c = Vector(point) * MM
+        R = (Matrix.Translation(c) @ Matrix.Rotation(ang, 4, Vector(axis))
+             @ Matrix.Translation(-c))
+        for n in names:
+            o = bpy.data.objects.get(n)
+            if o is not None:
+                o.matrix_world = R @ o.matrix_world
+    for L in k["legs"]:
+        turn(L["parts"], L["pivot"], L["axis"], L["stow"])
+    for d in k["doors"]:
+        turn([d["part"]], d["hinge"], d["axis"], d["close"])
+
+
+def mode_flight(samples):
+    """In the air, gear up, banking into a turn: how it spends its life."""
+    reset(); setup(samples); world(0.55); lights()
+    pose_gear_up()
+    import math as _m
+    from mathutils import Matrix
+    from mathutils import Vector
+    c = Vector((XM, 0.0, 0.0))
+    bank = (Matrix.Translation(c) @ Matrix.Rotation(_m.radians(-28.0), 4, "X")
+            @ Matrix.Rotation(_m.radians(6.0), 4, "Y") @ Matrix.Translation(-c))
+    for o in bpy.data.objects:
+        if o.type == "MESH" and not o.name.startswith("__"):
+            o.matrix_world = bank @ o.matrix_world
+    camera((XM - 15.5, -13.0, 7.5), (XM - 0.2, 0, 0.3), 55)
+    shoot("00_flight")
+
+
 MODES = {"hero": mode_hero, "plan": mode_plan, "side": mode_side,
-         "rear": mode_rear, "xray": mode_xray}
+         "rear": mode_rear, "xray": mode_xray, "flight": mode_flight}
 
 if __name__ == "__main__":
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else ["hero"]

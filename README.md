@@ -11,7 +11,7 @@ This is **version 2** of the aircraft project. Version 1 — a single-engine
 jet built around the GE F110 — is kept at
 [Krabduke/rc-jet](https://github.com/Krabduke/rc-jet) (tag `v1`).
 
-![hero](renders/01_hero.png)
+![in flight](renders/00_flight.png)
 
 | | |
 |---|---|
@@ -73,6 +73,8 @@ coefficients (0.016 to 0.022), so they do not rest on one guessed number.
 | Static margin | −5.0 % MAC, from a vortex-lattice solve |
 | Load limit | 9.5 g |
 | Weapons | four medium-range missiles in an internal bay |
+| Landing gear | retractable tricycle: a twin-wheel nose leg folding forward under the nose, and main legs in the wing roots, 5.9 m apart, folding inboard so each wheel lies flat in the wing-body blend; every bay closed by flush doors with serrated edges |
+| Gun | six-barrel rotary cannon in the starboard shoulder |
 
 ## How the numbers hang together
 
@@ -99,7 +101,7 @@ Requires Blender (`brew install --cask blender`) and Python 3 with numpy.
 make aero       # area rule, vortex lattice, turn performance
 make build      # generate geometry, assemble build/nyx.blend, write parts.csv
 make verify     # every gate below  <- the definition of done
-make render     # hero, plan, side, rear, x-ray
+make render     # in flight, hero, plan, side, rear, x-ray
 make web        # decimated, Draco-compressed GLB for the viewer
 ```
 
@@ -111,7 +113,11 @@ Serve the repository root (for example `python3 -m http.server`) and open
 - switch between four camera views;
 - hide or show each group of parts — the port engine is marked red and the
   starboard green, as the navigation lights are;
-- see through the skin to the intake ducts, engines, cockpit and weapons bay.
+- see through the skin to the intake ducts, engines, cockpit and weapons bay;
+- raise and lower the landing gear: it loads gear-up, as it flies. Coming
+  down, the doors open and the legs swing out; going up, the legs fold into
+  their bays and the doors shut flush behind them;
+- swivel both nozzles down to 95° and yaw them 12° either side.
 
 The dial shows the turn rates above. Every figure on the page comes from
 `viewer/parts.json`, which is generated from the build and checked against
@@ -119,7 +125,7 @@ it.
 
 ## The gates
 
-`make verify` runs nine checks, and all of them pass:
+`make verify` runs ten checks, and all of them pass:
 
 | Gate | What it enforces |
 |---|---|
@@ -128,6 +134,7 @@ it.
 | `audit_geometry` | No part is too crude for what it is named |
 | `audit_structure` | Every part is attached, mirrored, distinct and the shape it is named |
 | `audit_intersect` | No part occupies another's space unless declared |
+| `audit_stowage` | The same, with the gear up and every door shut: each leg, wheel and door fits in its bay without passing through the duct beside it, the wing it folds into, the cockpit floor above it or the radar bulkhead ahead of it |
 | `audit_support` | No piece floats free |
 | `audit_joints` | One assembly, and every load path and circuit is joined link by link |
 | `audit_manifest` | The viewer describes the build it ships with |

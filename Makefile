@@ -24,6 +24,7 @@ verify:                      ## the definition of done
 	python3 tools/audit_geometry.py
 	python3 tools/audit_structure.py
 	python3 tools/audit_intersect.py
+	python3 tools/audit_stowage.py
 	python3 tools/audit_support.py
 	python3 tools/audit_joints.py
 	python3 tools/audit_manifest.py

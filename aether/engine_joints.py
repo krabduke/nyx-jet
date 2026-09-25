@@ -67,24 +67,24 @@ EXPECTED = [
     ("igniters", "case_outer_aft"), ("igniters", "intermediate_case"),
     ("igniters", "case_combustor"), ("igniters", "combustor_liner_outer"),
     # reheat fuel: a feed from the manifold through the case and liner into
-    # each flameholder vane, where the spraybar is
+    # the gas path to zone 1's spray ring
     ("ab_fuel_manifold", "case_outer_aft"),
     ("ab_fuel_manifold", "augmentor_case"),
     ("ab_fuel_manifold", "augmentor_liner"),
-    ("ab_fuel_manifold", "flameholder_vanes"),
+    ("ab_fuel_manifold", "ab_spray_rings"),
     # zones 2 and 3: the spraybars come off their manifolds and pass through
     # the outer case, the augmentor case and the liner into the stream
     ("ab_spraybars", "ab_fuel_manifold"), ("ab_spraybars", "case_outer_aft"),
     ("ab_spraybars", "augmentor_case"), ("ab_spraybars", "augmentor_liner"),
-    # the igniter goes in through a boss on the case to the pilot's wake
+    # and end in the spray rings of their zones
+    ("ab_spraybars", "ab_spray_rings"),
+    # the igniter goes in through a boss on the case to a gutter's wake
     ("ab_igniter", "case_outer_aft"), ("ab_igniter", "augmentor_case"),
     ("ab_igniter", "augmentor_liner"),
-    # the pilot gutter sits on the vanes' trailing edges
-    ("ab_pilot_gutter", "flameholder_vanes"),
     # the reheat control stands on the case and its feeds go into the rings
     ("ab_fuel_control", "case_outer_aft"), ("ab_fuel_control", "ab_fuel_manifold"),
-    # the flameholder vanes are let into the tail cone and the liner
-    ("flameholder_vanes", "tailcone"), ("flameholder_vanes", "augmentor_liner"),
+    # the radial gutters are let into the tail cone and the liner
+    ("flameholder", "tailcone"), ("flameholder", "augmentor_liner"),
     # the variable-vane spindles pass through the case into each vane
     ("vsv_actuation", "case_hpc"), ("vsv_actuation", "vanes_hpc_"),
     # the mode valve's hinge ring is let into the splitter wall

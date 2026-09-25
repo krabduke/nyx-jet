@@ -1,12 +1,27 @@
-"""Landing gear, drawn down: a twin-wheel nose leg and two single-wheel
-main legs, each in a bay cut in the skin with its doors standing open.
+"""Landing gear: a twin-wheel nose leg and two single-wheel main legs, each
+retracting into a bay closed by doors that lie flush with the skin.
 
-The mains sit about 700 mm behind the aft-most centre of gravity -- an 18
-degree tip-back angle, so the aircraft cannot sit on its tail when fully
-fuelled -- and carry 89 % of the weight; the nose leg carries the other 11 %,
-enough to steer with and little enough to rotate at take-off (verify.py
-measures both). The track is 2.96 m, between the intake ducts and the wing
-roots.
+The model is built with the gear down and the doors open, standing on the
+ground; `pose("up")` gives the same parts retracted with the doors shut, and
+`kinematics()` gives the viewer the pivots and angles between the two.
+
+    nose gear   retracts forward about a pivot under the cockpit floor, the
+                twin wheels ending up under the nose between the radar
+                bulkhead and the cockpit; two doors hinged at the bay's
+                sides close under it
+    main gear   mounted in the wing roots, 5.8 m apart, each retracting
+                inboard about a fore-and-aft pivot, so the wheel ends up
+                lying flat in the thick wing-body blend beside the intake
+                duct; a door on the leg closes the leg's slot in the wing,
+                and a door hinged at the well's inboard edge closes over
+                the wheel
+
+Every stowed position is checked: tools/audit_stowage.py re-runs the
+interference audit with the gear up and the doors shut.
+
+The mains are about 700 mm behind the aft-most centre of gravity and carry
+89 % of the weight; the nose leg carries the other 11 % (verify.py measures
+both).
 """
 
 import math
@@ -22,56 +37,172 @@ import mesh      # noqa: E402
 G = spec.GEAR
 WALL = 8.0
 SEAT = 0.15
-WALL_SEAT = 1.0
+DOOR_T = spec.SKIN_T
 
 
-def bay_box(x0, x1, y0, y1, z_roof):
-    """An open-bottomed box: roof, and walls down to the skin's inner
-    surface just outside the opening."""
-    parts = [mesh.box(0.5 * (x0 + x1), 0.5 * (y0 + y1), z_roof + WALL / 2,
-                      x1 - x0 + 2 * WALL, y1 - y0 + 2 * WALL, WALL)]
-    xs = [x0 + (x1 - x0) * i / 12 for i in range(13)]
-    for ya, yb in ((y0 - WALL, y0), (y1, y1 + WALL)):
-        rings = []
-        for x in xs:
-            zb = max(shapes.z_dn(x, ya, spec.SKIN_T), shapes.z_dn(x, yb, spec.SKIN_T)) + WALL_SEAT
-            rings.append([(x, ya, zb), (x, yb, zb), (x, yb, z_roof), (x, ya, z_roof)])
-        parts.append(shapes.loft_rings(rings))
-    ys = [y0 + (y1 - y0) * i / 12 for i in range(13)]
-    for xa, xb in ((x0 - WALL, x0), (x1, x1 + WALL)):
-        rings = []
-        for y in ys:
-            zb = max(shapes.z_dn(xa, y, spec.SKIN_T), shapes.z_dn(xb, y, spec.SKIN_T)) + WALL_SEAT
-            rings.append([(xa, y, zb), (xa, y, z_roof), (xb, y, z_roof), (xb, y, zb)])
-        parts.append(shapes.loft_rings(rings))
-    return mesh.join(*parts)
+# --------------------------------------------------------------------------
+# geometry helpers
+
+def rotate(verts, point, axis, ang):
+    """Rodrigues: verts turned by ang about the line through point along
+    the unit vector axis."""
+    k = axis
+    c, s = math.cos(ang), math.sin(ang)
+    out = []
+    for p in verts:
+        v = [p[i] - point[i] for i in range(3)]
+        dot = sum(k[i] * v[i] for i in range(3))
+        cr = (k[1] * v[2] - k[2] * v[1], k[2] * v[0] - k[0] * v[2],
+              k[0] * v[1] - k[1] * v[0])
+        out.append(tuple(point[i] + v[i] * c + cr[i] * s + k[i] * dot * (1 - c)
+                         for i in range(3)))
+    return out
 
 
-def bay_cutter(x0, x1, y0, y1, z_roof):
-    return mesh.box(0.5 * (x0 + x1), 0.5 * (y0 + y1), 0.5 * (-2000.0 + z_roof),
-                    x1 - x0, y1 - y0, z_roof + 2000.0)
+def _rot_part(part, point, axis, ang):
+    v, f = part
+    return rotate(v, point, axis, ang), f
 
 
-def door(x0, x1, y, t, height, tooth=110.0, depth=46.0):
-    """A door standing open, hanging from the bay's edge at y: its top edge
-    is its hinge, let 2 mm into the skin's outside, and its free edge is
-    serrated, as every door on a low-observable airframe is -- a straight
-    edge across the flow is a bright return, a sawtooth scatters it."""
-    n_t = max(2, int(round((x1 - x0) / tooth)))
-    xs = []
-    for i in range(n_t):
-        a = x0 + (x1 - x0) * i / n_t
-        xs += [a, a + (x1 - x0) / n_t * 0.5]
-    xs.append(x1)
+def _mirror(part):
+    v, f = part
+    return shapes.orient(([(x, -y, z) for (x, y, z) in v],
+                          [tuple(reversed(c)) for c in f]))
+
+
+def wing_lower_z(x, y):
+    """The wing's lower surface at (x, y), or None off the wing."""
+    from parts import surfaces
+    W = spec.WING
+    ay = abs(y)
+    if not W["y_root"] - 400.0 <= ay <= W["y_tip"]:
+        return None
+    c = spec.wing_chord(ay)
+    u = (x - spec.wing_le_x(ay)) / c
+    if not 0.0 <= u <= 1.0:
+        return None
+    P = surfaces.WingPlace()
+    v = 4 * P.camber * u * (1 - u) - shapes.naca_t(u, P.tc(ay))
+    return P(ay, u, v)[2]
+
+
+def under_z(x, y):
+    """The aircraft's underside at (x, y): the body's, or the wing's where
+    the wing hangs below it."""
+    zs = []
+    if abs(y) < shapes.half_width(x) - 1.0:
+        zs.append(shapes.z_dn(x, y))
+    zw = wing_lower_z(x, y)
+    if zw is not None:
+        zs.append(zw)
+    return min(zs) if zs else 0.0
+
+
+def serration(u, teeth, tooth):
+    """A sawtooth across a door's width: zero at its ends and at every
+    tooth root, `tooth` deep at every tooth point. u runs 0..1."""
+    if teeth <= 0:
+        return 0.0
+    f = u * teeth
+    f -= math.floor(f)
+    return tooth * (1.0 - abs(2.0 * f - 1.0))
+
+
+def _outline(x0, x1, y0, y1, teeth, tooth, n, ends=(True, True), frame=None):
+    """The fore and aft edges over y0..y1. The sawtooth is laid out over
+    `frame` (default y0..y1), so a door can follow the teeth of an opening
+    wider than itself tooth for tooth."""
+    ys = [y0 + (y1 - y0) * j / n for j in range(n + 1)]
+    f0, f1 = frame or (y0, y1)
+    s = lambda y, on: serration((y - f0) / (f1 - f0), teeth, tooth) if on else 0.0
+    fwd = [(x0 + s(y, ends[0]), y) for y in ys]
+    aft = [(x1 - s(y, ends[1]), y) for y in ys]
+    return fwd, aft
+
+
+def panel(x0, x1, y0, y1, teeth=0, tooth=60.0, n=None, t=DOOR_T, gap=1.0,
+          frame=None, ends=(True, True)):
+    """A door lying flush in the underside: its outside on the underside,
+    t thick inward, over x0..x1 (its fore and aft ends serrated with
+    `teeth` teeth) and y0..y1, `gap` in from the opening all round. Each
+    end is capped quad by quad along the teeth."""
+    n = n or max(8, 4 * teeth)
+    x0, x1 = x0 + gap, x1 - gap
+    y0, y1 = (y0 + gap, y1 - gap) if y1 > y0 else (y0 - gap, y1 + gap)
+    frame = frame or ((y0 - gap, y1 + gap) if y1 > y0 else (y0 + gap, y1 - gap))
+    fwd, aft = _outline(x0, x1, y0, y1, teeth, tooth, n, ends=ends, frame=frame)
     rings = []
-    for k, x in enumerate(xs):
-        # under the skin's outside across the door's whole thickness: the
-        # skin slopes, and the door's top is its lowest point, not its middle
-        zt = min(shapes.z_dn(x, y - t / 2), shapes.z_dn(x, y + t / 2)) + 2.0
-        zb = zt - height + (depth if k % 2 == 0 else 0.0)
-        rings.append([(x, y - t / 2, zt), (x, y + t / 2, zt),
-                      (x, y + t / 2, zb), (x, y - t / 2, zb)])
-    return shapes.loft_rings(rings)
+    for i in range(25):
+        t_ = i / 24.0
+        pts = [(fx + (ax - fx) * t_, y) for (fx, y), (ax, _) in zip(fwd, aft)]
+        outer = [(x, y, under_z(x, y)) for (x, y) in pts]
+        inner = [(x, y, under_z(x, y) + t) for (x, y) in reversed(pts)]
+        rings.append(outer + inner)
+    v, f = shapes.loft_rings(rings, cap_start=False, cap_end=False)
+    m = len(rings[0])
+    f = list(f)
+    for base, flip in ((0, True), ((len(rings) - 1) * m, False)):
+        for k in range(n):
+            q = (base + k, base + k + 1, base + m - 2 - k, base + m - 1 - k)
+            f.append(tuple(reversed(q)) if flip else q)
+    return shapes.orient((v, f))
+
+
+def prism(x0, x1, y0, y1, z_top, teeth=0, tooth=60.0, n=None, ends=(True, True),
+          z_bot=-3000.0):
+    """A cutter on a door's outline, from well below the aircraft up to
+    z_top: the opening the door closes. `ends` says which of its fore and
+    aft ends are serrated.
+
+    Two cutters on one part must not share a vertex: the audits weld
+    coincident vertices, and two overlapping solids welded into one read
+    as neither. Nor share a plane: overlapping coplanar faces in one cutter
+    are what the exact boolean gets wrong."""
+    n = n or max(8, 4 * teeth)
+    fwd, aft = _outline(x0, x1, y0, y1, teeth, tooth, n, ends)
+    outline = fwd + list(reversed(aft))
+    m = len(outline)
+    v = [(x, y, z_bot) for (x, y) in outline] + [(x, y, z_top) for (x, y) in outline]
+    f = [(k, (k + 1) % m, m + (k + 1) % m, m + k) for k in range(m)]
+    # the ends capped strip by strip across the width, never as one n-gon:
+    # a serrated outline is concave, and a fan over it closes over the
+    # notches and leaves the solid's inside ambiguous
+    for base in (0, m):
+        for k in range(n):
+            q = (base + k, base + k + 1, base + m - 2 - k, base + m - 1 - k)
+            f.append(q if base else tuple(reversed(q)))
+    return shapes.orient((v, f))
+
+
+def walls(x0, x1, y0, y1, roof, skip=()):
+    """A bay's roof and walls, standing on the skin's inside. `skip` names
+    walls to leave out ('y1', 'x0', ...) where the bay opens into the next
+    one or into the wing."""
+    parts = [mesh.box(0.5 * (x0 + x1), 0.5 * (y0 + y1), roof + WALL / 2,
+                      x1 - x0 + 2 * WALL, abs(y1 - y0) + 2 * WALL, WALL)]
+    lo, hi = min(y0, y1), max(y0, y1)
+
+    def foot(x, y):
+        # on the skin's inside where the body is, on the wing's lower
+        # surface where it is not
+        if abs(y) < shapes.half_width(x, spec.SKIN_T) - 1.0:
+            return shapes.z_dn(x, y, spec.SKIN_T) + 2.0
+        return under_z(x, y) + 1.0
+    xs = [x0 + (x1 - x0) * i / 16 for i in range(17)]
+    for tag, ya, yb in (("ylo", lo - WALL, lo), ("yhi", hi, hi + WALL)):
+        if tag in skip:
+            continue
+        parts.append(shapes.loft_rings(
+            [[(x, ya, max(foot(x, ya), foot(x, yb))), (x, yb, max(foot(x, ya), foot(x, yb))),
+              (x, yb, roof), (x, ya, roof)] for x in xs]))
+    ys = [lo + (hi - lo) * i / 16 for i in range(17)]
+    for tag, xa, xb in (("x0", x0 - WALL, x0), ("x1", x1, x1 + WALL)):
+        if tag in skip:
+            continue
+        parts.append(shapes.loft_rings(
+            [[(xa, y, max(foot(xa, y), foot(xb, y))), (xa, y, roof), (xb, y, roof),
+              (xb, y, max(foot(xa, y), foot(xb, y)))] for y in ys]))
+    return mesh.join(*parts)
 
 
 def _about_z(part, cx, cy, cz):
@@ -134,97 +265,323 @@ def wheel(cx, cy, cz, r, w, out=1.0):
 
 
 def brake(cx, cy, cz, r, w, inboard):
-    """A carbon brake stack and its piston housing, on the wheel's inboard
-    side between the hub and the fork."""
-    y0 = cy + inboard * 0.46 * w
-    y1 = cy + inboard * (0.46 * w + 46.0)
-    disc = mesh.pipe([(cx, y0, cz), (cx, y1, cz)], r * 0.46, 48)
-    housing = mesh.box(cx - r * 0.30, 0.5 * (y0 + y1), cz + r * 0.28, 90.0,
-                       abs(y1 - y0) + 10.0, 70.0)
+    """A carbon brake stack inside the wheel's rim on its inboard half, and
+    the piston housing on top of it."""
+    y0 = cy + inboard * 0.04 * w
+    y1 = cy + inboard * 0.40 * w
+    disc = mesh.pipe([(cx, y0, cz), (cx, y1, cz)], r * 0.44, 48)
+    housing = mesh.box(cx - r * 0.22, 0.5 * (y0 + y1), cz + r * 0.30, 80.0,
+                       abs(y1 - y0), 50.0)
     return mesh.join(disc, housing)
 
 
-def nose():
-    x0, x1, hw = G["nose_bay"]
-    zr = -40.0
-    xc = G["nose_x"]
+
+# --------------------------------------------------------------------------
+# nose gear
+
+NX0, NX1, NHW = G["nose_bay"]
+N_SPLIT = G["nose_bay_split"]           # tall forward of here, shallow aft
+N_ROOF = G["nose_roofs"]
+
+
+def nose_pivot():
+    return (G["nose_x"], 0.0, G["nose_pivot_z"])
+
+
+def nose_leg():
+    """The nose leg, down: trunnion, oleo, yoke, axle, torque link, steering
+    collar and taxi light, and an A-frame brace from the leg up to the
+    trunnion's ends. (tyres, hubs, leg)."""
+    px, _, pz = nose_pivot()
     r, w = G["nose_wheel_r"], G["nose_wheel_w"]
     z_ax = spec.GROUND_Z + r
-    x_ax = xc - 60.0                      # the leg rakes forward a little
-    leg = mesh.join(
-        mesh.pipe([(xc, 0.0, zr + 4.0), (xc - 20.0, 0.0, -1150.0)], G["strut_r_nose"], 20),
-        mesh.pipe([(xc - 20.0, 0.0, -1100.0), (x_ax, 0.0, z_ax + 60.0)], 40.0, 18),
-        mesh.box(x_ax, 0.0, z_ax + 30.0, 70.0, 60.0, 90.0),               # yoke
-        mesh.pipe([(x_ax, -w - 60.0, z_ax), (x_ax, w + 60.0, z_ax)], 28.0, 14),  # axle
-        # torque link
-        mesh.pipe([(xc - 20.0, 0.0, -1040.0), (xc + 90.0, 0.0, -1250.0),
-                   (x_ax, 0.0, z_ax + 90.0)], 12.0, 10, bend=0.0),
-        # the gland nut where the piston enters the oleo, and the steering
-        # collar above it
-        _about_z(mesh.revolve_ring([(-12.0, 38.0), (12.0, 38.0), (12.0, 62.0),
-                                    (-12.0, 62.0)], 32), xc - 18.0, 0.0, -1108.0),
-        _about_z(mesh.revolve_ring([(-30.0, 50.0), (30.0, 50.0), (30.0, 70.0),
-                                    (-30.0, 70.0)], 32), xc - 8.0, 0.0, -560.0),
-        # taxi light on the collar, looking forward
-        mesh.box(xc - 82.0, 0.0, -560.0, 34.0, 60.0, 40.0))
+    yw = 0.5 * w + 40.0
+    leg = [
+        # the trunnion, its ends in bearings let into the bay's side walls
+        mesh.pipe([(px, -(NHW + 4.0), pz), (px, NHW + 4.0, pz)], 26.0, 20),
+        mesh.pipe([(px, 0.0, pz), (px, 0.0, pz - 800.0)], G["strut_r_nose"], 24),
+        mesh.pipe([(px, 0.0, pz - 790.0), (px, 0.0, z_ax + 110.0)], 36.0, 20),
+        _about_z(mesh.revolve_ring([(-12.0, 34.0), (12.0, 34.0), (12.0, 58.0),
+                                    (-12.0, 58.0)], 32), px, 0.0, pz - 792.0),
+        _about_z(mesh.revolve_ring([(-28.0, 48.0), (28.0, 48.0), (28.0, 66.0),
+                                    (-28.0, 66.0)], 32), px, 0.0, pz - 330.0),
+        mesh.box(px - 70.0, 0.0, pz - 330.0, 34.0, 56.0, 38.0),          # taxi light
+        mesh.box(px, 0.0, z_ax + 55.0, 80.0, 110.0, 150.0),              # yoke
+        mesh.pipe([(px, -(yw + 0.5 * w + 18.0), z_ax),
+                   (px, yw + 0.5 * w + 18.0, z_ax)], 24.0, 16),          # axle
+        mesh.pipe([(px - 40.0, 0.0, pz - 760.0), (px - 150.0, 0.0, pz - 930.0),
+                   (px - 40.0, 0.0, z_ax + 120.0)], 11.0, 10, bend=0.0),  # torque link
+    ]
+    for sy in (1.0, -1.0):                                               # A-frame
+        leg.append(mesh.pipe([(px, sy * (NHW - 30.0), pz),
+                              (px, sy * 44.0, pz - 430.0)], 16.0, 14))
     tyres, hubs = [], []
     for sy in (1.0, -1.0):
-        t, h = wheel(x_ax, sy * (0.5 * w + 45.0), z_ax, r, w, out=sy)
+        t, h = wheel(px, sy * yw, z_ax, r, w, out=sy)
         tyres.append(t); hubs.append(h)
-    doors = [door(x0 + 10.0, x1 - 10.0, sy * (hw + 5.0), 8.0, 420.0) for sy in (1.0, -1.0)]
-    return {"gear_nose": leg, "tyres_nose": mesh.join(*tyres),
-            "wheels_nose": mesh.join(*hubs), "gear_door_nose": mesh.join(*doors),
-            "gear_bay_nose": bay_box(x0, x1, -hw, hw, zr)}, bay_cutter(x0, x1, -hw, hw, zr)
+    return mesh.join(*tyres), mesh.join(*hubs), mesh.join(*leg)
 
 
-def main(sy):
-    x0, x1, y0, y1 = G["main_bay"]
-    zr = -330.0
-    xc, yc = G["main_x"], G["main_y"]
+def nose_door(sy):
+    """One of the two nose doors, shut: flush, from the centreline split to
+    the bay's side, hinged along the side."""
+    # laid out on the whole opening's teeth, so the two doors' teeth are the
+    # opening's
+    # (the aft end straight: the leg comes out through it)
+    return panel(NX0, NX1, sy * 2.0, sy * NHW, teeth=8, tooth=70.0, n=64,
+                 frame=(-NHW, NHW), ends=(True, False))
+
+
+def nose_hinge(sy):
+    a = (NX0, sy * NHW, under_z(NX0, sy * NHW) + DOOR_T / 2)
+    b = (NX1, sy * NHW, under_z(NX1, sy * NHW) + DOOR_T / 2)
+    L = math.dist(a, b)
+    return a, tuple((b[i] - a[i]) / L for i in range(3))
+
+
+NOSE_DOOR_OPEN = math.radians(95.0)
+
+
+def nose_bay():
+    """The bay: tall enough forward for the wheels, shallow aft under the
+    cockpit floor where only the leg lies."""
+    fwd = walls(NX0, N_SPLIT, -NHW, NHW, N_ROOF[0], skip=("x1",))
+    aft = walls(N_SPLIT, NX1, -NHW, NHW, N_ROOF[1], skip=("x0",))
+    # the step between the two roofs
+    step = mesh.box(N_SPLIT - WALL / 2, 0.0, 0.5 * (N_ROOF[0] + N_ROOF[1]),
+                    WALL, 2 * NHW + 2 * WALL, N_ROOF[0] - N_ROOF[1] + WALL)
+    return mesh.join(fwd, aft, step)
+
+
+def nose_cutter():
+    # tall forward, shallow aft, the opening's ends serrated as the doors'
+    # are (4 teeth a door, 8 across both)
+    return mesh.join(
+        prism(NX0, N_SPLIT + 2.0, -NHW, NHW, N_ROOF[0], teeth=8, tooth=70.0,
+              ends=(True, False)),
+        prism(N_SPLIT - 2.0, NX1, -NHW, NHW, N_ROOF[1], teeth=8, tooth=70.0,
+              ends=(False, False), z_bot=-2990.0))
+
+
+# --------------------------------------------------------------------------
+# main gear (starboard; port is its mirror)
+
+MX = G["main_x"]
+MY, MZ = G["main_pivot"]
+WELL = G["main_well"]           # x0, x1, y0, y1: the wheel well
+SLOT_HW = G["main_slot_hw"]
+ROOF = G["main_roofs"]          # well, slot
+
+
+def main_pivot():
+    return (MX, MY, MZ)
+
+
+def main_stow_angle():
+    """About +x, from down to stowed: the leg ends up pointing inboard and a
+    little down, with the wheel lying in the well at main_stow_z."""
+    r = G["main_wheel_r"]
+    L = MZ - (spec.GROUND_Z + r)
+    th = math.asin((MZ - G["main_stow_z"]) / L)
+    # R_x(a) takes (0, 0, -1) to (0, sin a, -cos a): inboard is -y, so
+    # sin a = -cos th and cos a = sin th
+    return -(0.5 * math.pi - th)
+
+
+def main_leg():
+    """(tyre, hub, leg) for the starboard main gear, down."""
     r, w = G["main_wheel_r"], G["main_wheel_w"]
     z_ax = spec.GROUND_Z + r
-    yw = yc + 0.5 * w + 60.0              # the wheel is outboard of its leg
-    leg = mesh.join(
-        mesh.pipe([(xc, yc, zr + 4.0), (xc, yc, -1050.0)], G["strut_r_main"], 22),
-        mesh.pipe([(xc, yc, -1000.0), (xc, yc, z_ax)], 60.0, 20),
-        mesh.pipe([(xc, yc - 40.0, z_ax), (xc, yw + 0.5 * w + 30.0, z_ax)], 42.0, 16),
-        # drag brace from the bay's front to the leg
-        mesh.pipe([(x0 + 60.0, yc, zr - 2.0), (xc - 60.0, yc, -900.0)], 30.0, 14),
-        # side brace to the bay's inboard wall
-        mesh.pipe([(xc, y0 + 40.0, zr - 2.0), (xc, yc - 50.0, -760.0)], 26.0, 14),
-        # the gland nut where the chrome piston enters the oleo
-        _about_z(mesh.revolve_ring([(-14.0, 58.0), (14.0, 58.0), (14.0, 88.0),
-                                    (-14.0, 88.0)], 40), xc, yc, -1040.0),
-        # the torque link: a scissor on the leg's front, cylinder to axle
-        mesh.pipe([(xc - 70.0, yc, -1010.0), (xc - 170.0, yc, -1130.0),
-                   (xc - 58.0, yc, z_ax + 70.0)], 13.0, 10, bend=0.0),
-        # the fork the axle runs through
-        mesh.box(xc, yc + 10.0, z_ax, 150.0, 110.0, 120.0))
-    t, h = wheel(xc, yw, z_ax, r, w, out=1.0)
-    # and the brake stack inboard of the hub, bolted to the axle
-    h = mesh.join(h, brake(xc, yw, z_ax, r, w, -1.0))
-    doors = mesh.join(door(x0 + 10.0, x1 - 10.0, y1 + 5.0, 8.0, 520.0),
-                      door(x0 + 10.0, x1 - 10.0, y0 - 5.0, 8.0, 300.0))
-    parts = {"gear_main": leg, "tyre_main": t, "wheel_main": h,
-             "gear_door_main": doors, "gear_bay_main": bay_box(x0, x1, y0, y1, zr)}
-    cut = bay_cutter(x0, x1, y0, y1, zr)
-    if sy < 0:
-        mir = lambda p: shapes.orient(([(x, -y, z) for (x, y, z) in p[0]],
-                                       [tuple(reversed(c)) for c in p[1]]))
-        parts = {k: mir(v) for k, v in parts.items()}
-        cut = mir(cut)
-    return parts, cut
+    px, py, pz = main_pivot()
+    crown = z_ax + r + 45.0
+    arm_y = 0.5 * w + 22.0
+    leg = [
+        mesh.pipe([(px - 160.0, py, pz), (px + 160.0, py, pz)], 30.0, 24),   # trunnion
+        mesh.pipe([(px, py, pz), (px, py, pz - 590.0)], G["strut_r_main"], 28),
+        mesh.pipe([(px, py, pz - 580.0), (px, py, crown)], 46.0, 24),        # piston
+        _about_z(mesh.revolve_ring([(-14.0, 44.0), (14.0, 44.0), (14.0, 72.0),
+                                    (-14.0, 72.0)], 40), px, py, pz - 582.0),
+        mesh.box(px, py, crown, 130.0, 2 * arm_y + 36.0, 60.0),               # fork crown
+        # the torque link on the leg's inboard face, where it stows inside
+        # the slot with the leg
+        mesh.pipe([(px, py - 58.0, pz - 540.0), (px, py - 150.0, pz - 690.0),
+                   (px, py - 50.0, crown + 20.0)], 12.0, 10, bend=0.0),
+        mesh.pipe([(px, py - arm_y - 30.0, z_ax), (px, py + arm_y + 30.0, z_ax)],
+                  30.0, 20),                                                  # axle
+    ]
+    for sy in (1.0, -1.0):                                                    # fork arms
+        leg.append(mesh.box(px, py + sy * arm_y, 0.5 * (crown + z_ax),
+                            96.0, 20.0, crown - z_ax + 50.0))
+    t, h = wheel(px, py, z_ax, r, w, out=1.0)
+    h = mesh.join(h, brake(px, py, z_ax, r, w, -1.0))
+    return t, h, mesh.join(*leg)
+
+
+LEG_DOOR_Y1 = MY - 200.0      # the leg's door ends here; the pivot door on
+PIVOT_END = MY + 40.0         # from here out to the end of the slot
+
+
+def leg_door_stowed():
+    """The door on the leg, as it lies shut: flush in the wing's underside
+    over the leg's slot, from the well to 200 mm short of the pivot. Its
+    outboard end stops there because anything on the leg closer to the
+    pivot than that swings up into the wing as the leg comes down."""
+    door = panel(MX - SLOT_HW, MX + SLOT_HW, WELL[3], LEG_DOOR_Y1)
+    # two brackets from its inside up to the leg, which carry it
+    px, py, pz = main_pivot()
+    cy = py - math.sqrt((pz - (spec.GROUND_Z + G["main_wheel_r"])) ** 2
+                        - (pz - G["main_stow_z"]) ** 2)
+    brackets = []
+    for y in (WELL[3] + 180.0, LEG_DOOR_Y1 - 120.0):
+        f = (py - y) / (py - cy)
+        z_axis = pz + (G["main_stow_z"] - pz) * f
+        z0 = under_z(MX, y) + DOOR_T - 2.0
+        brackets.append(mesh.pipe([(MX, y, z0),
+                                   (MX, y, z_axis - G["strut_r_main"] + 3.0)],
+                                  11.0, 12))
+    return mesh.join(door, *brackets)
+
+
+def pivot_door():
+    """The small door over the pivot end of the slot, shut. It is hinged
+    along the slot's forward edge, on its outer face, and swings down to
+    stand beside the leg, clear of it."""
+    door = panel(MX - SLOT_HW, MX + SLOT_HW, LEG_DOOR_Y1, PIVOT_END, gap=3.0)
+    # two hinge knuckles on the hinge line, between the door and the slot's
+    # edge: on the axis, they stay where they are as the door swings
+    a, ax = pivot_hinge()
+    L = PIVOT_END - LEG_DOOR_Y1
+    knuckles = [mesh.pipe([tuple(a[i] + ax[i] * s0 for i in range(3)),
+                           tuple(a[i] + ax[i] * (s0 + 40.0) for i in range(3))],
+                          7.0, 12)
+                for s0 in (20.0, L - 60.0)]
+    return mesh.join(door, *knuckles)
+
+
+def pivot_hinge():
+    x0 = MX - SLOT_HW
+    a = (x0, LEG_DOOR_Y1, under_z(x0, LEG_DOOR_Y1))
+    b = (x0, PIVOT_END, under_z(x0, PIVOT_END))
+    L = math.dist(a, b)
+    return a, tuple((b[i] - a[i]) / L for i in range(3))
+
+
+PIVOT_DOOR_OPEN = math.radians(90.0)
+
+
+def wheel_door():
+    """The wheel-well door, shut: flush over the well, its fore and aft
+    ends serrated, hinged along the well's inboard edge."""
+    x0, x1, y0, y1 = WELL
+    return panel(x0, x1, y0, y1, teeth=4, tooth=70.0)
+
+
+def wheel_hinge():
+    x0, x1, y0, _ = WELL
+    a = (x0, y0, under_z(x0, y0) + DOOR_T / 2)
+    b = (x1, y0, under_z(x1, y0) + DOOR_T / 2)
+    L = math.dist(a, b)
+    return a, tuple((b[i] - a[i]) / L for i in range(3))
+
+
+WHEEL_DOOR_OPEN = math.radians(-92.0)
+
+
+def main_bay():
+    """The well's roof and walls where it is in the body. Outboard of the
+    wing's root rib the wing's own cut faces are its walls."""
+    x0, x1, y0, _ = WELL
+    return walls(x0, x1, y0, spec.WING["y_root"] - 230.0, ROOF[0], skip=("yhi",))
+
+
+def main_cutter():
+    x0, x1, y0, y1 = WELL
+    return mesh.join(prism(x0, x1, y0, y1 + 2.0, ROOF[0], teeth=4, tooth=70.0),
+                     prism(MX - SLOT_HW, MX + SLOT_HW, y1 - 2.0, PIVOT_END, ROOF[1],
+                           z_bot=-2990.0))
+
+
+# --------------------------------------------------------------------------
+
+def _main_parts(up):
+    t, h, leg = main_leg()
+    door = leg_door_stowed()
+    P, ax, a = main_pivot(), (1.0, 0.0, 0.0), main_stow_angle()
+    if up:
+        t, h, leg = (_rot_part(p, P, ax, a) for p in (t, h, leg))
+        wd, pd = wheel_door(), pivot_door()
+    else:
+        door = _rot_part(door, P, ax, -a)
+        hp, hax = wheel_hinge()
+        wd = _rot_part(wheel_door(), hp, hax, WHEEL_DOOR_OPEN)
+        hp, hax = pivot_hinge()
+        pd = _rot_part(pivot_door(), hp, hax, PIVOT_DOOR_OPEN)
+    return {"gear_main": leg, "tyre_main": t, "wheel_main": h,
+            "gear_leg_door_main": door, "gear_door_main": wd,
+            "gear_pivot_door_main": pd, "gear_bay_main": main_bay()}
+
+
+def pose():
+    """'down' (the build) or 'up', from NYX_GEAR: tools/audit_stowage.py
+    builds the aircraft with the gear up to check where it all goes."""
+    return os.environ.get("NYX_GEAR", "down")
 
 
 def build():
+    up = pose() == "up"
     out = {}
-    n, cn = nose()
-    out.update(n)
-    cuts = [cn]
+    t, h, leg = nose_leg()
+    if up:
+        P, ax, a = nose_pivot(), (0.0, 1.0, 0.0), 0.5 * math.pi
+        t, h, leg = (_rot_part(p, P, ax, a) for p in (t, h, leg))
+    out.update({"gear_nose": leg, "tyres_nose": t, "wheels_nose": h,
+                "gear_bay_nose": nose_bay()})
     for side, sy in (("r", 1.0), ("l", -1.0)):
-        p, c = main(sy)
-        cuts.append(c)
-        for k, v in p.items():
-            out[f"{k}_{side}"] = v
-    out["cut:fuselage_skin"] = mesh.join(*cuts)
+        d = nose_door(sy)
+        if not up:
+            hp, hax = nose_hinge(sy)
+            d = _rot_part(d, hp, hax, sy * NOSE_DOOR_OPEN)
+        out[f"gear_door_nose_{side}"] = d
+    mp = _main_parts(up)
+    for k, v in mp.items():
+        out[f"{k}_r"] = v
+        out[f"{k}_l"] = _mirror(v)
+    mc = main_cutter()
+    out["cut:fuselage_skin"] = mesh.join(nose_cutter(), mc, _mirror(mc))
+    out["cut:wing_r"] = mc
+    out["cut:wing_l"] = _mirror(mc)
+    return out
+
+
+def kinematics():
+    """What the viewer needs to raise and lower the gear: each leg's pivot,
+    axis and stowing angle, each door's hinge and closing angle, and the
+    parts that move with each."""
+    a = main_stow_angle()
+    out = {"legs": [
+        {"parts": ["gear_nose", "tyres_nose", "wheels_nose"],
+         "pivot": list(nose_pivot()), "axis": [0.0, 1.0, 0.0],
+         "stow": 0.5 * math.pi}],
+        "doors": []}
+    for side, sy in (("r", 1.0), ("l", -1.0)):
+        px, py, pz = main_pivot()
+        out["legs"].append({"parts": [f"gear_main_{side}", f"tyre_main_{side}",
+                                      f"wheel_main_{side}",
+                                      f"gear_leg_door_main_{side}"],
+                            "pivot": [px, sy * py, pz], "axis": [1.0, 0.0, 0.0],
+                            "stow": sy * a})
+        hp, hax = wheel_hinge()
+        out["doors"].append({"part": f"gear_door_main_{side}",
+                             "hinge": [hp[0], sy * hp[1], hp[2]],
+                             "axis": [hax[0], sy * hax[1], hax[2]],
+                             "close": -sy * WHEEL_DOOR_OPEN})
+        hp, hax = pivot_hinge()
+        out["doors"].append({"part": f"gear_pivot_door_main_{side}",
+                             "hinge": [hp[0], sy * hp[1], hp[2]],
+                             "axis": [hax[0], sy * hax[1], hax[2]],
+                             "close": -sy * PIVOT_DOOR_OPEN})
+        hp, hax = nose_hinge(sy)
+        out["doors"].append({"part": f"gear_door_nose_{side}",
+                             "hinge": list(hp), "axis": list(hax),
+                             "close": -sy * NOSE_DOOR_OPEN})
     return out

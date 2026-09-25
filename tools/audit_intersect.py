@@ -54,7 +54,7 @@ AIRFRAME = [
     ("launchers", "missiles"), ("launchers", "bay_structure"),
     # landing gear: legs into their bay roofs, axles through the hubs, tyres
     # on the hubs
-    ("gear_nose", "gear_bay_nose"), ("gear_main_", "gear_bay_main_"),
+    ("gear_nose", "gear_bay_nose"),
     ("wheels_nose", "gear_nose"), ("wheel_main_", "gear_main_"),
     ("tyres_nose", "wheels_nose"), ("tyre_main_", "wheel_main_"),
     # the canopy's rim is pressed into its seal on the skin
@@ -64,6 +64,13 @@ AIRFRAME = [
     ("canopy_frame_", "fuselage_skin"), ("canopy_frame_", "canopy_glass"),
     # the gear doors' hinges are let into the skin at the bay edges
     ("gear_door_", "fuselage_skin"),
+    # each main leg's trunnion runs in fittings let into the wing's root,
+    # the well's walls meet the wing's root rib, and the leg's door hangs on
+    # brackets from the leg
+    ("gear_main_", "wing_"), ("gear_bay_main_", "wing_"),
+    ("gear_leg_door_main_", "gear_main_"),
+    # the pivot doors' hinge knuckles are let into the slot's edge
+    ("gear_pivot_door_main_", "wing_"),
     # cockpit furniture is bolted to the tub
     ("seat", "cockpit_tub"), ("cockpit_panel", "cockpit_tub"),
     ("cockpit_controls", "cockpit_tub"), ("cockpit_hud", "cockpit_panel"),

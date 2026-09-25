@@ -56,7 +56,7 @@
   #modules small{color:var(--muted); font-size:12px}
 
   #controls{
-    position:fixed; left:24px; bottom:22px; z-index:6;
+    position:fixed; left:24px; right:348px; bottom:22px; z-index:6;
     display:flex; flex-wrap:wrap; gap:10px 22px; align-items:flex-end;
   }
   .group{display:flex; flex-direction:column; gap:6px}
@@ -113,7 +113,7 @@
     #modules{top:auto; bottom:120px; transform:none; left:12px; font-size:13px}
     #turn{width:180px; right:12px; bottom:auto; top:16px}
     #turn p{display:none}
-    #controls{left:12px; bottom:14px}
+    #controls{left:12px; right:12px; bottom:14px}
     #probe{top:auto; bottom:120px; right:12px; transform:none; width:200px}
   }
   @media (prefers-reduced-motion: reduce){ *{transition-duration:.01ms !important} }
@@ -140,6 +140,10 @@
       <button data-v="side" aria-pressed="false">Side</button>
       <button data-v="rear" aria-pressed="false">Rear</button>
     </div>
+  </div>
+  <div class="group">
+    <span>Landing gear</span>
+    <button class="toggle" id="gear" aria-pressed="false">Lower the gear</button>
   </div>
   <div class="group">
     <label for="swivel">Nozzles down <span class="val" id="swval">0°</span></label>
@@ -416,6 +420,37 @@ function applySwivel(){
 $('swivel').addEventListener('input', (e) => { $('swval').textContent = `${e.target.value}°`; sw.tp = +e.target.value; });
 $('yaw').addEventListener('input', (e) => { $('yawval').textContent = `${e.target.value}°`; sw.ty = +e.target.value; });
 
+/* ---------------- landing gear ----------------
+   Built down; the page raises it on load. Each leg turns about its pivot,
+   each door about its hinge. Going up the legs fold first and the doors
+   shut after them; coming down the doors open first. */
+const GEARK = M.gear;
+function hingeGroup(point, axis, parts){
+  const g = new THREE.Group();
+  g.position.copy(toScene(point).multiplyScalar(MM));
+  gltf.scene.add(g); g.updateMatrixWorld(true);
+  g.userData.axis = toScene(axis).normalize();
+  for (const n of parts) for (const m of (meshes.get(n) || [])) g.attach(m);
+  return g;
+}
+const gearLegs = GEARK.legs.map(L => Object.assign(hingeGroup(L.pivot, L.axis, L.parts), {stow: L.stow}));
+const gearDoors = GEARK.doors.map(d => Object.assign(hingeGroup(d.hinge, d.axis, [d.part]), {close: d.close}));
+const gearState = {u: 1, target: 1};           // 0 down, 1 up
+function applyGear(){
+  const legs = THREE.MathUtils.clamp(gearState.u / 0.7, 0, 1);
+  const doors = THREE.MathUtils.clamp((gearState.u - 0.7) / 0.3, 0, 1);
+  const ease = (t) => t * t * (3 - 2 * t);
+  for (const g of gearLegs) g.quaternion.setFromAxisAngle(g.userData.axis, g.stow * ease(legs));
+  for (const g of gearDoors) g.quaternion.setFromAxisAngle(g.userData.axis, g.close * ease(doors));
+}
+applyGear();
+$('gear').addEventListener('click', () => {
+  const down = $('gear').getAttribute('aria-pressed') !== 'true';
+  $('gear').setAttribute('aria-pressed', down);
+  $('gear').textContent = down ? 'Raise the gear' : 'Lower the gear';
+  gearState.target = down ? 0 : 1;
+});
+
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
 const clock = new THREE.Clock();
@@ -426,6 +461,14 @@ renderer.setAnimationLoop(() => {
     const k = flight.t < 0.5 ? 2 * flight.t * flight.t : 1 - Math.pow(-2 * flight.t + 2, 2) / 2;
     camera.position.lerpVectors(flight.from, flight.to, k);
     if (flight.t >= 1) flight = null;
+  }
+  // the gear takes about six seconds each way, as a real one does
+  if (gearState.u !== gearState.target) {
+    const v = dt / 6.0;
+    gearState.u = reduced ? gearState.target
+      : (Math.abs(gearState.target - gearState.u) < v ? gearState.target
+         : gearState.u + Math.sign(gearState.target - gearState.u) * v);
+    applyGear();
   }
   // the bearings turn at a hydraulic motor's pace, not a slider's
   if (sw.pitch !== sw.tp || sw.yaw !== sw.ty) {

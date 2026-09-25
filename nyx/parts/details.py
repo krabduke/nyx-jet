@@ -185,7 +185,8 @@ def _blade(x, y, z_of, down=False, h=170.0, c0=260.0, c1=110.0, t=12.0):
 def _antennas():
     return {
         "antenna_dorsal": _blade(7700.0, 0.0, lambda x, y: shapes.z_up(x, y)),
-        "antenna_ventral": _blade(1900.0, 0.0, lambda x, y: shapes.z_dn(x, y),
+        # under the cockpit, aft of the nose gear's bay
+        "antenna_ventral": _blade(3700.0, 0.0, lambda x, y: shapes.z_dn(x, y),
                                   down=True, h=130.0, c0=200.0, c1=90.0),
         "antenna_datalink": _blade(11300.0, 0.0, lambda x, y: shapes.z_dn(x, y),
                                    down=True, h=150.0, c0=240.0, c1=100.0),
@@ -337,8 +338,10 @@ def _panel(x0, x1, y0, y1, upper, teeth=0, tooth=60.0, n=24):
 
 
 def _seams():
+    # (the forward-fuselage joint only over the top: underneath, the nose
+    # gear's doors are the joints)
     parts = [_across(1300.0, True), _across(1300.0, False),     # radome
-             _across(2250.0, True), _across(2250.0, False)]     # fwd fuselage
+             _across(2250.0, True)]                              # fwd fuselage
     # spine access panels
     parts += _panel(6350.0, 7450.0, -260.0, 260.0, True, teeth=4)
     parts += _panel(8150.0, 9450.0, -300.0, 300.0, True, teeth=4)

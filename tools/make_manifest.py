@@ -20,6 +20,7 @@ import spec      # noqa: E402
 import agility   # noqa: E402
 import vlm       # noqa: E402
 from parts import engines   # noqa: E402
+from parts import gear      # noqa: E402
 
 MODULES = [
     ("01 Airframe", "Airframe", "#C9CDD1"),
@@ -90,6 +91,19 @@ def nozzles():
             "fold_table": [[r1(a, 2), r1(b, 3)] for a, b in n["fold_table"]]}
 
 
+def gear_kinematics():
+    """Each gear leg's pivot, axis and stowing angle, and each door's hinge
+    and closing angle, rounded for the page."""
+    k = gear.kinematics()
+    rd = lambda v: [r1(c, 4) for c in v]
+    return {"legs": [{"parts": L["parts"], "pivot": rd(L["pivot"]),
+                      "axis": rd(L["axis"]), "stow": r1(L["stow"], 5)}
+                     for L in k["legs"]],
+            "doors": [{"part": d["part"], "hinge": rd(d["hinge"]),
+                       "axis": rd(d["axis"]), "close": r1(d["close"], 5)}
+                      for d in k["doors"]]}
+
+
 def main():
     rows = list(csv.DictReader(open(os.path.join(ROOT, "build", "parts.csv"))))
     mods = []
@@ -107,6 +121,7 @@ def main():
         "figures": figures(rows),
         "palette": palette(),
         "nozzles": nozzles(),
+        "gear": gear_kinematics(),
         "modules": mods,
         "parts": parts,
     }
