@@ -935,7 +935,7 @@
    "label": "Flying surfaces",
    "color": "#8E979E",
    "parts": 26,
-   "faces": 22572
+   "faces": 22624
   },
   {
    "key": "03 Intakes",
@@ -962,8 +962,8 @@
    "key": "06 Landing gear",
    "label": "Landing gear",
    "color": "#5C6166",
-   "parts": 20,
-   "faces": 26528
+   "parts": 23,
+   "faces": 26722
   },
   {
    "key": "07 Structure",
@@ -2503,6 +2503,21 @@
    "mat": "skin",
    "f": 35639
   },
+  "gear_actuator_main_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 58
+  },
+  "gear_actuator_main_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 58
+  },
+  "gear_actuator_nose": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 78
+  },
   "gear_bay_main_l": {
    "m": "06 Landing gear",
    "mat": "steel",
@@ -2741,12 +2756,12 @@
   "wing_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 3302
+   "f": 3328
   },
   "wing_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 3295
+   "f": 3321
   }
  }
 }

@@ -421,6 +421,7 @@ MATERIAL_MAP = {
     "wheel": "wheel",
     "gear_door": "skin_dark",
     "gear_leg_door": "skin_dark",
+    "gear_actuator": "steel",
     "gear_pivot_door": "skin_dark",
     "frame": "structure",
     "longeron": "structure",

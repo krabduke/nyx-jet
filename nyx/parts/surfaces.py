@@ -359,7 +359,10 @@ def canard_drive(xp):
     parts = []
     # the beam: from 8 mm into the tub wall out to 4 mm into the skin
     zm = 0.5 * (zb0 + zb1)
-    y_skin = body_side_y(xp, zb1) - spec.SKIN_T + 4.0
+    # 4 mm into the skin's inside, where the skin is closest -- the body
+    # narrows forward, so across the beam's width that is its front face
+    y_skin = min(body_side_y(xp + dx, z) for dx in (-w / 2, w / 2)
+                 for z in (zb0, zb1)) - spec.SKIN_T + 4.0
     y0 = tub_y - 8.0
     parts.append(mesh.box(xp, 0.5 * (y0 + y_skin), zm, w, y_skin - y0,
                           zb1 - zb0))

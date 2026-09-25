@@ -503,6 +503,55 @@ def main_cutter():
 
 # --------------------------------------------------------------------------
 
+# The gear's retraction actuators: a geared rotary actuator on each leg's
+# trunnion, coaxial with it, bolted to the airframe -- the main legs' in a
+# pocket in the wing ahead of each trunnion, the nose leg's outboard of the
+# bay's starboard wall. The legs turned on their trunnions with nothing to
+# turn them. Rotary, not a jack: the main leg's slot in the wing is as wide
+# as the leg, and there is no room beside it for a jack's stroke.
+ACT_R, ACT_L = 35.0, 150.0
+
+
+def _rotary(p0, axis, flange_at_far_end=True):
+    """A rotary actuator on an axis from p0, ACT_L long: its body, a
+    mounting flange at its far end, and its output spline let 2 mm into the
+    trunnion at p0."""
+    m = math.sqrt(sum(c * c for c in axis))
+    ax = [c / m for c in axis]
+    q = lambda t: tuple(p0[k] + ax[k] * t for k in range(3))
+    return mesh.join(
+        mesh.pipe([q(-2.0), q(ACT_L)], ACT_R, 24, bend=0.0),
+        mesh.pipe([q(ACT_L - 12.0), q(ACT_L)], ACT_R + 14.0, 24, bend=0.0),
+        mesh.pipe([q(ACT_L * 0.35), q(ACT_L * 0.65)], ACT_R + 5.0, 24, bend=0.0))
+
+
+MAIN_ACT_R = 28.0      # the wing's top skin is 40 mm over the pivot's axis
+
+
+def main_actuator():
+    """The starboard main leg's, and the pocket it sits in. The pivot is high
+    in the wing -- its axis 40 mm under the top skin -- so this one is
+    slimmer than the nose leg's and has no round flange: it is bolted down
+    through a foot under it into the wing's structure."""
+    px, py, pz = main_pivot()
+    x0 = px - 160.0
+    r = MAIN_ACT_R
+    act = mesh.join(
+        mesh.pipe([(x0 + 2.0, py, pz), (x0 - ACT_L, py, pz)], r, 24, bend=0.0),
+        mesh.pipe([(x0 - ACT_L * 0.35, py, pz), (x0 - ACT_L * 0.65, py, pz)],
+                  r + 3.0, 24, bend=0.0),
+        mesh.box(x0 - ACT_L / 2, py, pz - r - 14.0, ACT_L - 10.0, 2 * r + 20.0,
+                 36.0))
+    pocket = mesh.pipe([(x0 + 1.0, py, pz), (x0 - ACT_L - 1.0, py, pz)],
+                       r + 4.0, 24, bend=0.0)
+    return act, pocket
+
+
+def nose_actuator():
+    px, _, pz = nose_pivot()
+    return _rotary((px, NHW + 4.0, pz), (0.0, 1.0, 0.0))
+
+
 def _main_parts(up):
     t, h, leg = main_leg()
     door = leg_door_stowed()
@@ -518,7 +567,8 @@ def _main_parts(up):
         pd = _rot_part(pivot_door(), hp, hax, PIVOT_DOOR_OPEN)
     return {"gear_main": leg, "tyre_main": t, "wheel_main": h,
             "gear_leg_door_main": door, "gear_door_main": wd,
-            "gear_pivot_door_main": pd, "gear_bay_main": main_bay()}
+            "gear_pivot_door_main": pd, "gear_bay_main": main_bay(),
+            "gear_actuator_main": main_actuator()[0]}
 
 
 def pose():
@@ -535,7 +585,7 @@ def build():
         P, ax, a = nose_pivot(), (0.0, 1.0, 0.0), 0.5 * math.pi
         t, h, leg = (_rot_part(p, P, ax, a) for p in (t, h, leg))
     out.update({"gear_nose": leg, "tyres_nose": t, "wheels_nose": h,
-                "gear_bay_nose": nose_bay()})
+                "gear_bay_nose": nose_bay(), "gear_actuator_nose": nose_actuator()})
     for side, sy in (("r", 1.0), ("l", -1.0)):
         d = nose_door(sy)
         if not up:
@@ -548,8 +598,9 @@ def build():
         out[f"{k}_l"] = _mirror(v)
     mc = main_cutter()
     out["cut:fuselage_skin"] = mesh.join(nose_cutter(), mc, _mirror(mc))
-    out["cut:wing_r"] = mc
-    out["cut:wing_l"] = _mirror(mc)
+    pocket = main_actuator()[1]
+    out["cut:wing_r"] = mesh.join(mc, pocket)
+    out["cut:wing_l"] = mesh.join(_mirror(mc), _mirror(pocket))
     return out
 
 

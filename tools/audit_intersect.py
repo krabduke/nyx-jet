@@ -80,6 +80,10 @@ AIRFRAME = [
     # landing gear: legs into their bay roofs, axles through the hubs, tyres
     # on the hubs
     ("gear_nose", "gear_bay_nose"),
+    # each leg's rotary actuator: its output spline is in the trunnion's
+    # end, its body in the bay's wall or the wing's pocket
+    ("gear_actuator_nose", "gear_nose"), ("gear_actuator_nose", "gear_bay_nose"),
+    ("gear_actuator_main_", "gear_main_"), ("gear_actuator_main_", "wing_"),
     ("wheels_nose", "gear_nose"), ("wheel_main_", "gear_main_"),
     ("tyres_nose", "wheels_nose"), ("tyre_main_", "wheel_main_"),
     # the canopy's rim is pressed into its seal on the skin
