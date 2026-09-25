@@ -29,7 +29,9 @@ def opening_half_width(x):
     xm = 0.5 * (CK["x0"] + CK["x1"])
     L = 0.5 * (CK["x1"] - CK["x0"])
     u = min(1.0, abs(x - xm) / L)
-    return CK["half_w"] * max(0.0, 1.0 - u ** 2.6) ** 0.5
+    # blunt at the windscreen, drawn out to a point aft where the canopy
+    # runs into the spine, as a fighter's canopy does
+    return CK["half_w"] * max(0.0, 1.0 - u ** (2.6 if x < xm else 1.5)) ** 0.5
 
 
 def canopy_top(x):
@@ -43,8 +45,15 @@ def canopy_top(x):
         t = (x - x0) / (xe - x0)
         f = math.sin(0.5 * math.pi * max(0.0, t)) ** 0.8
     else:
+        # an eased fall, not a cosine held high and dropped at the end: the
+        # crown lets down into the spine over the whole aft half
+        # It falls to the spine's height where the canopy ends, not to the
+        # skin under each station: the spine rises under the aft half, and
+        # a crown measured from it sagged and rose again into it.
         t = (x - xe) / (x1 - xe)
-        f = math.cos(0.5 * math.pi * min(1.0, t)) ** 0.7
+        f = (0.5 + 0.5 * math.cos(math.pi * min(1.0, t))) ** 0.7
+        z_end = shapes.z_up(x1, 0.0)
+        return max(base + 2.0, z_end + (CK["canopy_top_z"] - z_end) * f)
     return base + (CK["canopy_top_z"] - base) * max(f, 0.015)
 
 

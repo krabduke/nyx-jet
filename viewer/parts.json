@@ -919,7 +919,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42066
+   "faces": 42091
   },
   {
    "key": "02 Flying surfaces",
@@ -2357,7 +2357,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35614
+   "f": 35639
   },
   "gear_bay_main_l": {
    "m": "06 Landing gear",
