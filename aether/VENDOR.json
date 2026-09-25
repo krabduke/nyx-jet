@@ -51,7 +51,7 @@
   },
   "parts/nozzle.py": {
    "from": "engine/parts/nozzle.py",
-   "sha": "fba67f1efd17"
+   "sha": "8cba162310c7"
   },
   "parts/frames.py": {
    "from": "engine/parts/frames.py",
@@ -66,5 +66,5 @@
    "sha": "524953259aa3"
   }
  },
- "commit": "7a025d6"
+ "commit": "007e847"
 }

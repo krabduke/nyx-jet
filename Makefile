@@ -28,6 +28,7 @@ verify:                      ## the definition of done
 	python3 tools/measure_fuel.py --check
 	python3 tools/audit_oml.py
 	python3 tools/audit_support.py
+	python3 tools/audit_ports.py
 	python3 tools/audit_joints.py
 	python3 tools/audit_manifest.py
 	node tools/validate_viewer.mjs .

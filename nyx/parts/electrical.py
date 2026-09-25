@@ -202,7 +202,12 @@ def fuselage_looms():
                 if kind in ("wing", "wingf"):
                     a0, a1 = wing_roots()[kind]
                     mir = lambda q: (q[0], sgn * q[1], q[2])
-                    pts = pts[:-1] + [mir(a0), mir(_toward(a0, a1, 0.4))]
+                    # in along the wing loom's own line for the last 30 mm,
+                    # so the point it joins at is on a straight run: turning
+                    # there, the corner's fillet passed 5 mm inside it and
+                    # the wing's loom started beside this one, not in it
+                    pts = pts[:-1] + [mir(_toward(a0, a1, -0.6)), mir(a0),
+                                      mir(_toward(a0, a1, 0.4))]
                 elif kind == "fwd":
                     # it ends on the canard's actuator; on the starboard side
                     # the nose gear's run goes on from there, its own part

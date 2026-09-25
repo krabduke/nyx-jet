@@ -149,17 +149,27 @@ def _flange(fr, aft):
     return to_frame(part, fr)
 
 
-def _hangers(fr, a):
+def _hangers(fa, fb, a):
     """Eight radial hangers carrying the liner off the shell, a mm along the
-    duct from a joint plane."""
+    duct from fa's joint plane (from fb's, for a negative a).
+
+    Each is on the duct's own lofted surfaces, which run straight from a
+    circle in one joint plane to a circle in the other. They were on a circle
+    a mm along one plane's normal, which is not on the loft when the planes
+    are oblique: at some clocks they stopped short of the liner, which is
+    4 mm thick, or of the shell."""
+    L = math.dist(fa[0], fb[0])
+    s = a / L if a >= 0.0 else 1.0 + a / L
+
+    def at(r, t):
+        pa = frame_pt(fa, 0.0, r * math.cos(t), r * math.sin(t))
+        pb = frame_pt(fb, 0.0, r * math.cos(t), r * math.sin(t))
+        return tuple(pa[j] + (pb[j] - pa[j]) * s for j in range(3))
     parts = []
     for k in range(8):
         t = 2.0 * math.pi * (k + 0.5) / 8
-        p0 = frame_pt(fr, a, (LINER_OUT - 1.0) * math.cos(t),
-                      (LINER_OUT - 1.0) * math.sin(t))
-        p1 = frame_pt(fr, a, (SHELL_IN + 1.0) * math.cos(t),
-                      (SHELL_IN + 1.0) * math.sin(t))
-        parts.append(mesh.pipe([p0, p1], 7.0, 10))
+        parts.append(mesh.pipe([at(LINER_OUT - 1.0, t), at(SHELL_IN + 1.0, t)],
+                               7.0, 10))
     return mesh.join(*parts)
 
 
@@ -183,7 +193,7 @@ def _stiffener(fa, fb):
 def _duct(fa, fb, front_flange=True, aft_flange=True, stiff=True, hang=40.0):
     parts = [_loft(fa, fb, SHELL_IN, R_OUT),
              _loft(fa, fb, R_IN, LINER_OUT),
-             _hangers(fa, hang), _hangers(fb, -hang)]
+             _hangers(fa, fb, hang), _hangers(fa, fb, -hang)]
     if front_flange:
         parts.append(_flange(fa, aft=False))
     if aft_flange:
@@ -388,7 +398,7 @@ def _static_ring():
     return mesh.join(mesh.tube(x0, x1 - 15.0, SHELL_IN, R_OUT, SEG),
                      mesh.tube(x0, x1, R_IN, LINER_OUT, SEG),
                      mesh.tube(x1 - 15.0, x1, R_IN, R_OUT, SEG),
-                     _hangers(square(x0), 40.0),
+                     _hangers(square(x0), square(x1), 40.0),
                      _flange(square(x0), aft=False))
 
 

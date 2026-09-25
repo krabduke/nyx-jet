@@ -970,7 +970,7 @@
    "label": "Structure",
    "color": "#9A8F7E",
    "parts": 33,
-   "faces": 31199
+   "faces": 31415
   },
   {
    "key": "08 Engine port",
@@ -2661,12 +2661,12 @@
   "loom_fuselage_l": {
    "m": "07 Structure",
    "mat": "rubber",
-   "f": 3706
+   "f": 3814
   },
   "loom_fuselage_r": {
    "m": "07 Structure",
    "mat": "rubber",
-   "f": 3706
+   "f": 3814
   },
   "loom_nose_gear": {
    "m": "07 Structure",

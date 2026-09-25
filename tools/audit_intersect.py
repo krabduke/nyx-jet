@@ -75,7 +75,7 @@ AIRFRAME = [
     ("loom_fuselage_l", "engine_l_generator_l"),
     ("loom_fuselage_", "canard_drive_"), ("loom_nose_gear", "gear_actuator_nose"),
     ("loom_nose_gear", "loom_fuselage_r"),
-    ("loom_fuselage_", "loom_wing_"), ("loom_fuselage_", "loom_fin_"),
+    ("loom_fuselage_", "loom_fin_"),
     ("loom_wing_", "flaperon_act_"), ("loom_wing_", "le_flap_act_"),
     ("loom_wing_", "gear_actuator_main_"), ("loom_fin_", "rudder_act_"),
     ("fuel_gallery", "fuel_tank_"), ("refuel_receptacle", "fuel_tank_fwd_1"),
