@@ -169,6 +169,62 @@ def seat():
     return mesh.join(*parts)
 
 
+def seat_bulkhead():
+    """The bulkhead behind the seat, which the seat's rails are bolted to.
+
+    The rails used to stand up from the floor to z 981 and end there: a
+    zero-zero seat's guide rails, which take the whole ejection load, held
+    at their feet and nowhere else. The bulkhead leans back with them at
+    the seat's 18 degrees, just behind them: full width inside the tub's
+    walls up to the sill, set into the walls and the floor, and narrower
+    above, inside the canopy's opening, up past the rails' tops behind the
+    headbox."""
+    xs = CK["seat_x"]
+    zf = 125.0
+    r = math.radians(18.0)
+    d = (math.sin(r), math.cos(r))          # up the rails, in (x, z)
+    n = (math.cos(r), -math.sin(r))         # aft, off their faces
+    x0, z0 = xs + 230.0, zf - 4.0           # the rails' feet
+    off = 16.0 - 2.0 + 5.0                  # rails 2 mm into its face
+    wall = 460.0 + 1.0                      # the tub's walls' inner faces
+    tiers = ((-8.0, (CK["sill_z"] - 4.0 - z0) / d[1], wall),
+             ((CK["sill_z"] - 40.0 - z0) / d[1], 960.0, 240.0))
+    parts = []
+    for (t0, t1, hy) in tiers:
+        ring = []
+        for t in (t0, t1):
+            cx = x0 + d[0] * t + n[0] * off
+            cz = z0 + d[1] * t + n[1] * off
+            for s in (-1.0, 1.0):
+                ring.append((cx + n[0] * 5.0 * s, cz + n[1] * 5.0 * s))
+        # a slab: (bottom front, bottom back, top back, top front) in x-z,
+        # extruded across y
+        q = [ring[0], ring[1], ring[3], ring[2]]
+        verts = [(x, -hy, z) for (x, z) in q] + [(x, hy, z) for (x, z) in q]
+        faces = [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2),
+                 (2, 6, 7, 3), (3, 7, 4, 0)]
+        parts.append(shapes.orient((verts, faces)))
+    # its stiffeners, up its back, and the rails' bolts through it, heads
+    # on its back face
+    for yy in (-120.0, 120.0):
+        a0, a1 = 10.0, 900.0
+        p0 = (x0 + d[0] * a0 + n[0] * (off + 5.0 + 14.0),
+              z0 + d[1] * a0 + n[1] * (off + 5.0 + 14.0))
+        p1 = (x0 + d[0] * a1 + n[0] * (off + 5.0 + 14.0),
+              z0 + d[1] * a1 + n[1] * (off + 5.0 + 14.0))
+        parts.append(mesh.pipe([(p0[0], yy, p0[1]), (p1[0], yy, p1[1])],
+                               15.0, 4, bend=0.0))
+    for yy in (-200.0, 200.0):
+        for t in (150.0, 380.0, 610.0, 840.0):
+            bx = x0 + d[0] * t
+            bz = z0 + d[1] * t
+            parts.append(mesh.pipe(
+                [(bx + n[0] * 8.0, yy, bz + n[1] * 8.0),
+                 (bx + n[0] * (off + 9.0), yy, bz + n[1] * (off + 9.0))],
+                7.0, 6, bend=0.0))
+    return mesh.join(*parts)
+
+
 def _arc_loft(x0, x1, y_half, z_lo, z_hi, bulge, n=16):
     """A panel curved across the cockpit: rings at stations across y, each a
     rectangle in x-z, the whole thing bowed forward by `bulge` at the
@@ -230,6 +286,7 @@ def build():
         "cut:fuselage_skin": opening_cutter(),
         "cockpit_tub": tub(),
         "seat": seat(),
+        "seat_bulkhead": seat_bulkhead(),
         "cockpit_panel": panel(),
         "cockpit_hud": hud(),
         "cockpit_controls": stick(),

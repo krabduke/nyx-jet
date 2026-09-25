@@ -392,6 +392,7 @@ MATERIAL_MAP = {
     "canopy_frame": "skin_dark",
     "cockpit": "cockpit",
     "seat": "seat",
+    "seat_bulkhead": "structure",
     "gear": "steel",
     "tyre": "rubber",
     "wheel": "wheel",

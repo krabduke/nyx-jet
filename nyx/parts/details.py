@@ -307,11 +307,19 @@ def _ribbon(pts, upper, width=SEAM_W, proud=SEAM_H):
         L = math.hypot(dx, dy) or 1.0
         # across the seam, in plan
         cx, cy = -dy / L * width / 2, dx / L * width / 2
+        # across the strip in steps, so a wide one follows the skin's
+        # curvature instead of spanning it flat -- a 50 mm strip laid flat
+        # across the forebody's crown was under the skin in its middle and
+        # showed as two lines
+        k = max(1, int(width / 8.0))
+        across = [-1.0 + 2.0 * i / k for i in range(k + 1)]
         ring = []
-        for (ox, oy, h) in ((cx, cy, -0.6), (-cx, -cy, -0.6),
-                            (-cx, -cy, proud), (cx, cy, proud)):
-            px, py = x + ox, y + oy
-            ring.append((px, py, _surface(px, py, upper) + s * h))
+        for f in across:
+            px, py = x + cx * f, y + cy * f
+            ring.append((px, py, _surface(px, py, upper) - s * 0.6))
+        for f in reversed(across):
+            px, py = x + cx * f, y + cy * f
+            ring.append((px, py, _surface(px, py, upper) + s * proud))
         rings.append(ring)
     return shapes.loft_rings(rings)
 

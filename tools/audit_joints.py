@@ -45,6 +45,8 @@ CIRCUITS += mirrored("each rudder is driven from its fin",
                      ["fin_{s}", "rudder_act_{s}", "rudder_{s}"])
 CIRCUITS += mirrored("each canard turns on its spindle in the body",
                      ["fuselage_skin", "canard_spindle_{s}", "canard_{s}"])
+CIRCUITS += [("the seat's rails are bolted to the bulkhead in the tub",
+              ["seat", "seat_bulkhead", "cockpit_tub"])]
 CIRCUITS += mirrored("and is carried and driven off the cockpit tub",
                      ["cockpit_tub", "canard_drive_{s}", "canard_spindle_{s}"])
 CIRCUITS += mirrored("each fin stands on the body and carries its rudder",

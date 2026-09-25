@@ -55,6 +55,9 @@ AIRFRAME = [
     ("canard_drive_", "frame_5119"),
     # every frame is riveted to the skin: its outer face is let into it
     ("frame_", "fuselage_skin"),
+    # the seat's rails are bolted to the bulkhead behind it, which is set
+    # into the tub's walls and floor
+    ("seat", "seat_bulkhead"), ("seat_bulkhead", "cockpit_tub"),
     # the keel passes through the frames' arches
     ("frame_", "keel"),
     # engine mounts: beams from the keel and the forward frame to the
