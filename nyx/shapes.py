@@ -128,7 +128,7 @@ def _hump(y, h, inset):
 def z_up(x, y, inset=0.0):
     """Upper surface height at (x, y); with `inset` the surface moved in
     by that much (crown down, half-width in)."""
-    base = _z_up_smooth(x, y, inset)
+    base = _z_up_smooth(x, y, inset) + _spine(x, y, inset)
     a = _nac_weight(x)
     if a <= 0.0:
         return base
@@ -136,6 +136,41 @@ def z_up(x, y, inset=0.0):
     low = zc + (base - zc) * NAC_LOW
     aft = _smax(low, _hump(y, NAC_UP, inset))
     return base + (aft - base) * a
+
+
+# The dorsal spine. Behind a fighter's canopy the body does not drop
+# straight back to its crown: a fairing carries the canopy's line aft and
+# lets it down into the body over several metres. That fairing is the spine,
+# and it is where the avionics bays, the environmental-control ducting and
+# the refuelling receptacle live. Without it the canopy was a bubble set on
+# a flat back. It starts under the canopy's aft half (the canopy sits on the
+# skin, so it rides up on it), is highest where the canopy ends, and is gone
+# before the body opens into its two nacelles.
+SPINE = ((4500.0, 0.0), (5800.0, 230.0), (7000.0, 175.0),
+         (8300.0, 80.0), (9500.0, 0.0))
+SPINE_W = ((4500.0, 470.0), (5800.0, 440.0), (9500.0, 300.0))
+
+
+def _lerp_table(tab, x):
+    if x <= tab[0][0]:
+        return tab[0][1]
+    for (x0, v0), (x1, v1) in zip(tab, tab[1:]):
+        if x <= x1:
+            t = (x - x0) / (x1 - x0)
+            t = t * t * (3.0 - 2.0 * t)
+            return v0 + (v1 - v0) * t
+    return tab[-1][1]
+
+
+def _spine(x, y, inset=0.0):
+    if not SPINE[0][0] < x < SPINE[-1][0]:
+        return 0.0
+    h = _lerp_table(SPINE, x)
+    w = _lerp_table(SPINE_W, x) - inset
+    u = abs(y) / w
+    if u >= 1.0:
+        return 0.0
+    return h * (1.0 - u * u) ** 2
 
 
 def z_dn(x, y, inset=0.0):

@@ -229,7 +229,7 @@ CLOSE = {
     "c2_intake": ((2.8, -4.6, -0.9), (5.4, -1.3, -0.4), 42),
     "c3_nozzles": ((17.6, 4.2, 1.8), (14.1, 0.0, 0.0), 45),
     "c4_bay": ((6.6, -4.8, -3.2), (7.0, 0.0, -0.9), 38),
-    "c5_main_gear": ((8.0, -5.2, -1.4), (9.5, -1.5, -1.4), 40),
+    "c5_main_gear": ((6.4, -7.4, -0.7), (9.5, -2.9, -1.05), 38),
     "c6_wing": ((12.0, -10.0, 4.0), (10.5, -4.0, 0.0), 45),
 }
 
@@ -239,6 +239,10 @@ def mode_close(name, samples):
     if name == "c4_bay":
         open_bay()
     loc, tgt, lens = CLOSE[name]
+    if tgt[2] < -0.3:
+        # under the aircraft the key and top lights are behind the airframe:
+        # a low fill from the camera's side, as a hangar's floor lights give
+        light("under", (loc[0] - 2.0, loc[1] - 3.0, -1.2), tgt, 900, 6)
     camera(loc, tgt, lens)
     shoot(name)
 
