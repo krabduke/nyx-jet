@@ -136,7 +136,7 @@ it.
 
 ## The gates
 
-`make verify` runs ten checks, and all of them pass:
+`make verify` runs twelve checks, and all of them pass:
 
 | Gate | What it enforces |
 |---|---|
@@ -146,6 +146,8 @@ it.
 | `audit_structure` | Every part is attached, mirrored, distinct and the shape it is named |
 | `audit_intersect` | No part occupies another's space unless declared |
 | `audit_stowage` | The same, with the gear up and every door shut: each leg, wheel and door fits in its bay without passing through the duct beside it, the wing it folds into, the cockpit floor above it or the radar bulkhead ahead of it |
+| `measure_fuel --check` | The mass table's fuel is what the built tanks hold, measured off the geometry, to half a per cent |
+| `audit_oml` | Every internal part — frames, tanks, actuators, looms — is inside the outer mould line: nothing pokes through the skin |
 | `audit_support` | No piece floats free |
 | `audit_joints` | One assembly, and every load path and circuit is joined link by link |
 | `audit_manifest` | The viewer describes the build it ships with |
