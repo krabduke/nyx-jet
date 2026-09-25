@@ -686,6 +686,8 @@ MATERIAL_MAP = {
     "fadec": "composite",
     "harness": "rubber",
     "sensor": "steel",
+    "ignition_exciters": "casing",
+    "ignition_leads": "steel",
     "mount": "steel",
     "igniter": "steel",
     "vsv": "steel",

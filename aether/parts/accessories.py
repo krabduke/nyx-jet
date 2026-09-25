@@ -78,6 +78,7 @@ def build():
     out["mode_valve_actuators"] = _mode_valve_actuators()
     out.update(_hydraulics())
     out.update(_instrumentation(out))
+    out.update(_ignition(out))
     # last: the clamps need every line's run
     out["line_clamps"] = _line_clamps()
     return out
@@ -542,17 +543,26 @@ def _simplify(pts, tol=0.8):
     return _simplify(pts[:bi + 1], tol)[:-1] + _simplify(pts[bi:], tol)
 
 
+# each channel's loom radius along its run, x -> r, as last built
+LOOM_AT = {}
+
+
 def _instrumentation(built):
     out = {}
     looms, probes = [], []
     bin_mm = 5.0
-    xs_lo = min(p[0] for p in PROBES) - 40.0
-    xs_hi = max(p[0] for p in PROBES) + 60.0
+    # each run ends where its last probe's pigtail joins it: the pigtails
+    # join 40 mm aft of their probes. They ran on 40 and 80 mm past that
+    # and stopped in the air.
+    xs_lo = min(p[0] for p in PROBES) + 40.0
+    xs_hi = max(p[0] for p in PROBES) + 40.0
     for tag, c_fadec, c_run, sgn in CHANNELS:
         top = _case_envelope(built, c_run, LOOM_R + LOOM_CLEAR + 4.0,
                              xs_lo, xs_hi, bin_mm)
         rr = _loom_radius(top, xs_lo, bin_mm)
-        r_at = lambda x: rr[min(len(rr) - 1, max(0, int(round((x - xs_lo) / bin_mm))))]
+        r_at = (lambda rr_: lambda x: rr_[min(len(rr_) - 1, max(
+            0, int(round((x - xs_lo) / bin_mm))))])(rr)
+        LOOM_AT[tag] = r_at
         # the run, fore and aft of the climb
         for xa, xb in ((ARC_X, xs_lo), (ARC_X, xs_hi)):
             step = bin_mm if xb > xa else -bin_mm
@@ -590,4 +600,109 @@ def _instrumentation(built):
             looms.append(mesh.pipe(pig, PIG_R, 12, bend=8.0))
     out["harness_looms"] = mesh.join(*looms)
     out["sensor_probes"] = mesh.join(*probes)
+    return out
+
+
+# --------------------------------------------------------------------------
+# Ignition: the exciters and their leads.
+#
+# The two main igniters and the reheat igniter ended in their connectors,
+# and nothing on the engine could make a spark: no exciter, no lead. Each
+# main igniter now has its own exciter on the case at its own clock, ahead
+# of the mid flange, so its high-tension lead runs straight aft along that
+# clock over the channel's loom, the flange and the fuel manifold to a
+# coupling nut on the plug. The reheat igniter's exciter sits ahead of the
+# reheat manifolds at 45 degrees. Each exciter takes its power from its
+# channel's loom through a short pigtail.
+
+EXC = ((30.0, 1140.0, 1250.0, "a"), (150.0, 1140.0, 1250.0, "b"),
+       (45.0, 1960.0, 2110.0, "a"))
+EXC_H, EXC_W = 22.0, 40.0          # half-depth off the case, half-width
+HT_R = 5.0
+
+
+def _arc_point(c_fadec, c_run, clock, r_box, r_run):
+    """The point on a channel's loom climb (see _instrumentation) at a
+    given clock."""
+    t = (clock - c_fadec) / (c_run - c_fadec)
+    r = r_box + (r_run - r_box) * min(1.0, t * 5.0)
+    return common.polar(ARC_X, r, clock)
+
+
+def _ignition(built):
+    from parts import combustor, augmentor
+    out = {}
+    boxes, leads = [], []
+    runs = {}
+    for tag, c_fadec, c_run, _sgn in CHANNELS:
+        runs[tag] = (c_fadec, c_run)
+    r_box = outer_od(920.0) + 12.0 + 30.0
+    for k, (clock, x0, x1, ch) in enumerate(EXC):
+        od = outer_od(x0)
+        r0 = od + 12.0
+        rc = r0 + EXC_H
+        a = math.radians(clock)
+        v, f = _rounded_box(x0, x1, rc, 0.0, EXC_H, EXC_W, 6.0, 40, taper=10.0)
+        boxes.append((mesh.rot_x(v, a), f))
+        for xp in (x0 + 25.0, x1 - 25.0):
+            for off in (-15.0, 15.0):
+                pv, pf = mesh.pipe([(xp, outer_od(xp) - 6.0, off),
+                                    (xp, r0 + 3.0, off)], 6.0, 12)
+                boxes.append((mesh.rot_x(pv, a), pf))
+        c_fadec, c_run = runs[ch]
+        top = rc + EXC_H - 6.0          # the HT socket, high on the aft face
+        if k < 2:
+            # the main igniter at this clock, straight aft
+            xi = spec.COMBUSTOR["igniter_x"]
+            r_od = outer_od(xi)
+            env = _case_envelope(built, clock, HT_R + 6.0, x1, xi - 20.0)
+            r_lead = max(max(env) + 6.0 + HT_R, top)
+            nut0, nut1 = r_od + 24.0, r_od + 36.0
+            leads.append(common.radial_pin(xi, nut0, nut1, 10.0, clock, 6))
+            path = [common.polar(x1 - 4.0, top, clock),
+                    common.polar(x1 + 30.0, r_lead, clock),
+                    common.polar(xi - 40.0, r_lead, clock),
+                    common.polar(xi, nut1 + 18.0, clock),
+                    common.polar(xi, nut1 - 2.0, clock)]
+            # power, from the loom's climb at this clock to the box's
+            # low aft corner
+            loom_pt = None
+            for cand in (clock, clock - 360.0):
+                t = (cand - c_fadec) / (c_run - c_fadec)
+                if 0.0 <= t <= 1.0:
+                    loom_pt = cand
+            if loom_pt is not None:
+                lp = _arc_point(c_fadec, c_run, loom_pt, r_box,
+                                LOOM_AT[ch](ARC_X))
+                leads.append(mesh.pipe([common.polar(x1 - 4.0, r0 + 10.0, clock),
+                                        (lp[0] - 12.0, lp[1], lp[2]), lp],
+                                       3.2, 12, bend=6.0))
+        else:
+            # the reheat igniter: along 45 degrees over the manifolds, then
+            # round to its clock and down onto its connector
+            xi = spec.AUGMENTOR["igniter_x"]
+            ci = 60.0
+            r_od = outer_od(xi)
+            env = _case_envelope(built, clock, HT_R + 6.0, x1, xi - 30.0)
+            r_lead = max(max(env) + 6.0 + HT_R, top)
+            conn_top = r_od + 52.0
+            path = [common.polar(x1 - 4.0, top, clock),
+                    common.polar(x1 + 30.0, r_lead, clock),
+                    common.polar(xi - 70.0, r_lead, clock),
+                    common.polar(xi - 10.0, conn_top + 20.0, ci),
+                    common.polar(xi, conn_top + 14.0, ci),
+                    common.polar(xi, conn_top - 2.0, ci)]
+            # power from channel A's run, 22.5 degrees round at the box's
+            # front end
+            xr = x0 + 20.0
+            r_run = LOOM_AT[ch](xr)
+            leads.append(mesh.pipe([common.polar(xr, rc, clock + 4.0),
+                                    common.polar(xr, rc + 4.0, clock + 12.0),
+                                    common.polar(xr, r_run, c_run)],
+                                   3.2, 12, bend=10.0))
+        leads.append(mesh.pipe(path, HT_R, 14, bend=18.0))
+        # clamped along its straight run only, not where it drops to its plug
+        RUNS.append((path[1:3], HT_R, 18.0))
+    out["ignition_exciters"] = mesh.join(*boxes)
+    out["ignition_leads"] = mesh.join(*leads)
     return out

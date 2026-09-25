@@ -119,6 +119,13 @@ EXPECTED = [
     # bosses are let into the case
     ("harness_looms", "fadec_"), ("harness_looms", "sensor_probes"),
     ("sensor_probes", "case_outer_"),
+    # the ignition exciters stand on posts let into the case; each HT lead
+    # plugs into its exciter's socket and ends in the coupling nut it
+    # screws onto its igniter with, and each power pigtail runs from its
+    # exciter into its channel's loom
+    ("ignition_exciters", "case_outer_"), ("ignition_leads", "ignition_exciters"),
+    ("ignition_leads", "igniters"), ("ignition_leads", "ab_igniter"),
+    ("ignition_leads", "harness_looms"),
     # mounts are let into the case, the trunnions over the frame's struts
     ("mount_trunnions", "case_outer_fwd"),
     ("mount_trunnions", "fan_frame_struts"),

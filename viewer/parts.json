@@ -976,15 +976,15 @@
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
-   "parts": 122,
-   "faces": 738700
+   "parts": 124,
+   "faces": 740834
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
-   "parts": 122,
-   "faces": 738700
+   "parts": 124,
+   "faces": 740834
   }
  ],
  "parts": {
@@ -1432,6 +1432,16 @@
    "m": "08 Engine port",
    "mat": "steel",
    "f": 72
+  },
+  "engine_l_ignition_exciters": {
+   "m": "08 Engine port",
+   "mat": "casing",
+   "f": 774
+  },
+  "engine_l_ignition_leads": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1360
   },
   "engine_l_inlet_case": {
    "m": "08 Engine port",
@@ -2047,6 +2057,16 @@
    "m": "09 Engine starboard",
    "mat": "steel",
    "f": 72
+  },
+  "engine_r_ignition_exciters": {
+   "m": "09 Engine starboard",
+   "mat": "casing",
+   "f": 774
+  },
+  "engine_r_ignition_leads": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1360
   },
   "engine_r_inlet_case": {
    "m": "09 Engine starboard",

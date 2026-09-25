@@ -80,7 +80,7 @@ engine_l_gearbox,08 Engine port,engines,casing,1728,1452,10770.0,11270.0,-919.0,
 engine_l_gearbox_mounts,08 Engine port,engines,casing,96,56,10777.0,11238.0,-878.0,-722.0,-458.0,-405.7,,
 engine_l_generator_l,08 Engine port,engines,casing,1440,1440,10990.0,11210.0,-695.0,-561.0,-579.0,-445.0,,
 engine_l_generator_r,08 Engine port,engines,casing,1440,1440,10990.0,11210.0,-1039.0,-905.0,-579.0,-445.0,,
-engine_l_harness_looms,08 Engine port,engines,rubber,8088,7852,11150.0,13070.0,-1282.1,-317.9,-265.0,473.5,,
+engine_l_harness_looms,08 Engine port,engines,rubber,8088,7852,11186.8,13052.3,-1282.1,-317.9,-265.0,473.5,,
 engine_l_harnesses,08 Engine port,engines,rubber,168,144,11251.1,11326.9,-1218.6,-381.4,-488.3,-253.5,,
 engine_l_hp_front_drum,08 Engine port,engines,titanium,960,960,11012.2,11214.8,-1082.0,-518.0,-282.0,282.0,hp,-1.0
 engine_l_hpc_drum,08 Engine port,engines,titanium,18240,18240,11214.8,11797.0,-1095.0,-505.0,-295.0,295.0,hp,-1.0
@@ -88,6 +88,8 @@ engine_l_hpt_disc,08 Engine port,engines,nickel,3840,3840,12112.6,12205.2,-1062.
 engine_l_hydraulic_lines,08 Engine port,engines,steel,5340,5300,10854.0,13223.8,-1223.4,-412.3,-627.7,-309.5,,
 engine_l_hydraulic_pump,08 Engine port,engines,steel,128,128,10820.0,10910.0,-838.0,-762.0,-642.0,-566.0,,
 engine_l_igniters,08 Engine port,engines,steel,128,72,11839.0,11865.0,-1233.0,-367.0,166.3,255.3,,
+engine_l_ignition_exciters,08 Engine port,engines,casing,1008,774,11530.0,12500.0,-1250.5,-349.5,198.2,392.9,,
+engine_l_ignition_leads,08 Engine port,engines,steel,1434,1360,11635.2,12856.9,-1248.6,-351.4,230.8,472.6,,
 engine_l_inlet_case,08 Engine port,engines,casing,1600,1600,10200.0,10382.0,-1246.0,-354.0,-446.0,446.0,,
 engine_l_intermediate_case,08 Engine port,engines,titanium,28800,28800,10815.0,12410.0,-1226.0,-374.0,-426.0,426.0,,
 engine_l_line_clamps,08 Engine port,engines,steel,3072,1728,10961.4,13030.9,-1160.9,-439.1,-505.1,463.6,,
@@ -203,7 +205,7 @@ engine_r_gearbox,09 Engine starboard,engines,casing,1728,1452,10770.0,11270.0,68
 engine_r_gearbox_mounts,09 Engine starboard,engines,casing,96,56,10777.0,11238.0,722.0,878.0,-458.0,-405.7,,
 engine_r_generator_l,09 Engine starboard,engines,casing,1440,1440,10990.0,11210.0,905.0,1039.0,-579.0,-445.0,,
 engine_r_generator_r,09 Engine starboard,engines,casing,1440,1440,10990.0,11210.0,561.0,695.0,-579.0,-445.0,,
-engine_r_harness_looms,09 Engine starboard,engines,rubber,8088,7852,11150.0,13070.0,317.9,1282.1,-265.0,473.5,,
+engine_r_harness_looms,09 Engine starboard,engines,rubber,8088,7852,11186.8,13052.3,317.9,1282.1,-265.0,473.5,,
 engine_r_harnesses,09 Engine starboard,engines,rubber,168,144,11251.1,11326.9,381.4,1218.6,-488.3,-253.5,,
 engine_r_hp_front_drum,09 Engine starboard,engines,titanium,960,960,11012.2,11214.8,518.0,1082.0,-282.0,282.0,hp,-1.0
 engine_r_hpc_drum,09 Engine starboard,engines,titanium,18240,18240,11214.8,11797.0,505.0,1095.0,-295.0,295.0,hp,-1.0
@@ -211,6 +213,8 @@ engine_r_hpt_disc,09 Engine starboard,engines,nickel,3840,3840,12112.6,12205.2,5
 engine_r_hydraulic_lines,09 Engine starboard,engines,steel,5340,5300,10854.0,13223.8,376.6,1187.7,-627.7,-309.5,,
 engine_r_hydraulic_pump,09 Engine starboard,engines,steel,128,128,10820.0,10910.0,762.0,838.0,-642.0,-566.0,,
 engine_r_igniters,09 Engine starboard,engines,steel,128,72,11839.0,11865.0,367.0,1233.0,166.3,255.3,,
+engine_r_ignition_exciters,09 Engine starboard,engines,casing,1008,774,11530.0,12500.0,349.5,1250.5,198.2,392.9,,
+engine_r_ignition_leads,09 Engine starboard,engines,steel,1434,1360,11635.2,12856.9,351.4,1248.6,230.8,472.6,,
 engine_r_inlet_case,09 Engine starboard,engines,casing,1600,1600,10200.0,10382.0,354.0,1246.0,-446.0,446.0,,
 engine_r_intermediate_case,09 Engine starboard,engines,titanium,28800,28800,10815.0,12410.0,374.0,1226.0,-426.0,426.0,,
 engine_r_line_clamps,09 Engine starboard,engines,steel,3072,1728,10961.4,13030.9,439.1,1160.9,-505.1,463.6,,
