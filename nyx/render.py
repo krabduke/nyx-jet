@@ -50,6 +50,7 @@ def world(strength=0.5):
 def ground():
     """A large matt floor under the wheels, darkening into the distance."""
     if "__ground" in bpy.data.objects:
+        bpy.data.objects["__ground"].hide_render = False
         return
     bpy.ops.mesh.primitive_plane_add(size=120, location=(XM, 0, ZG))
     g = bpy.context.active_object
@@ -128,7 +129,9 @@ def reset():
     for o in bpy.data.objects:
         if o.type != "MESH":
             continue
-        o.hide_render = False
+        # the floor is kept between modes but shown only by those that ask
+        # for it: the flight shot is in the air
+        o.hide_render = o.name == "__ground"
         for m in list(o.modifiers):
             if m.name == "section":
                 o.modifiers.remove(m)
