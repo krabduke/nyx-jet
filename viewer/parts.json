@@ -969,8 +969,8 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 8,
-   "faces": 3318
+   "parts": 15,
+   "faces": 9860
   },
   {
    "key": "08 Engine port",
@@ -2412,6 +2412,41 @@
    "m": "07 Structure",
    "mat": "lens_formation",
    "f": 132
+  },
+  "frame_2250": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 974
+  },
+  "frame_3270": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 758
+  },
+  "frame_5119": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 940
+  },
+  "frame_5680": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 768
+  },
+  "frame_6800": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 882
+  },
+  "frame_7900": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 1094
+  },
+  "frame_9000": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 1126
   },
   "frame_engine_aft": {
    "m": "07 Structure",

@@ -51,6 +51,10 @@ AIRFRAME = [
     # bracket is let into the tub wall
     ("canard_drive_", "canard_spindle_"), ("canard_drive_", "cockpit_tub"),
     ("canard_drive_", "fuselage_skin"),
+    # and the canards' pivot beams are bolted through the canard frame
+    ("canard_drive_", "frame_5119"),
+    # every frame is riveted to the skin: its outer face is let into it
+    ("frame_", "fuselage_skin"),
     # the keel passes through the frames' arches
     ("frame_", "keel"),
     # engine mounts: beams from the keel and the forward frame to the

@@ -2,10 +2,13 @@
 
     keel          a vertical beam on the centreline between the engines,
                   from the bay's aft end to the tail
-    frames        two frames just inside the skin, each an upper and a lower
-                  arch: the forward engine frame at the engines' trunnions,
-                  which the fins' front spars also pick up, and the aft frame
-                  at the engines' thrust links
+    frames        ring frames riveted inside the skin, each an upper and a
+                  lower arch: seven forward (the forward fuselage joint,
+                  either end of the cockpit, the canards' pivot, three along
+                  the weapons bay), each relieved round what passes through
+                  it; the forward engine frame at the engines' trunnions,
+                  which the fins' front spars also pick up; and the aft
+                  frame at the engines' thrust links
     engine mounts each engine hangs on two trunnions -- the inboard one on a
                   beam from the keel, the outboard one on a strut up to the
                   forward frame -- and is steadied at the back by a link from
@@ -52,7 +55,7 @@ def loft_cyclic(rings):
 ARCH_Y = 0.78      # an arch spans this fraction of the local half-width
 
 
-def frame(x):
+def frame(x, y_cap=None):
     """A ring frame as two arches -- one under the upper skin, one over the
     lower -- each FRAME_T thick and FRAME_DEPTH deep, standing a seat in
     from the skin. They stop short of the chine, where the section is
@@ -60,6 +63,8 @@ def frame(x):
     instead."""
     x0, x1 = x - FRAME_T / 2, x + FRAME_T / 2
     Y = ARCH_Y * shapes.half_width(x0, spec.SKIN_T)
+    if y_cap is not None:
+        Y = min(Y, y_cap)
     # finely: aft, the skin is a valley between the nacelles, and a coarse
     # chord across a valley stands proud of the skin in its bottom
     ys = [-Y + 2 * Y * i / 160 for i in range(161)]
@@ -70,7 +75,11 @@ def frame(x):
         for y in ys:
             za = surf(x0, y, ins)
             zb = surf(x1, y, ins)
-            z_out = (min(za, zb) - 2.5) if sgn < 0 else (max(za, zb) + 2.5)
+            # riveted to the skin: its outer face half a millimetre into the
+            # skin's inside. (Over the spine's crest the skin's facets sag a
+            # few millimetres under the surface they are cut from, and there
+            # the frame is a few millimetres into the 10 mm skin.)
+            z_out = (min(za, zb) + 0.5) if sgn < 0 else (max(za, zb) - 0.5)
             z_in = z_out + sgn * FRAME_DEPTH
             rings.append([(x0, y, z_in), (x1, y, z_in), (x1, y, z_out), (x0, y, z_out)])
         parts.append(shapes.loft_rings(rings))
@@ -153,9 +162,63 @@ def radar():
     return bulk, mesh.join((v, f), stub)
 
 
+# The forward and centre fuselage's frames. The body used to have two
+# frames in it, both at the engines: the cockpit, the canards, the gun, the
+# weapons bay and the intakes hung in a skin with nothing inside it. Each of
+# these stands where the airframe has a joint or a load to take -- the
+# forward fuselage joint, either end of the cockpit tub, the canards'
+# pivot, and three along the weapons bay -- and each is relieved where
+# something passes through it: the canopy opening over the cockpit, the
+# nose gear's bay and the weapons bay under it, the intake ducts, and the
+# gun in the starboard shoulder.
+FWD_FRAMES = (2250.0, 3270.0, 5119.0, 5680.0, 6800.0, 7900.0, 9000.0)
+WING_ROOT_CLEAR = 1640.0      # the arches stop inboard of the wing's root
+
+
+def _box(x0, x1, y0, y1, z0, z1):
+    return mesh.box(0.5 * (x0 + x1), 0.5 * (y0 + y1), 0.5 * (z0 + z1),
+                    x1 - x0, y1 - y0, z1 - z0)
+
+
+def _frame_cutter(x):
+    from parts import intakes, cockpit, details
+    x0, x1 = x - FRAME_T / 2 - 10.0, x + FRAME_T / 2 + 10.0
+    cuts = []
+    CK = spec.COCKPIT
+    if CK["x0"] < x < CK["x1"]:
+        cuts.append(cockpit.opening_cutter())
+    G = spec.GEAR
+    nb0, nb1, _nw = G["nose_bay"]
+    if nb0 - 30.0 < x < nb1 + 30.0:
+        cuts.append(_box(x0, x1, -240.0, 240.0, -2000.0, 360.0))
+    B = spec.BAY
+    if B["x0"] - 30.0 < x < B["x1"] + 30.0:
+        cuts.append(_box(x0, x1, -B["half_w"] - 20.0, B["half_w"] + 20.0,
+                         -2000.0, B["z_roof"] + 20.0))
+    I = spec.INTAKE
+    if x > intakes.lip_range()[0] - 60.0:
+        for sgn in (1.0, -1.0):
+            rings = [[(xx, sgn * y, z) for (y, z) in
+                      intakes._shape(max(xx, I["x_mouth"]), I["wall"] + 20.0)]
+                     for xx in (x0, x1)]
+            cuts.append(shapes.loft_rings(rings))
+    gx0, gx1 = details.GUN_X
+    if gx0 - 60.0 < x < gx1 + 60.0:
+        cuts.append(_box(x0, x1, details.GUN_Y - 110.0, details.GUN_Y + 110.0,
+                         330.0, 2000.0))
+    return mesh.join(*cuts) if cuts else None
+
+
 def build():
     bulk, array = radar()
-    return {
+    out = {}
+    for x in FWD_FRAMES:
+        name = f"frame_{x:.0f}"
+        out[name] = frame(x, WING_ROOT_CLEAR)
+        c = _frame_cutter(x)
+        if c is not None:
+            out[f"cut:{name}"] = c
+    return {**out,
         "keel": keel(),
         "frame_engine_fwd": frame(x_fwd_frame()),
         "frame_engine_aft": frame(x_aft_frame()),

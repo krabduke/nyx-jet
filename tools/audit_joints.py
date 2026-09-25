@@ -59,6 +59,9 @@ CIRCUITS += mirrored("and is steadied by its thrust link into the aft frame",
                      ["engine_{s}_mount_aft_lug", "engine_mounts", "frame_engine_aft"])
 CIRCUITS += mirrored("the frames are in the skin", ["fuselage_skin", "frame_engine_fwd"])
 CIRCUITS += mirrored("", ["fuselage_skin", "frame_engine_aft", "keel"])
+for _x in (2250, 3270, 5119, 5680, 6800, 7900, 9000):
+    CIRCUITS += mirrored("" if _x != 2250 else "and the forward frames",
+                         ["fuselage_skin", f"frame_{_x}"])
 CIRCUITS += [
     ("the canopy sits on the skin", ["fuselage_skin", "canopy_glass"]),
     ("the cockpit is built into the body",
