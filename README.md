@@ -73,7 +73,7 @@ coefficients (0.016 to 0.022), so they do not rest on one guessed number.
 | Length × span | 14.9 × 13.2 m |
 | Wing | 68.2 m², aspect ratio 2.55, 48° leading-edge sweep, 5 % thick at the root |
 | Combat mass | 17,475 kg (13,160 kg empty) |
-| Internal fuel | 7,130 kg in six tanks, measured off the built geometry: three cells over the bay, a centre collector tank, a tank in each wing between its spars; used in an order that holds the CG at −4.7 to −6.1 % MAC |
+| Internal fuel | 7,127 kg in six tanks, measured off the built geometry: three cells over the bay, a centre collector tank, a tank in each wing between its spars; used in an order that holds the CG at −4.7 to −6.1 % MAC |
 | Engines | 2 × Aether AX-1, 90.5 kN dry and 134.9 kN reheat each, three-bearing swivel nozzles |
 | Thrust / weight | 1.57 at combat weight |
 | Static margin | −4.8 % MAC at combat weight, from a vortex-lattice solve |
