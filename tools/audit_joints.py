@@ -49,6 +49,8 @@ CIRCUITS += [("the fuel cells hang between the frames",
               ["frame_5680", "fuel_tank_fwd_1", "frame_6800", "fuel_tank_fwd_2",
                "frame_7900", "fuel_tank_fwd_3", "frame_9000", "fuel_tank_centre"])]
 CIRCUITS += mirrored("and each wing's tank is in it", ["wing_{s}", "fuel_tank_wing_{s}"])
+CIRCUITS += mirrored("each engine is fed from the collector",
+                     ["fuel_tank_centre", "fuel_feed_{s}", "engine_{s}_fuel_pump"])
 CIRCUITS += [("the seat's rails are bolted to the bulkhead in the tub",
               ["seat", "seat_bulkhead", "cockpit_tub"])]
 CIRCUITS += mirrored("and is carried and driven off the cockpit tub",

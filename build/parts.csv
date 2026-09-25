@@ -293,6 +293,8 @@ frame_7900,07 Structure,structure,structure,1137,1094,7880.0,7920.0,-1640.0,1640
 frame_9000,07 Structure,structure,structure,1132,1126,8980.0,9020.0,-1640.0,1640.0,-749.8,704.2,,
 frame_engine_aft,07 Structure,structure,structure,1288,1284,12520.0,12560.0,-1308.7,1308.7,-790.3,640.3,,
 frame_engine_fwd,07 Structure,structure,structure,1288,1284,10860.0,10900.0,-1707.1,1707.1,-775.8,649.2,,
+fuel_feed_l,07 Structure,fuel,steel,268,212,10170.0,10692.0,-815.0,-255.0,-605.0,-513.2,,
+fuel_feed_r,07 Structure,fuel,steel,268,212,10170.0,10692.0,255.0,815.0,-605.0,-513.2,,
 fuel_tank_centre,07 Structure,fuel,tank,3374,3088,9019.5,10180.0,-1250.0,1250.0,-740.4,683.9,,
 fuel_tank_fwd_1,07 Structure,fuel,tank,1825,1598,5699.5,6780.5,-1600.0,1600.0,-130.0,985.9,,
 fuel_tank_fwd_2,07 Structure,fuel,tank,2135,1888,6819.5,7880.5,-1600.0,1600.0,-130.0,894.2,,

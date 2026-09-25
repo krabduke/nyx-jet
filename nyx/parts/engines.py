@@ -112,6 +112,10 @@ def _build_engine():
             "inlet_bore": espec.annulus(espec.FAN_PATH, espec.SPINNER["x_base"])[1],
             "inlet_x0": espec.INLET["x0"],
             "inlet_wall": espec.WALL["fan_case"],
+            # the end of the fuel inlet union on the gearbox pump's face
+            # (accessories._gearbox_units), in the engine's frame
+            "fuel_inlet": (espec.GEARBOX["x0"] - 98.0, 0.0,
+                           imp("parts.accessories").gb_centre_z() - 16.0),
         }
         return built, proto, info
 

@@ -60,6 +60,10 @@ AIRFRAME = [
     # that close them
     ("fuel_tank_fwd_", "frame_"), ("fuel_tank_centre", "frame_9000"),
     ("fuel_tank_wing_", "wing_"),
+    # each engine's feed: the boost pump's housing is in the collector
+    # tank's aft wall, and the line is pushed onto the engine's inlet union
+    ("fuel_feed_", "fuel_tank_centre"), ("fuel_feed_r", "engine_r_fuel_pump"),
+    ("fuel_feed_l", "engine_l_fuel_pump"),
     # the seat's rails are bolted to the bulkhead behind it, which is set
     # into the tub's walls and floor
     ("seat", "seat_bulkhead"), ("seat_bulkhead", "cockpit_tub"),

@@ -969,8 +969,8 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 21,
-   "faces": 19662
+   "parts": 23,
+   "faces": 20086
   },
   {
    "key": "08 Engine port",
@@ -2457,6 +2457,16 @@
    "m": "07 Structure",
    "mat": "structure",
    "f": 1284
+  },
+  "fuel_feed_l": {
+   "m": "07 Structure",
+   "mat": "steel",
+   "f": 212
+  },
+  "fuel_feed_r": {
+   "m": "07 Structure",
+   "mat": "steel",
+   "f": 212
   },
   "fuel_tank_centre": {
    "m": "07 Structure",

@@ -110,6 +110,29 @@ def _wing_tank(grow):
     return shapes.loft_rings([_wing_loop(y, grow) for y in ys])
 
 
+def _feed():
+    """The starboard engine's feed: a boost pump in a housing on the
+    collector tank's aft face, and a 30 mm line from it straight to the
+    fuel inlet union on the engine's gearbox pump, pushed on over its bead
+    -- the path tools/route_solve found clear under the intake duct's end.
+    The engines had no line to them from anywhere."""
+    from parts import engines
+    e = engines.info()
+    _, _, x1 = CENTRE
+    y0, z0 = 300.0, -560.0
+    # the engine's inlet union, in the aircraft's frame (see
+    # accessories._gearbox_units: on the pump's axis, ahead of its face)
+    xu = spec.ENGINE_FAN_FACE_X + e["fuel_inlet"][0]
+    yu, zu = spec.ENGINE_Y + e["fuel_inlet"][1], spec.ENGINE_Z + e["fuel_inlet"][2]
+    parts = [mesh.pipe([(x1 - 10.0, y0, z0), (x1 + 38.0, y0, z0)], 45.0, 24,
+                       bend=0.0),
+             mesh.pipe([(x1 + 38.0, y0, z0), (x1 + 50.0, y0, z0)], 30.0, 20,
+                       bend=0.0)]
+    parts.append(mesh.pipe([(x1 + 50.0, y0, z0), (xu - 32.0, yu, zu),
+                            (xu + 20.0, yu, zu)], 15.0, 18, bend=30.0))
+    return mesh.join(*parts)
+
+
 def _mirror(part):
     v, f = part
     return shapes.orient(([(x, -y, z) for (x, y, z) in v],
@@ -135,4 +158,6 @@ def build():
     tank = _wing_tank(0.5)
     out["cut:wing_r"], out["cut:wing_l"] = cav, _mirror(cav)
     out["fuel_tank_wing_r"], out["fuel_tank_wing_l"] = tank, _mirror(tank)
+    feed = _feed()
+    out["fuel_feed_r"], out["fuel_feed_l"] = feed, _mirror(feed)
     return out

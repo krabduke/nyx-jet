@@ -436,6 +436,7 @@ MATERIAL_MAP = {
     "canard_drive": "steel",
     "flaperon_act": "steel",
     "le_flap_act": "steel",
+    "fuel_feed": "steel",
     "rudder_act": "steel",
 }
 DEFAULT_MATERIAL = "structure"
