@@ -40,7 +40,7 @@ import shapes  # noqa: E402
 from parts import surfaces  # noqa: E402
 
 MM = 0.001
-INTERNAL = ("frame_", "fuel_tank_", "canard_drive_", "flaperon_act_",
+INTERNAL = ("frame_", "fuel_tank_", "fuel_gallery", "refuel_receptacle", "canard_drive_", "flaperon_act_",
             "le_flap_act_", "rudder_act_", "gear_actuator_", "seat_bulkhead",
             "cockpit_tub", "radar_", "keel", "bay_structure", "gear_bay_")
 TOL = 0.5          # mm

@@ -64,6 +64,10 @@ AIRFRAME = [
     # tank's aft wall, and the line is pushed onto the engine's inlet union
     ("fuel_feed_", "fuel_tank_centre"), ("fuel_feed_r", "engine_r_fuel_pump"),
     ("fuel_feed_l", "engine_l_fuel_pump"),
+    # the gallery runs inside the cells and through the collector's wall;
+    # the receptacle's line comes down through the forward cell into it
+    ("fuel_gallery", "fuel_tank_"), ("refuel_receptacle", "fuel_tank_fwd_1"),
+    ("refuel_receptacle", "fuel_gallery"),
     # the seat's rails are bolted to the bulkhead behind it, which is set
     # into the tub's walls and floor
     ("seat", "seat_bulkhead"), ("seat_bulkhead", "cockpit_tub"),

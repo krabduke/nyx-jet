@@ -4,7 +4,7 @@
  "figures": {
   "length_mm": 14890.0,
   "span_mm": 13236.0,
-  "combat_mass_kg": 17475.0,
+  "combat_mass_kg": 17473.0,
   "empty_mass_kg": 13160.0,
   "wing_area_m2": 68.2,
   "aspect_ratio": 2.55,
@@ -17,7 +17,7 @@
   "str_sl": 25.5,
   "str_sl_g": 5.3,
   "itr_15k": 27.5,
-  "str_15k": 16.9,
+  "str_15k": 17.0,
   "engine_thrust_kn": 134.9
  },
  "palette": {
@@ -969,8 +969,8 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 23,
-   "faces": 20086
+   "parts": 25,
+   "faces": 20693
   },
   {
    "key": "08 Engine port",
@@ -2468,6 +2468,11 @@
    "mat": "steel",
    "f": 212
   },
+  "fuel_gallery": {
+   "m": "07 Structure",
+   "mat": "steel",
+   "f": 200
+  },
   "fuel_tank_centre": {
    "m": "07 Structure",
    "mat": "tank",
@@ -2476,7 +2481,7 @@
   "fuel_tank_fwd_1": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 1598
+   "f": 1631
   },
   "fuel_tank_fwd_2": {
    "m": "07 Structure",
@@ -2672,6 +2677,11 @@
    "m": "07 Structure",
    "mat": "radar",
    "f": 98
+  },
+  "refuel_receptacle": {
+   "m": "07 Structure",
+   "mat": "steel",
+   "f": 374
   },
   "rudder_act_l": {
    "m": "02 Flying surfaces",

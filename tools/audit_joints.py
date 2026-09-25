@@ -53,6 +53,11 @@ CIRCUITS += [("the nose leg is turned by its actuator on the bay's wall",
               ["gear_bay_nose", "gear_actuator_nose", "gear_nose"])]
 CIRCUITS += mirrored("each main leg by its actuator in the wing",
                      ["wing_{s}", "gear_actuator_main_{s}", "gear_main_{s}"])
+CIRCUITS += [("refuelling: receptacle, gallery, every tank",
+              ["refuel_receptacle", "fuel_gallery", "fuel_tank_fwd_1"]),
+             ("", ["fuel_gallery", "fuel_tank_fwd_2"]),
+             ("", ["fuel_gallery", "fuel_tank_fwd_3"]),
+             ("", ["fuel_gallery", "fuel_tank_centre"])]
 CIRCUITS += mirrored("each engine is fed from the collector",
                      ["fuel_tank_centre", "fuel_feed_{s}", "engine_{s}_fuel_pump"])
 CIRCUITS += [("the seat's rails are bolted to the bulkhead in the tub",

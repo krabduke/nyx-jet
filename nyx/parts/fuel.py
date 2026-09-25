@@ -133,6 +133,69 @@ def _feed():
     return mesh.join(*parts)
 
 
+REC = {"x": 6055.0, "r_top": 64.0, "r_bot": 26.0, "depth": 150.0}
+GALLERY_Z = -95.0            # low in the cells, over the bay's roof
+GALLERY_R = 20.0
+
+
+def _receptacle():
+    """The refuelling receptacle, under its door on the spine: a slipway cup
+    the boom's nozzle seats in, 12 mm under the skin, narrowing to the
+    nozzle's latch and the valve, and the refuel line on down into the
+    gallery. The door on the spine had nothing under it."""
+    x = REC["x"]
+    z0 = _rec_top()
+    z1 = z0 - REC["depth"]
+    cup = mesh.revolve_closed(
+        [(0.0, 0.0), (0.0, REC["r_top"] + 8.0), (10.0, REC["r_top"] + 8.0),
+         (REC["depth"], REC["r_bot"] + 10.0), (REC["depth"] + 30.0, REC["r_bot"] + 10.0),
+         (REC["depth"] + 30.0, 0.0)], 32)
+    # the lathe runs along +x; stand it up, opening upward
+    cup = ([(x + pz, py, z0 - px) for (px, py, pz) in cup[0]], cup[1])
+    line = mesh.pipe([(x, 0.0, z1 - 20.0), (x, 0.0, GALLERY_Z + 40.0),
+                      (x + 60.0, 0.0, GALLERY_Z)], GALLERY_R, 18, bend=40.0)
+    return mesh.join(cup, line)
+
+
+def _rec_top():
+    """The cup's rim: 6 mm under the skin's inside at its lowest over the
+    rim -- the spine curves away either side of the centreline."""
+    x, r = REC["x"], REC["r_top"] + 8.0
+    zs = min(shapes.z_up(x + r * math.cos(a), r * math.sin(a))
+             for a in [2.0 * math.pi * k / 16 for k in range(16)])
+    return zs - spec.SKIN_T - 6.0
+
+
+def _receptacle_cutter():
+    x = REC["x"]
+    zs = shapes.z_up(x, 0.0)
+    return mesh.pipe([(x, 0.0, zs + 5.0), (x, 0.0, _rec_top() - REC["depth"]
+                                           - 30.0 - CLEAR)],
+                     REC["r_top"] + 8.0 + CLEAR, 32, bend=0.0)
+
+
+def _gallery():
+    """The refuel and transfer gallery: from the receptacle's line aft through
+    every cell to the collector, low on the centreline. It passes between
+    the cells where the frames' lower arches are cut away over the bay, and
+    the transfer pumps move the fuel along it to the collector in the burn
+    order the mass table follows."""
+    x0 = REC["x"] + 60.0
+    x1 = CENTRE[2] - 60.0
+    parts = [mesh.pipe([(x0 - 1.0, 0.0, GALLERY_Z), (x1, 0.0, GALLERY_Z)],
+                       GALLERY_R, 18, bend=0.0)]
+    # it is made in sections, one per cell, joined by a flanged coupling
+    # where it crosses each frame
+    for (_, _, xf) in CELLS:
+        parts.append(mesh.pipe([(xf - 16.0, 0.0, GALLERY_Z), (xf + 16.0, 0.0, GALLERY_Z)],
+                               GALLERY_R + 6.0, 18, bend=0.0))
+        for dx in (-16.0, 10.0):
+            parts.append(mesh.pipe([(xf + dx, 0.0, GALLERY_Z),
+                                    (xf + dx + 6.0, 0.0, GALLERY_Z)],
+                                   GALLERY_R + 12.0, 18, bend=0.0))
+    return mesh.join(*parts)
+
+
 def _mirror(part):
     v, f = part
     return shapes.orient(([(x, -y, z) for (x, y, z) in v],
@@ -147,7 +210,12 @@ def build():
         # the ends let 0.5 mm into the frames' arches, which it hangs from
         x0, x1 = xf0 + FRAME_HALF - 0.5, xf1 - FRAME_HALF + 0.5
         out[name] = _cell(x0, x1, Y_LIM_FWD, z_bay)
-        out[f"cut:{name}"] = _cell_cutter(x0, x1)
+        cut = _cell_cutter(x0, x1)
+        if x0 < REC["x"] < x1:
+            cut = mesh.join(cut, _receptacle_cutter())
+        out[f"cut:{name}"] = cut
+    out["refuel_receptacle"] = _receptacle()
+    out["fuel_gallery"] = _gallery()
     name, xf0, x1 = CENTRE
     x0 = xf0 + FRAME_HALF - 0.5
     out[name] = _cell(x0, x1, Y_LIM_CENTRE, None)

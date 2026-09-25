@@ -438,6 +438,8 @@ MATERIAL_MAP = {
     "flaperon_act": "steel",
     "le_flap_act": "steel",
     "fuel_feed": "steel",
+    "fuel_gallery": "steel",
+    "refuel_receptacle": "steel",
     "rudder_act": "steel",
 }
 DEFAULT_MATERIAL = "structure"
