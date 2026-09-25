@@ -48,6 +48,11 @@ The brief was agility over top speed. Each choice follows from it.
 - **Stealth shaping that costs no agility.** A chined nose, caret intakes
   with serpentine ducts that hide the engine faces, an internal weapons bay,
   canted fins and sawtooth edges.
+- **Power by wire.** Every actuator is electro-hydrostatic, as on the F-35 —
+  its own motor, pump and reservoir, fed only with power — so there is no
+  hydraulic system: a power distribution unit on the keel, a feeder from
+  each engine's generator, and looms through the fuselage and in conduits
+  inside the wings and fins to every actuator.
 - **Every moving surface is driven.** Each canard turns on a spindle in two
   bearings on a beam off the cockpit tub, through a crank and a linear
   actuator. Each flaperon, leading-edge flap and rudder has its actuator in

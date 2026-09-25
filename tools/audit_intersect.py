@@ -66,6 +66,18 @@ AIRFRAME = [
     ("fuel_feed_l", "engine_l_fuel_pump"),
     # the gallery runs inside the cells and through the collector's wall;
     # the receptacle's line comes down through the forward cell into it
+    # electrical power: the PDU is bolted to the keel's face; every loom
+    # is plugged into what it connects -- the PDU, each engine's inboard
+    # generator, each actuator -- and the fuselage's looms into the wings'
+    # and fins' at their roots
+    ("pdu", "keel"), ("loom_fuselage_", "pdu"),
+    ("loom_fuselage_r", "engine_r_generator_r"),
+    ("loom_fuselage_l", "engine_l_generator_l"),
+    ("loom_fuselage_", "canard_drive_"), ("loom_nose_gear", "gear_actuator_nose"),
+    ("loom_nose_gear", "loom_fuselage_r"),
+    ("loom_fuselage_", "loom_wing_"), ("loom_fuselage_", "loom_fin_"),
+    ("loom_wing_", "flaperon_act_"), ("loom_wing_", "le_flap_act_"),
+    ("loom_wing_", "gear_actuator_main_"), ("loom_fin_", "rudder_act_"),
     ("fuel_gallery", "fuel_tank_"), ("refuel_receptacle", "fuel_tank_fwd_1"),
     ("refuel_receptacle", "fuel_gallery"),
     # the seat's rails are bolted to the bulkhead behind it, which is set

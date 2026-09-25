@@ -928,14 +928,14 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42421
+   "faces": 42519
   },
   {
    "key": "02 Flying surfaces",
    "label": "Flying surfaces",
    "color": "#8E979E",
    "parts": 26,
-   "faces": 22624
+   "faces": 26061
   },
   {
    "key": "03 Intakes",
@@ -969,8 +969,8 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 25,
-   "faces": 20693
+   "parts": 33,
+   "faces": 31199
   },
   {
    "key": "08 Engine port",
@@ -2356,12 +2356,12 @@
   "fin_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 1625
+   "f": 2131
   },
   "fin_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 1636
+   "f": 2215
   },
   "flaperon_act_in_l": {
    "m": "02 Flying surfaces",
@@ -2506,7 +2506,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35639
+   "f": 35737
   },
   "gear_actuator_main_l": {
    "m": "06 Landing gear",
@@ -2648,6 +2648,41 @@
    "mat": "skin_dark",
    "f": 1590
   },
+  "loom_fin_l": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 290
+  },
+  "loom_fin_r": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 290
+  },
+  "loom_fuselage_l": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 3706
+  },
+  "loom_fuselage_r": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 3706
+  },
+  "loom_nose_gear": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 386
+  },
+  "loom_wing_l": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 1034
+  },
+  "loom_wing_r": {
+   "m": "07 Structure",
+   "mat": "rubber",
+   "f": 1034
+  },
   "missiles": {
    "m": "05 Weapons bay",
    "mat": "missile",
@@ -2667,6 +2702,11 @@
    "m": "01 Airframe",
    "mat": "seam",
    "f": 2704
+  },
+  "pdu": {
+   "m": "07 Structure",
+   "mat": "structure",
+   "f": 60
   },
   "radar_array": {
    "m": "07 Structure",
@@ -2766,12 +2806,12 @@
   "wing_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 3328
+   "f": 4506
   },
   "wing_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 3321
+   "f": 4495
   }
  }
 }

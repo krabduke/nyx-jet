@@ -58,6 +58,17 @@ CIRCUITS += [("refuelling: receptacle, gallery, every tank",
              ("", ["fuel_gallery", "fuel_tank_fwd_2"]),
              ("", ["fuel_gallery", "fuel_tank_fwd_3"]),
              ("", ["fuel_gallery", "fuel_tank_centre"])]
+CIRCUITS += mirrored("power: each engine's generator feeds the PDU",
+                     ["engine_{s}_generator_{s}", "loom_fuselage_{s}", "pdu", "keel"])
+CIRCUITS += mirrored("and the PDU every actuator: the wing's",
+                     ["pdu", "loom_fuselage_{s}", "loom_wing_{s}", "flaperon_act_in_{s}"])
+CIRCUITS += mirrored("", ["loom_wing_{s}", "flaperon_act_out_{s}"])
+CIRCUITS += mirrored("", ["loom_wing_{s}", "le_flap_act_{s}"])
+CIRCUITS += mirrored("", ["loom_wing_{s}", "gear_actuator_main_{s}"])
+CIRCUITS += mirrored("the fin's", ["loom_fuselage_{s}", "loom_fin_{s}", "rudder_act_{s}"])
+CIRCUITS += mirrored("the canard's", ["loom_fuselage_{s}", "canard_drive_{s}"])
+CIRCUITS += [("and the nose gear's",
+              ["loom_fuselage_r", "loom_nose_gear", "gear_actuator_nose"])]
 CIRCUITS += mirrored("each engine is fed from the collector",
                      ["fuel_tank_centre", "fuel_feed_{s}", "engine_{s}_fuel_pump"])
 CIRCUITS += [("the seat's rails are bolted to the bulkhead in the tub",

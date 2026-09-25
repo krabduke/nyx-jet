@@ -439,6 +439,7 @@ MATERIAL_MAP = {
     "le_flap_act": "steel",
     "fuel_feed": "steel",
     "fuel_gallery": "steel",
+    "loom_": "rubber",
     "refuel_receptacle": "steel",
     "rudder_act": "steel",
 }
