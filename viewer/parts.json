@@ -237,6 +237,15 @@
    "metal": 0.0,
    "rough": 0.08
   },
+  "lens_formation": {
+   "rgb": [
+    0.42,
+    0.5,
+    0.24
+   ],
+   "metal": 0.0,
+   "rough": 0.35
+  },
   "sensor_glass": {
    "rgb": [
     0.22,
@@ -919,7 +928,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42091
+   "faces": 42421
   },
   {
    "key": "02 Flying surfaces",
@@ -960,8 +969,8 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 6,
-   "faces": 3054
+   "parts": 8,
+   "faces": 3318
   },
   {
    "key": "08 Engine port",
@@ -2344,6 +2353,16 @@
    "mat": "skin_dark",
    "f": 796
   },
+  "formation_light_l": {
+   "m": "07 Structure",
+   "mat": "lens_formation",
+   "f": 132
+  },
+  "formation_light_r": {
+   "m": "07 Structure",
+   "mat": "lens_formation",
+   "f": 132
+  },
   "frame_engine_aft": {
    "m": "07 Structure",
    "mat": "structure",
@@ -2492,7 +2511,7 @@
   "panel_seams": {
    "m": "01 Airframe",
    "mat": "seam",
-   "f": 2374
+   "f": 2704
   },
   "radar_array": {
    "m": "07 Structure",

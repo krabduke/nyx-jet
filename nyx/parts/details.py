@@ -17,6 +17,9 @@
     lights            navigation lights on the wingtips -- red to port,
                       green to starboard -- and white tail lights on the
                       fin tips
+    formation lights  electroluminescent strips on the forebody's shoulders
+                      and up the fins, for a wingman at night
+    refuelling door   the air-refuelling receptacle's door on the spine
     static wicks      discharge wicks on the trailing edges of the wing tips
                       and fin tips, where static bleeds off in flight
     gun               a six-barrel rotary cannon in the starboard shoulder,
@@ -291,9 +294,9 @@ def _surface(x, y, upper):
     return shapes.z_up(x, y) if upper else shapes.z_dn(x, y)
 
 
-def _ribbon(pts, upper):
+def _ribbon(pts, upper, width=SEAM_W, proud=SEAM_H):
     """A seam along a polyline of (x, y) on the upper or lower skin: a thin
-    strip following the surface, SEAM_W wide."""
+    strip following the surface, `width` wide."""
     s = 1.0 if upper else -1.0
     rings = []
     n = len(pts)
@@ -303,10 +306,10 @@ def _ribbon(pts, upper):
         dx, dy = xb - xa, yb - ya
         L = math.hypot(dx, dy) or 1.0
         # across the seam, in plan
-        cx, cy = -dy / L * SEAM_W / 2, dx / L * SEAM_W / 2
+        cx, cy = -dy / L * width / 2, dx / L * width / 2
         ring = []
         for (ox, oy, h) in ((cx, cy, -0.6), (-cx, -cy, -0.6),
-                            (-cx, -cy, SEAM_H), (cx, cy, SEAM_H)):
+                            (-cx, -cy, proud), (cx, cy, proud)):
             px, py = x + ox, y + oy
             ring.append((px, py, _surface(px, py, upper) + s * h))
         rings.append(ring)
@@ -342,6 +345,12 @@ def _seams():
     # gear's doors are the joints)
     parts = [_across(1300.0, True), _across(1300.0, False),     # radome
              _across(2250.0, True)]                              # fwd fuselage
+    # the air-refuelling receptacle's door, on the spine just aft of the
+    # canopy where the boom operator can see it and the pilot need not, and
+    # the door's hinge line across its aft edge
+    parts += _panel(5880.0, 6230.0, -135.0, 135.0, True, teeth=3, tooth=45.0)
+    parts.append(_ribbon([(6190.0, -120.0 + 240.0 * i / 20) for i in range(21)],
+                         True))
     # spine access panels
     parts += _panel(6350.0, 7450.0, -260.0, 260.0, True, teeth=4)
     parts += _panel(8150.0, 9450.0, -300.0, 300.0, True, teeth=4)
@@ -353,8 +362,40 @@ def _seams():
     return mesh.join(*parts)
 
 
+# --------------------------------------------------------------------------
+# formation lights
+
+def _formation_light():
+    """The starboard set of low-voltage electroluminescent strips a wingman
+    keeps station on at night: one on the forebody's shoulder under the
+    canopy, one up the fin's outboard face. Flush strips, 50 mm wide,
+    standing a millimetre proud."""
+    parts = []
+    x0, x1 = 2750.0, 3250.0
+    pts = [(x0 + (x1 - x0) * i / 20, 0.0) for i in range(21)]
+    pts = [(x, shapes.half_width(x) * 0.80) for (x, _) in pts]
+    parts.append(_ribbon(pts, True, width=50.0, proud=1.0))
+    # and one up the fin's outboard face, ahead of the rudder
+    P = surfaces.FinPlace()
+    F = spec.FIN
+    rings = []
+    for j in range(13):
+        sp = F["span"] * (0.28 + 0.34 * j / 12)
+        c = P.chord(sp)
+        u0, u1 = 0.42 - 25.0 / c, 0.42 + 25.0 / c
+        ring = []
+        for (u, off) in ((u0, -0.6), (u1, -0.6), (u1, 1.0), (u0, 1.0)):
+            v = shapes.naca_t(u, F["tc"]) + off / c
+            ring.append(P(sp, u, v))
+        rings.append(ring)
+    parts.append(shapes.loft_rings(rings))
+    return mesh.join(*parts)
+
+
 def build():
     out = {}
+    fl = _formation_light()
+    out["formation_light_r"], out["formation_light_l"] = fl, _mirror(fl)
     out["panel_seams"] = _seams()
     out["gun"] = _gun()
     out["cut:fuselage_skin"] = _gun_port()

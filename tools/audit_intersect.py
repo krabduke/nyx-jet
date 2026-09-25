@@ -88,7 +88,8 @@ AIRFRAME = [
     # the gun hangs from the skin on two posts let into it
     ("gun", "fuselage_skin"),
     # the panel seams are the sealant in the gaps between skin panels
-    ("panel_seams", "fuselage_skin"),
+    ("panel_seams", "fuselage_skin"), ("formation_light_", "fuselage_skin"),
+    ("formation_light_", "fin_"),
 ]
 
 EXPECTED = AIRFRAME + _engine_rules()

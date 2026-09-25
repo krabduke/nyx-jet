@@ -375,6 +375,7 @@ MATERIAL_MAP = {
     "tail_light": "lens_white",
     "static_wicks": "rubber",
     "panel_seams": "seam",
+    "formation_light": "lens_formation",
     "wing": "skin",
     "flaperon": "skin_dark",
     "le_flap": "skin_dark",
@@ -431,6 +432,8 @@ PALETTE = {
     "lens_red":     ((0.70, 0.04, 0.03), 0.00, 0.10),
     "lens_green":   ((0.03, 0.55, 0.12), 0.00, 0.10),
     "lens_white":   ((0.85, 0.85, 0.82), 0.00, 0.08),
+    # electroluminescent strip, unlit: a pale green-yellow panel
+    "lens_formation": ((0.42, 0.50, 0.24), 0.00, 0.35),
     "sensor_glass": ((0.22, 0.17, 0.08), 0.70, 0.05),
     # the gaps between panels, filled with sealant a shade darker than skin
     "seam":         ((0.055, 0.060, 0.068), 0.10, 0.70),
