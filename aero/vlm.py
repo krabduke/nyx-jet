@@ -152,8 +152,16 @@ def validate():
     return cla, theory
 
 
+# What the lattice cannot see: the fuselage ahead of the CG adds a nose-up
+# moment of its own. The aero study's OpenFOAM runs of the built aircraft
+# (model-gallery/aero) put the neutral point 1.95 % of the MAC further
+# forward than the lattice does, a margin of -6.8 % against its -4.8 %.
+FUSELAGE_NP_SHIFT = -0.0195      # of the MAC, forward
+
+
 def static_margin(mach=0.0, fuel_fraction=None):
     x_np, cla = neutral_point(mach=mach)
+    x_np = x_np + FUSELAGE_NP_SHIFT * spec.mac()[0]
     c, x_mac, _ = spec.mac()
     x_cg = spec.cg_x() if fuel_fraction is None else spec.cg_x(fuel_fraction)
     return (x_np - x_cg) / c, x_np, x_cg, cla

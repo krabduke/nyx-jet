@@ -27,11 +27,13 @@ formula's -- and Kv = pi, the slender-delta limiting value. The angle of
 attack is capped at 28 degrees for manoeuvring, below vortex breakdown on a
 48-degree delta with close-coupled canards; that cap is an assumption.
 
-The drag polar is CD = CD0 + K CL^2. CD0 is an assumption, stated with a
-band: 0.018 for a clean stealth fighter with internal carriage (no pylons, no
-stores), within 0.016-0.022; every headline number is repeated at both ends
-of the band. K comes from an Oswald factor of 0.72, which a low-aspect-ratio
-delta with a vortex costs.
+The drag polar is CD = CD0 + K CL^2, both measured: an OpenFOAM run of
+the built aircraft (the aero study, model-gallery/aero) gave CD 0.0222 at
+zero lift and 0.0654 at CL 0.442, so CD0 0.0222 and K 0.222 -- an Oswald
+factor of 0.564. They replace the assumptions they overturned, 0.018 and
+0.72: the drag was 23 % higher at zero lift than assumed and 28 % higher
+due to lift. The CD0 includes the base drag of the powered-off model's
+capped nozzles, so it errs high; the band, 0.020-0.024, covers that.
 
 Thrust falls with density as (rho/rho0)^0.7 -- the usual first-order rule,
 not an engine deck; there is no Mach-number effect in it, which is why the
@@ -49,9 +51,9 @@ import spec   # noqa: E402
 
 G = 9.80665
 RHO0 = 1.225
-CD0 = 0.018
-CD0_BAND = (0.016, 0.022)
-OSWALD = 0.72
+CD0 = 0.0222
+CD0_BAND = (0.020, 0.024)
+OSWALD = 0.564
 ALPHA_MAX_DEG = 28.0
 KV = math.pi
 MACH_MAX = 0.9
