@@ -188,6 +188,28 @@ def flows():
     return out
 
 
+def flight():
+    """What the viewer's flight model flies on: the aircraft's own mass,
+    wing, lift slope (the vortex-lattice solve), CG and neutral point, drag
+    polar and thrust -- the numbers the turn-rate figures come from -- and
+    moments of inertia from Roskam's radii of gyration for fighters (an
+    estimate; the build has no mass per part)."""
+    j = agility.Jet()
+    sm, x_np, x_cg, cla = vlm.static_margin()
+    c, _, _ = spec.mac()
+    b = 2 * spec.WING["y_tip"] / 1000.0
+    L = 14.89
+    m = j.m
+    return {"mass": r1(m, 0), "S": r1(j.S, 3), "b": r1(b, 3), "c": r1(c / 1000.0, 4),
+            "x_cg": r1(x_cg, 1), "x_np": r1(float(x_np), 1), "Kp": r1(float(j.Kp), 4),
+            "Kv": r1(agility.KV, 5), "cd0": agility.CD0, "K": r1(j.K, 5),
+            "alpha_max_deg": agility.ALPHA_MAX_DEG, "g_limit": spec.G_LIMIT,
+            "T_ab": r1(j.T0, 0), "T_dry": r1(2 * agility.engine_thrust(False), 0),
+            "x_nozzle": r1(nozzles()["engines"][0]["exit"][0], 0),
+            "I": [r1(m * (b * 0.23 / 2) ** 2, 0), r1(m * (L * 0.38 / 2) ** 2, 0),
+                  r1(m * ((b + L) / 2 * 0.52 / 2) ** 2, 0)]}
+
+
 def main():
     rows = list(csv.DictReader(open(os.path.join(ROOT, "build", "parts.csv"))))
     mods = []
@@ -209,6 +231,7 @@ def main():
         "canopy": canopy_kinematics(),
         "bay": bay_kinematics(),
         "flows": flows(),
+        "flight": flight(),
         "modules": mods,
         "parts": parts,
     }

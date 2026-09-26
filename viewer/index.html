@@ -108,6 +108,26 @@
   #flowkey li{display:flex; align-items:center; justify-content:flex-end; gap:9px}
   #flowkey i{width:18px; height:4px; border-radius:2px; background:var(--fc)}
 
+  #hud{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:7; display:none;
+    padding:12px 16px 12px; background:rgba(20,26,38,.82); border:1px solid var(--line);
+    border-radius:3px; min-width:min(560px, 92vw);
+  }
+  body.flying #hud{display:block}
+  body.flying #turn{background:rgba(20,26,38,.82); border:1px solid var(--line); border-radius:3px;
+                    padding:10px 12px 12px}
+  body.flying #controls, body.flying #modules, body.flying #figures,
+  body.flying #title p, body.flying #flowkey{display:none}
+  #hud dl{display:grid; grid-template-columns:repeat(6, auto); gap:2px 18px; margin:0}
+  #hud dt{color:var(--muted); font-size:12px}
+  #hud dd{margin:0; font-size:22px; font-weight:600; font-variant-numeric:tabular-nums}
+  #hud dd small{font-size:12px; color:var(--muted); font-weight:400; margin-left:3px}
+  #hud .keys{margin:10px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55}
+  #hud .keys b{color:var(--ink); font-weight:500}
+  #hud .row{display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:8px}
+  #hud .warn{color:#E8C040; font-size:13px; min-height:1.2em}
+  @media (max-width:820px){ #hud dl{grid-template-columns:repeat(3, auto)} }
+
   #loading{position:fixed; inset:0; display:grid; place-items:center; z-index:20; background:var(--night); transition:opacity .5s}
   #loading.gone{opacity:0; pointer-events:none}
   #loading p{color:var(--muted); max-width:36em; text-align:center; line-height:1.5}
@@ -177,6 +197,10 @@
     <button class="toggle" id="xray" aria-pressed="false">See through the skin</button>
   </div>
   <div class="group">
+    <span>Flight</span>
+    <button class="toggle" id="fly" aria-pressed="false">Fly it</button>
+  </div>
+  <div class="group">
     <span>Systems</span>
     <button class="toggle" id="flow" aria-pressed="false">Show what flows</button>
   </div>
@@ -192,6 +216,22 @@
     <input id="cut" type="range" min="0" max="100" step="1" value="0">
   </div>
 </div>
+
+<section id="hud" aria-label="Flight instruments">
+  <dl>
+    <div><dt>Speed</dt><dd id="h-v">0<small>km/h</small></dd></div>
+    <div><dt>Mach</dt><dd id="h-m">0</dd></div>
+    <div><dt>Altitude</dt><dd id="h-h">0<small>m</small></dd></div>
+    <div><dt>Angle of attack</dt><dd id="h-a">0<small>°</small></dd></div>
+    <div><dt>Load</dt><dd id="h-n">1.0<small>g</small></dd></div>
+    <div><dt>Throttle</dt><dd id="h-t">0<small>%</small></dd></div>
+  </dl>
+  <p class="keys"><b>W S</b> pitch, <b>A D</b> roll, <b>Q E</b> rudder (or the arrow keys),
+    <b>R F</b> throttle, past 100 % is reheat. <b>L</b> lifts the angle-of-attack limit and
+    lets the nozzles fly it. <b>Esc</b> stops.</p>
+  <div class="row"><span class="warn" id="h-warn"></span>
+    <button class="toggle" id="land">Stop flying</button></div>
+</section>
 
 <figure id="turn" aria-label="Turn rate at sea level">
   <svg viewBox="0 0 300 170" id="dial"></svg>
@@ -261,9 +301,20 @@ $('figures').innerHTML = figs.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join
     s += `<line class="tick" x1="${a}" y1="${b}" x2="${c}" y2="${d}"/>`;
     s += `<text class="lab" x="${lx}" y="${ly + 4}" text-anchor="middle">${v}</text>`;
   }
-  s += `<text class="big" x="${cx}" y="${cy - 12}" text-anchor="middle">${F.itr_sl}</text>`;
+  s += `<line id="needle" style="display:none" stroke="#E8C040" stroke-width="3" stroke-linecap="round"/>`;
+  s += `<text class="big" id="dial-big" x="${cx}" y="${cy - 12}" text-anchor="middle">${F.itr_sl}</text>`;
   s += `<text class="unit" x="${cx}" y="${cy + 8}" text-anchor="middle">degrees a second</text>`;
   $('dial').innerHTML = s;
+  // the live turn rate, while flying
+  window.__dialNeedle = (v) => {
+    const n = $('needle');
+    if (v == null) { n.style.display = 'none'; return; }
+    const vv = Math.min(MAX, Math.max(0, v));
+    const [x0, y0] = pt(vv, r - 32), [x1, y1] = pt(vv, r + 7);
+    n.style.display = '';
+    n.setAttribute('x1', x0.toFixed(1)); n.setAttribute('y1', y0.toFixed(1));
+    n.setAttribute('x2', x1.toFixed(1)); n.setAttribute('y2', y1.toFixed(1));
+  };
   $('turn-note').innerHTML =
     `Instantaneous turn at sea level, at ${F.g_limit} g and ${Math.round(F.corner_ms * 3.6)} km/h. ` +
     `It holds <b>${F.str_sl}°/s</b> at ${F.str_sl_g} g without losing speed.`;
@@ -419,6 +470,7 @@ const describe = (name) => {
 const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
 let lastHover = null, lastEmissive = null;
 renderer.domElement.addEventListener('pointermove', (e) => {
+  if (fly.on) return;
   const r = renderer.domElement.getBoundingClientRect();
   mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(mouse, camera);
@@ -775,6 +827,261 @@ $('build').addEventListener('click', () => {
   if (reduced) { apart.s = 0; apart.playing = false; $('apart').value = 0; applyApart(); }
 });
 
+/* ---------------- flying it ----------------
+   A rigid body in six degrees of freedom, flown on the aircraft's own
+   numbers (M.flight): its mass, wing, the vortex-lattice lift slope with
+   Polhamus's vortex lift on top, the drag polar, thrust lapsing with
+   density, and the CG 4.8 % of the chord behind the neutral point -- so it
+   is unstable in pitch, as it is built to be, and cannot be flown without
+   the flight control computers. Those are here too, as dynamic inversion:
+   each step they work out the moment that gives the pitch, roll and yaw
+   rates the stick asks for, take what the canards, flaperons and rudders
+   can give, and ask the swivel nozzles for the rest. Control powers,
+   damping derivatives and the moments of inertia are estimates; the rest
+   is the aircraft's. Body axes: x forward, y right, z down. */
+const FL = M.flight;
+const fly = {on: false, keys: new Set(), limiter: true, stick: {p: 0, r: 0, y: 0},
+             thr: 0.8, pos: new THREE.Vector3(), vel: new THREE.Vector3(),
+             Q: new THREE.Quaternion(), w: new THREE.Vector3(), prevDir: null, rate: 0};
+const G0 = 9.80665, D2R = Math.PI / 180;
+const CTRL = {cm_de: 0.35, de: 25 * D2R, cl_da: 0.10, da: 25 * D2R, cn_dr: 0.06, dr: 30 * D2R,
+              clb: -0.06, clp: -0.30, cnb: 0.07, cnr: -0.25, cyb: -0.6, cmq: -3.5,
+              tvc_p: 20 * D2R, tvc_y: 12 * D2R};
+const armT = (FL.x_nozzle - FL.x_cg) / 1000;             // nozzle behind the CG, m
+const cmCG = (FL.x_cg - FL.x_np) / 1000 / FL.c;          // CL's moment arm, in chords
+const F_L = new THREE.Vector3(-1, 0, 0), R_L = new THREE.Vector3(0, 0, -1),
+      D_L = new THREE.Vector3(0, -1, 0);                  // body axes in the model's frame
+function isa(h){
+  const t = 288.15 - 0.0065 * Math.min(h, 11000);
+  let rho = 1.225 * Math.pow(t / 288.15, 4.2561);
+  if (h > 11000) rho *= Math.exp(-(h - 11000) / 6341.6);
+  return [rho, Math.sqrt(1.4 * 287.05 * t)];
+}
+function cl(a){
+  // Polhamus: potential lift plus the leading-edge vortex's, which breaks
+  // down past 35 degrees and is mostly gone by 65
+  const s = Math.sin(Math.abs(a)), c = Math.cos(a);
+  const kv = FL.Kv * THREE.MathUtils.clamp(1 - (Math.abs(a) - 35 * D2R) / (30 * D2R), 0.3, 1);
+  return Math.sign(a) * (FL.Kp * s * c * c + kv * Math.abs(c) * s * s);
+}
+function cd(a, CL){
+  // the polar in the manoeuvring range; past it, the lift's own tilt
+  const lo = FL.cd0 + FL.K * CL * CL, hi = FL.cd0 + Math.abs(CL * Math.tan(Math.min(Math.abs(a), 1.45)));
+  const f = THREE.MathUtils.smoothstep(Math.abs(a), FL.alpha_max_deg * D2R, 40 * D2R);
+  return lo + f * Math.max(0, hi - lo);
+}
+
+let rig = null, ground = null, saved = null;
+function groundMesh(){
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d');
+  g.fillStyle = '#10151e'; g.fillRect(0, 0, 256, 256);
+  g.fillStyle = '#141b26'; g.fillRect(0, 0, 128, 128); g.fillRect(128, 128, 128, 128);
+  g.strokeStyle = '#5b6d8c'; g.lineWidth = 4; g.strokeRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(200, 200);
+  t.anisotropy = 8; t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(80000, 80000),
+                           new THREE.MeshBasicMaterial({map: t, fog: true}));
+  m.rotation.x = -Math.PI / 2;
+  return m;
+}
+
+function startFlying(){
+  // clean aircraft: gear up and doors shut, nothing apart or cut away
+  gearState.u = gearState.target = 1; applyGear();
+  $('gear').setAttribute('aria-pressed', 'false'); $('gear').textContent = 'Lower the gear';
+  if (typeof bayState !== 'undefined') { bayState.u = bayState.target = 0; applyBay(); }
+  canState.u = canState.target = 0; applyCanopy();
+  apart.s = apart.target = 0; apart.playing = false; $('apart').value = 0; applyApart();
+  $('cut').value = 0; $('cut').dispatchEvent(new Event('input'));
+  flowGroup.visible = false;
+  if (!rig) {
+    rig = new THREE.Group(); scene.add(rig); rig.add(gltf.scene);
+    // turn about the CG: the aircraft's datum sits that far forward of it
+    gltf.scene.position.copy(toScene([FL.x_cg, 0, 0]).multiplyScalar(-MM));
+    ground = groundMesh(); scene.add(ground);
+  }
+  ground.visible = true;
+  saved = {bg: scene.background.clone(), cam: camera.position.clone(),
+           target: controls.target.clone(), fog: scene.fog, far: camera.far};
+  scene.background = new THREE.Color(0x2a3850);
+  scene.fog = new THREE.Fog(0x2a3850, 6000, 30000);
+  camera.far = 60000; camera.updateProjectionMatrix();
+  controls.enabled = false;
+  fly.pos.set(0, 1500, 0); fly.n = 1;
+  fly.Q.identity();
+  fly.vel.copy(F_L).multiplyScalar(230);
+  fly.w.set(0, 0, 0);
+  fly.thr = 0.8; fly.limiter = true; fly.prevDir = null;
+  fly.stick = {p: 0, r: 0, y: 0};
+  camera.position.set(34, 9, 0);
+  fly.on = true;
+  fly.note = $('turn-note').innerHTML;
+  $('turn-note').innerHTML = 'Turning now, from how fast the flight path swings. Pull to the ' +
+    `${FL.g_limit} g limit at about ${Math.round(F.corner_ms * 3.6)} km/h low down for the most.`;
+  document.body.classList.add('flying');
+  $('fly').setAttribute('aria-pressed', 'true');
+}
+function stopFlying(){
+  fly.on = false;
+  document.body.classList.remove('flying');
+  $('fly').setAttribute('aria-pressed', 'false');
+  rig.quaternion.identity();
+  ground.visible = false;
+  scene.background = saved.bg; scene.fog = saved.fog;
+  camera.far = saved.far; camera.updateProjectionMatrix();
+  camera.position.copy(saved.cam); controls.target.copy(saved.target);
+  controls.enabled = true;
+  sw.tp = sw.ty = 0;
+  window.__dialNeedle(null);
+  $('dial-big').textContent = F.itr_sl;
+  if (fly.note) $('turn-note').innerHTML = fly.note;
+  flowGroup.visible = look.flow && apart.s === 0;
+}
+$('fly').addEventListener('click', () => (fly.on ? stopFlying() : startFlying()));
+$('land').addEventListener('click', stopFlying);
+const KEYS = {KeyW: 1, KeyS: 1, KeyA: 1, KeyD: 1, KeyQ: 1, KeyE: 1, KeyR: 1, KeyF: 1,
+              ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1};
+addEventListener('keydown', (e) => {
+  if (!fly.on) return;
+  if (e.code === 'Escape') { stopFlying(); return; }
+  if (e.code === 'KeyL') { fly.limiter = !fly.limiter; return; }
+  if (KEYS[e.code]) { fly.keys.add(e.code); e.preventDefault(); }
+});
+addEventListener('keyup', (e) => fly.keys.delete(e.code));
+addEventListener('blur', () => fly.keys.clear());
+
+function physics(h){
+  const k = fly.keys, has = (a, b) => (k.has(a) || k.has(b)) ? 1 : 0;
+  // the stick: pull is nose up; it moves at a hand's pace and springs back
+  const want = {p: has('KeyS', 'ArrowDown') - has('KeyW', 'ArrowUp'),
+                r: has('KeyD', 'ArrowRight') - has('KeyA', 'ArrowLeft'),
+                y: (k.has('KeyE') ? 1 : 0) - (k.has('KeyQ') ? 1 : 0)};
+  for (const a of ['p', 'r', 'y']) {
+    const d = want[a] - fly.stick[a];
+    fly.stick[a] += Math.sign(d) * Math.min(Math.abs(d), h * 4);
+  }
+  if (k.has('KeyR')) fly.thr = Math.min(1.2, fly.thr + h * 0.4);
+  if (k.has('KeyF')) fly.thr = Math.max(0.0, fly.thr - h * 0.4);
+
+  const Qi = fly.Q.clone().invert();
+  const vb = fly.vel.clone().applyQuaternion(Qi);
+  const u = vb.dot(F_L), v = vb.dot(R_L), w = vb.dot(D_L);
+  const V = Math.max(vb.length(), 1);
+  const al = Math.atan2(w, u), be = Math.asin(THREE.MathUtils.clamp(v / V, -1, 1));
+  const [rho, a_s] = isa(fly.pos.y);
+  const qS = 0.5 * rho * V * V * FL.S;
+  const CL = cl(al), CD = cd(al, CL);
+  const Lf = qS * CL, Df = qS * CD, Yf = qS * CTRL.cyb * be;
+  const T = (fly.thr > 1 ? FL.T_ab : FL.T_dry * fly.thr) * Math.pow(rho / 1.225, 0.7);
+  const [Ixx, Iyy, Izz] = FL.I;
+  const [p, q, r] = [fly.w.x, fly.w.y, fly.w.z];
+
+  // flight control computers
+  // pitch commands load factor, as a fighter's does: the stick centred
+  // holds the flight path (the load that just balances gravity across it),
+  // pulled it asks for up to the g limit, pushed down to -3 g; the pitch
+  // rate that gives it is what the loop below flies
+  const g = FL.g_limit;
+  const bu = D_L.clone().negate().applyQuaternion(fly.Q).y;     // cos(pitch) cos(bank)
+  const n0 = THREE.MathUtils.clamp(bu, -1, 1);
+  const nc = fly.stick.p >= 0 ? n0 + fly.stick.p * (g - n0) : n0 + fly.stick.p * (n0 + 3);
+  const Vc = Math.max(V, 40);
+  let qc = G0 * (nc - n0) / Vc + 1.5 * G0 * (nc - (fly.n ?? 1)) / Vc;
+  qc = THREE.MathUtils.clamp(qc, -1.0, 1.4);
+  const aLim = (fly.limiter ? FL.alpha_max_deg : 80) * D2R;
+  qc = Math.min(qc, 3.0 * (aLim - al));
+  qc = Math.max(qc, 3.0 * (-12 * D2R - al));
+  const pc = fly.stick.r * 4.2;
+  const rc = fly.stick.y * 0.6 + 2.0 * be;
+  const Mneed = Iyy * 4 * (qc - q) - (Izz - Ixx) * p * r;
+  const Lneed = Ixx * 6 * (pc - p) - (Iyy - Izz) * q * r;
+  const Nneed = Izz * 3 * (rc - r) - (Ixx - Iyy) * p * q;
+  const Mbare = qS * FL.c * (CL * cmCG + CTRL.cmq * q * FL.c / (2 * V));
+  const Lbare = qS * FL.b * (CTRL.clb * be + CTRL.clp * p * FL.b / (2 * V));
+  const Nbare = qS * FL.b * (CTRL.cnb * be + CTRL.cnr * r * FL.b / (2 * V));
+  const cl_ = (x, m) => THREE.MathUtils.clamp(x, -m, m);
+  const de = cl_((Mneed - Mbare) / (qS * FL.c * CTRL.cm_de + 1e-6), CTRL.de);
+  const da = cl_((Lneed - Lbare) / (qS * FL.b * CTRL.cl_da + 1e-6), CTRL.da);
+  const dr = cl_((Nneed - Nbare) / (qS * FL.b * CTRL.cn_dr + 1e-6), CTRL.dr);
+  // what the surfaces could not give, the nozzles do: they swivel down
+  // (nose down) and a little either way
+  const Mleft = Mneed - Mbare - qS * FL.c * CTRL.cm_de * de;
+  const Nleft = Nneed - Nbare - qS * FL.b * CTRL.cn_dr * dr;
+  const dp = T > 1 && Mleft < 0 ? Math.min(Math.asin(Math.min(1, -Mleft / (armT * T))), CTRL.tvc_p) : 0;
+  const dy = T > 1 ? cl_(Math.asin(cl_(Nleft / (armT * T), 1)), CTRL.tvc_y) : 0;
+
+  // forces, body axes
+  const sa = Math.sin(al), ca = Math.cos(al);
+  const X = Lf * sa - Df * ca + T * Math.cos(dp) * Math.cos(dy);
+  const Z = -Lf * ca - Df * sa - T * Math.sin(dp);
+  const Y = Yf - T * Math.sin(dy);
+  // moments
+  const Mm = Mbare + qS * FL.c * CTRL.cm_de * de - armT * T * Math.sin(dp);
+  const Lm = Lbare + qS * FL.b * CTRL.cl_da * da;
+  const Nm = Nbare + qS * FL.b * CTRL.cn_dr * dr + armT * T * Math.sin(dy);
+  fly.w.x += h * (Lm + (Iyy - Izz) * q * r) / Ixx;
+  fly.w.y += h * (Mm + (Izz - Ixx) * p * r) / Iyy;
+  fly.w.z += h * (Nm + (Ixx - Iyy) * p * q) / Izz;
+  const wl = F_L.clone().multiplyScalar(fly.w.x).addScaledVector(R_L, fly.w.y)
+    .addScaledVector(D_L, fly.w.z);
+  const ang = wl.length() * h;
+  if (ang > 1e-9) fly.Q.multiply(new THREE.Quaternion().setFromAxisAngle(wl.normalize(), ang));
+  fly.Q.normalize();
+  const Fw = F_L.clone().multiplyScalar(X).addScaledVector(R_L, Y).addScaledVector(D_L, Z)
+    .applyQuaternion(fly.Q);
+  fly.vel.addScaledVector(Fw, h / FL.mass);
+  fly.vel.y -= G0 * h;
+  fly.pos.addScaledVector(fly.vel, h);
+  fly.n = -Z / (FL.mass * G0);
+  return {V, mach: V / a_s, al, n: fly.n, dp, dy};
+}
+
+function flyStep(dt){
+  let out = null;
+  const n = Math.max(1, Math.ceil(dt / (1 / 240)));
+  for (let i = 0; i < n; i++) out = physics(dt / n);
+  if (fly.pos.y < 3) {
+    // into the ground: start again where it began
+    $('h-warn').textContent = 'Flew into the ground. Starting again at 1,500 m.';
+    const keepWarn = setTimeout(() => ($('h-warn').textContent = ''), 3000);
+    stopFlying(); startFlying(); return keepWarn;
+  }
+  rig.quaternion.copy(fly.Q);
+  // the world moves under the aircraft, which stays at the origin
+  ground.position.set(0, -fly.pos.y, 0);
+  ground.material.map.offset.set(fly.pos.x / 400, -fly.pos.z / 400);
+  // the swivel nozzles show what the computers ask of them
+  sw.tp = out.dp / D2R; sw.ty = THREE.MathUtils.clamp(-out.dy / D2R, -12, 12);
+  // chase camera: behind along the flight path, a little above
+  const dir = fly.vel.clone().normalize();
+  const up = new THREE.Vector3(0, 1, 0).applyQuaternion(fly.Q);
+  const want = dir.clone().multiplyScalar(-34).addScaledVector(up, 7).addScaledVector(new THREE.Vector3(0, 1, 0), 3);
+  camera.position.lerp(want, 1 - Math.exp(-dt * 3));
+  camera.up.copy(new THREE.Vector3(0, 1, 0).lerp(up, 0.35).normalize());
+  camera.lookAt(dir.clone().multiplyScalar(8));
+  // the turn rate, from how fast the flight path swings
+  if (fly.prevDir) {
+    const r = fly.prevDir.angleTo(dir) / Math.max(dt, 1e-4) / D2R;
+    fly.rate += (r - fly.rate) * Math.min(1, dt * 4);
+  }
+  fly.prevDir = dir;
+  window.__dialNeedle(fly.rate);
+  $('dial-big').textContent = fly.rate.toFixed(1);
+  // instruments
+  $('h-v').innerHTML = `${Math.round(out.V * 3.6).toLocaleString()}<small>km/h</small>`;
+  $('h-m').textContent = out.mach.toFixed(2);
+  $('h-h').innerHTML = `${Math.round(fly.pos.y).toLocaleString()}<small>m</small>`;
+  $('h-a').innerHTML = `${(out.al / D2R).toFixed(1)}<small>°</small>`;
+  $('h-n').innerHTML = `${out.n.toFixed(1)}<small>g</small>`;
+  $('h-t').innerHTML = fly.thr > 1 ? `reheat` : `${Math.round(fly.thr * 100)}<small>%</small>`;
+  if (!$('h-warn').textContent.startsWith('Flew'))
+    $('h-warn').textContent = !fly.limiter ? 'Angle-of-attack limit off: the nozzles are flying it'
+      : out.n > FL.g_limit - 0.3 ? `At the ${FL.g_limit} g limit` : '';
+  return null;
+}
+
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
 const clock = new THREE.Clock();
@@ -831,7 +1138,8 @@ renderer.setAnimationLoop(() => {
   } else if (apart.s > 0 && (gearState.u !== gearState.target || bayState.u !== bayState.target ||
                              canState.u !== canState.target)) applyApart();
   if (flowGroup.visible && !reduced) for (const t of flowTubes) t.map.offset.x -= t.speed * dt;
-  controls.update();
+  if (fly.on) flyStep(Math.min(dt, 0.05));
+  else controls.update();
   renderer.render(scene, camera);
 });
 </script>
