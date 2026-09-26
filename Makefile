@@ -2,7 +2,7 @@ BLENDER := /Applications/Blender.app/Contents/MacOS/Blender
 BLEND   := build/nyx.blend
 SAMPLES ?= 64
 
-.PHONY: all build verify aero render export web stl manifest vendor clean
+.PHONY: all build verify aero render export web stl manifest vendor clean bom drawings
 
 all: build verify render web
 
@@ -53,3 +53,7 @@ clean:
 
 bom:                         ## bill of materials: every part, its group, material, pieces, size
 	python3 ../_shared/tools/make_bom.py . build/nyx.blend bom.csv
+
+drawings:                    ## drawings.pdf: a GA sheet and one per assembly, A1, dimensioned, with parts lists
+	python3 ../_shared/tools/make_drawings.py . build/nyx.blend build/drawings
+	cp build/drawings/drawings.pdf drawings.pdf
