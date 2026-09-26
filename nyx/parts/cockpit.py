@@ -121,6 +121,152 @@ def opening_cutter():
     return shapes.loft_rings([lo, hi])
 
 
+# --------------------------------------------------------------------------
+# How the canopy opens
+#
+# It was a lid with nothing to lift it and nothing to hold it shut. A
+# one-piece canopy hinges at its aft end, as an F-16's does: the front lifts
+# and the tail stays at the spine. It is lifted by two linear actuators
+# behind the seat, and held down by three hooks a side under the opening's
+# edge, which pins on the canopy's rim frame drop into.
+
+HINGE = (CK["x1"] - 160.0, 0.0, shapes.z_up(CK["x1"] - 160.0, 0.0) - 23.0)
+CANOPY_OPEN = math.radians(40.0)
+LOCK_X = (3600.0, 4400.0, 5220.0)   # clear of frames 3270 and 5119
+ACT_X = 5450.0                  # where the actuators push on the rim
+ACT_ANCHOR_X = 5620.0           # on the tub's aft wall, whose face is at 5640
+ACT_ANCHOR_Z = 530.0
+
+
+def _rim(x, s):
+    """The rim frame's centreline on side s: along the glass's inside at its
+    foot, over the opening's edge."""
+    y = s * (opening_half_width(x) + 4.0)
+    return (x, y, shapes.z_up(x, y) + 9.0)
+
+
+def act_lug(s):
+    """Where each actuator's rod end is pinned to the rim frame, canopy shut:
+    34 mm inboard of the opening's edge, 30 under it. (The hole in the skin
+    is cut on straight runs between stations, which fall a few millimetres
+    inside the opening's curve; anything through it keeps well in.)"""
+    hw = opening_half_width(ACT_X)
+    y = s * (hw - 34.0)
+    return (ACT_X, y, shapes.z_up(ACT_X, s * hw) - 30.0)
+
+
+def act_anchor(s):
+    return (ACT_ANCHOR_X, act_lug(s)[1], ACT_ANCHOR_Z)
+
+
+def canopy_rim():
+    """The frame bonded round the glass's foot, which everything that moves
+    the canopy or holds it is on: the lock pins, the actuators' lugs and
+    the hinge lug at its aft end."""
+    parts = []
+    xs = [3100.0 + (5700.0 - 3100.0) * i / 40 for i in range(41)]
+    for s in (-1.0, 1.0):
+        parts.append(mesh.pipe([_rim(x, s) for x in xs], 6.0, 12, subdiv=2))
+        # the lock pins, each on a tab down through the opening's edge
+        for x in LOCK_X:
+            hw = opening_half_width(x)
+            zs = shapes.z_up(x, s * hw)
+            zr = _rim(x, s)[2]
+            yt = s * (hw - 18.0)
+            parts.append(mesh.box(x, s * (hw - 7.0), zr + 5.0, 20.0, 30.0, 8.0))
+            parts.append(mesh.box(x, yt, 0.5 * (zr + 7.0 + zs - 20.0), 20.0, 8.0,
+                                  zr + 7.0 - (zs - 20.0)))
+            # the pin, lying in its hook's throat over the whole of its length
+            parts.append(mesh.pipe([(x - 13.0, yt, zs - 18.0),
+                                    (x + 13.0, yt, zs - 18.0)], 4.0, 10, bend=0.0))
+        # the actuator's lug: a tab in from the frame and two cheeks down to
+        # the rod end's pin
+        L = act_lug(s)
+        zr = _rim(ACT_X, s)[2]
+        hw = opening_half_width(ACT_X)
+        y_in = L[1] - s * 22.0
+        parts.append(mesh.box(ACT_X, 0.5 * (s * (hw + 4.0) + y_in), zr + 5.0,
+                              30.0, abs(s * (hw + 4.0) - y_in), 8.0))
+        for dy in (-16.0, 16.0):
+            parts.append(mesh.box(ACT_X, L[1] + dy, 0.5 * (zr + 5.0 + L[2] - 14.0),
+                                  30.0, 6.0, zr + 5.0 - (L[2] - 14.0)))
+    # the hinge lug, down from the glass's solid aft end to the hinge pin
+    hx, _hy, hz = HINGE
+    top = shapes.z_up(hx, 0.0) + SEAT + 3.0
+    parts.append(mesh.box(hx, 0.0, 0.5 * (hz - 12.0 + top), 30.0, 18.0,
+                          top - (hz - 12.0)))
+    return mesh.join(*parts)
+
+
+def canopy_hinge():
+    """A beam across the opening's aft end between frame 5680's cut ends,
+    two clevis plates up from it and the pin the canopy's lug turns on."""
+    hx, _hy, hz = HINGE
+    parts = [mesh.box(5680.0, 0.0, 892.5, 36.0, 420.0, 25.0)]
+    for y in (-14.0, 14.0):
+        parts.append(mesh.box(0.5 * (5690.0 + hx + 18.0), y, 0.5 * (900.0 + hz + 8.0),
+                              hx + 18.0 - 5690.0, 8.0, hz + 8.0 - 900.0))
+    parts.append(mesh.pipe([(hx, -26.0, hz), (hx, 26.0, hz)], 5.5, 16, bend=0.0))
+    return mesh.join(*parts)
+
+
+def canopy_hinge_pocket():
+    """What the hinge takes out of the top of the tank behind it."""
+    hx, _hy, hz = HINGE
+    return mesh.box(0.5 * (5695.0 + hx + 35.0), 0.0, 950.0, hx + 35.0 - 5695.0,
+                    48.0, 120.0)
+
+
+def canopy_locks():
+    """The hooks under the opening's edge the rim's pins drop into, each
+    hung from the skin's inside."""
+    parts = []
+    for s in (-1.0, 1.0):
+        for x in LOCK_X:
+            hw = opening_half_width(x)
+            zs = shapes.z_up(x, s * hw)
+            parts.append(mesh.box(x, s * (hw - 18.0), zs - 26.5, 32.0, 16.0, 7.0))
+            # up to the skin's inside, 1 mm into it where it is lowest
+            top = min(shapes.z_up(x, s * yy, spec.SKIN_T)
+                      for yy in (hw, hw + 7.0, hw + 14.0)) + 1.0
+            parts.append(mesh.box(x, s * (hw + 2.0), 0.5 * (zs - 30.0 + top), 32.0,
+                                  24.0, top - (zs - 30.0)))
+    return mesh.join(*parts)
+
+
+def canopy_actuator(s):
+    """(body, rod): the body pinned on a bracket on the tub's aft wall, the
+    rod out of it to the rim's lug."""
+    A, L = act_anchor(s), act_lug(s)
+    d = [L[i] - A[i] for i in range(3)]
+    n = math.sqrt(sum(c * c for c in d))
+    u = [c / n for c in d]
+    at = lambda t: tuple(A[i] + u[i] * t for i in range(3))
+    body = mesh.join(
+        mesh.pipe([A, at(190.0)], 16.0, 20, bend=0.0),
+        mesh.pipe([(A[0], A[1] - 14.0, A[2]), (A[0], A[1] + 14.0, A[2])], 10.0, 14,
+                  bend=0.0),
+        # the bracket, on the wall's face
+        mesh.box(0.5 * (A[0] - 8.0 + 5641.0), A[1], A[2], 5641.0 - (A[0] - 8.0),
+                 36.0, 44.0))
+    rod = mesh.join(
+        mesh.pipe([at(170.0), L], 8.0, 14, bend=0.0),
+        mesh.pipe([(L[0], L[1] - 12.0, L[2]), (L[0], L[1] + 12.0, L[2])], 10.0, 14,
+                  bend=0.0))
+    return body, rod
+
+
+def canopy_kinematics():
+    """What the viewer needs to open the canopy: its hinge, the angle, the
+    parts that swing, and each actuator's anchor and lug."""
+    struts = []
+    for s, t in ((1.0, "r"), (-1.0, "l")):
+        struts.append({"body": f"canopy_actuator_{t}", "rod": f"canopy_actuator_rod_{t}",
+                       "anchor": list(act_anchor(s)), "lug": list(act_lug(s))})
+    return {"hinge": list(HINGE), "axis": [0.0, 1.0, 0.0], "open": CANOPY_OPEN,
+            "parts": ["canopy_glass", "canopy_rim"], "struts": struts}
+
+
 def tub():
     """The cockpit tub: floor, sides and bulkheads, under the canopy. The
     walls stand up to 1 mm under the skin's inside, following it."""
@@ -290,4 +436,12 @@ def build():
         "cockpit_panel": panel(),
         "cockpit_hud": hud(),
         "cockpit_controls": stick(),
+        "canopy_rim": canopy_rim(),
+        "canopy_hinge": canopy_hinge(),
+        "cut:fuel_tank_fwd_1": canopy_hinge_pocket(),
+        "canopy_locks": canopy_locks(),
+        "canopy_actuator_r": canopy_actuator(1.0)[0],
+        "canopy_actuator_rod_r": canopy_actuator(1.0)[1],
+        "canopy_actuator_l": canopy_actuator(-1.0)[0],
+        "canopy_actuator_rod_l": canopy_actuator(-1.0)[1],
     }

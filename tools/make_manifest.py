@@ -21,6 +21,7 @@ import agility   # noqa: E402
 import vlm       # noqa: E402
 from parts import engines   # noqa: E402
 from parts import gear      # noqa: E402
+from parts import cockpit   # noqa: E402
 
 MODULES = [
     ("01 Airframe", "Airframe", "#C9CDD1"),
@@ -104,6 +105,18 @@ def gear_kinematics():
                       for d in k["doors"]]}
 
 
+def canopy_kinematics():
+    """The canopy's hinge and opening angle, the parts that swing with it,
+    and each actuator's anchor and lug, rounded for the page."""
+    k = cockpit.canopy_kinematics()
+    rd = lambda v: [r1(c, 4) for c in v]
+    return {"hinge": rd(k["hinge"]), "axis": rd(k["axis"]),
+            "open": r1(k["open"], 5), "parts": k["parts"],
+            "struts": [{"body": t["body"], "rod": t["rod"],
+                        "anchor": rd(t["anchor"]), "lug": rd(t["lug"])}
+                       for t in k["struts"]]}
+
+
 def main():
     rows = list(csv.DictReader(open(os.path.join(ROOT, "build", "parts.csv"))))
     mods = []
@@ -122,6 +135,7 @@ def main():
         "palette": palette(),
         "nozzles": nozzles(),
         "gear": gear_kinematics(),
+        "canopy": canopy_kinematics(),
         "modules": mods,
         "parts": parts,
     }

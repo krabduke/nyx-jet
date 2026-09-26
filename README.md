@@ -128,6 +128,8 @@ Serve the repository root (for example `python3 -m http.server`) and open
 - raise and lower the landing gear: it loads gear-up, as it flies. Coming
   down, the doors open and the legs swing out; going up, the legs fold into
   their bays and the doors shut flush behind them;
+- open and shut the canopy: it hinges at its aft end, and the two actuators
+  behind the seat swing on their anchors as their rods run out to the rim;
 - swivel both nozzles down to 95° and yaw them 12° either side.
 
 The dial shows the turn rates above. Every figure on the page comes from
@@ -136,7 +138,7 @@ it.
 
 ## The gates
 
-`make verify` runs twelve checks, and all of them pass:
+`make verify` runs thirteen checks, and all of them pass:
 
 | Gate | What it enforces |
 |---|---|
@@ -149,6 +151,7 @@ it.
 | `measure_fuel --check` | The mass table's fuel is what the built tanks hold, measured off the geometry, to half a per cent |
 | `audit_oml` | Every internal part — frames, tanks, actuators, looms — is inside the outer mould line: nothing pokes through the skin |
 | `audit_support` | No piece floats free |
+| `audit_ports` | Every pipe, loom and cable end runs into something, bar ends free by design, each named with its reason |
 | `audit_joints` | One assembly, and every load path and circuit is joined link by link |
 | `audit_manifest` | The viewer describes the build it ships with |
 | `validate_viewer` | The viewer's scripts parse and every part name it uses exists |

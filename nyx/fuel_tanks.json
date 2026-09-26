@@ -7,11 +7,11 @@
   "z_cg_mm": -56.9
  },
  "fuel_tank_fwd_1": {
-  "litres": 2273.7,
-  "kg": 1764.4,
-  "x_cg_mm": 6228.0,
+  "litres": 2273.4,
+  "kg": 1764.2,
+  "x_cg_mm": 6228.1,
   "y_cg_mm": -16.0,
-  "z_cg_mm": 328.7
+  "z_cg_mm": 328.6
  },
  "fuel_tank_fwd_2": {
   "litres": 1897.9,

@@ -76,6 +76,13 @@ AIRFRAME = [
     ("loom_fuselage_", "canard_drive_"), ("loom_nose_gear", "gear_actuator_nose"),
     ("loom_nose_gear", "loom_fuselage_r"),
     ("loom_fuselage_", "loom_fin_"),
+    # the canopy's mechanism: the rim frame is bonded into the glass's foot;
+    # the hinge beam bolts across frame 5680's cut ends and its pin is
+    # through the rim's lug; each actuator's rod runs in its body and its
+    # bracket is on the tub's aft wall; the lock hooks hang from the skin
+    ("canopy_glass", "canopy_rim"), ("canopy_hinge", "canopy_rim"),
+    ("canopy_hinge", "frame_5680"), ("canopy_actuator_", "canopy_actuator_rod_"),
+    ("canopy_actuator_", "cockpit_tub"), ("canopy_locks", "fuselage_skin"),
     ("loom_wing_", "flaperon_act_"), ("loom_wing_", "le_flap_act_"),
     ("loom_wing_", "gear_actuator_main_"), ("loom_fin_", "rudder_act_"),
     ("fuel_gallery", "fuel_tank_"), ("refuel_receptacle", "fuel_tank_fwd_1"),

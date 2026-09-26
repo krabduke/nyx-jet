@@ -146,6 +146,10 @@
     <button class="toggle" id="gear" aria-pressed="false">Lower the gear</button>
   </div>
   <div class="group">
+    <span>Canopy</span>
+    <button class="toggle" id="canopy" aria-pressed="false">Open the canopy</button>
+  </div>
+  <div class="group">
     <label for="swivel">Nozzles down <span class="val" id="swval">0°</span></label>
     <input id="swivel" type="range" min="0" max="95" step="1" value="0">
   </div>
@@ -451,6 +455,52 @@ $('gear').addEventListener('click', () => {
   gearState.target = down ? 0 : 1;
 });
 
+/* ---------------- canopy ----------------
+   It hinges at its aft end, as an F-16's does. The two actuators behind the
+   seat swing about their anchors on the tub's aft wall, and their rods run
+   out of them to follow the lugs on the canopy's rim. */
+const CANK = M.canopy;
+const canState = {u: 0, target: 0};             // 0 shut, 1 open
+let applyCanopy = () => {};
+if (CANK) {
+  const canopyGroup = hingeGroup(CANK.hinge, CANK.axis, CANK.parts);
+  const struts = CANK.struts.map(t => {
+    const rod = hingeGroup(t.anchor, [0, 1, 0], [t.rod]);
+    return {body: hingeGroup(t.anchor, [0, 1, 0], [t.body]), rod,
+            base: rod.position.clone(), A: t.anchor, L0: t.lug};
+  });
+  // the lug's place with the canopy turned th about the hinge (model axes)
+  const lugAt = (L0, th) => {
+    const H = CANK.hinge, dx = L0[0] - H[0], dz = L0[2] - H[2];
+    const c = Math.cos(th), s = Math.sin(th);
+    return [H[0] + dx * c + dz * s, L0[1], H[2] - dx * s + dz * c];
+  };
+  applyCanopy = () => {
+    const ease = (t) => t * t * (3 - 2 * t);
+    const th = CANK.open * ease(canState.u);
+    canopyGroup.quaternion.setFromAxisAngle(canopyGroup.userData.axis, th);
+    for (const t of struts) {
+      const A = t.A, L = lugAt(t.L0, th);
+      const ax0 = t.L0[0] - A[0], az0 = t.L0[2] - A[2];
+      const ax1 = L[0] - A[0], az1 = L[2] - A[2];
+      const a = Math.atan2(az0, ax0) - Math.atan2(az1, ax1);
+      t.body.quaternion.setFromAxisAngle(t.body.userData.axis, a);
+      t.rod.quaternion.setFromAxisAngle(t.rod.userData.axis, a);
+      const n0 = Math.hypot(ax0, az0), n1 = Math.hypot(ax1, az1);
+      const dir = toScene([ax1 / n1, 0, az1 / n1]);
+      t.rod.position.copy(t.base).addScaledVector(dir, (n1 - n0) * MM);
+    }
+  };
+  $('canopy').addEventListener('click', () => {
+    const open = $('canopy').getAttribute('aria-pressed') !== 'true';
+    $('canopy').setAttribute('aria-pressed', open);
+    $('canopy').textContent = open ? 'Close the canopy' : 'Open the canopy';
+    canState.target = open ? 1 : 0;
+  });
+} else {
+  $('canopy').closest('.group').remove();
+}
+
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
 const clock = new THREE.Clock();
@@ -469,6 +519,14 @@ renderer.setAnimationLoop(() => {
       : (Math.abs(gearState.target - gearState.u) < v ? gearState.target
          : gearState.u + Math.sign(gearState.target - gearState.u) * v);
     applyGear();
+  }
+  // the canopy takes about four seconds to open or shut
+  if (canState.u !== canState.target) {
+    const v = dt / 4.0;
+    canState.u = reduced ? canState.target
+      : (Math.abs(canState.target - canState.u) < v ? canState.target
+         : canState.u + Math.sign(canState.target - canState.u) * v);
+    applyCanopy();
   }
   // the bearings turn at a hydraulic motor's pace, not a slider's
   if (sw.pitch !== sw.tp || sw.yaw !== sw.ty) {

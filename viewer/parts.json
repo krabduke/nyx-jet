@@ -922,6 +922,53 @@
    }
   ]
  },
+ "canopy": {
+  "hinge": [
+   5740.0,
+   0.0,
+   993.3782
+  ],
+  "axis": [
+   0.0,
+   1.0,
+   0.0
+  ],
+  "open": 0.69813,
+  "parts": [
+   "canopy_glass",
+   "canopy_rim"
+  ],
+  "struts": [
+   {
+    "body": "canopy_actuator_r",
+    "rod": "canopy_actuator_rod_r",
+    "anchor": [
+     5620.0,
+     242.7871,
+     530.0
+    ],
+    "lug": [
+     5450.0,
+     242.7871,
+     830.6131
+    ]
+   },
+   {
+    "body": "canopy_actuator_l",
+    "rod": "canopy_actuator_rod_l",
+    "anchor": [
+     5620.0,
+     -242.7871,
+     530.0
+    ],
+    "lug": [
+     5450.0,
+     -242.7871,
+     830.6131
+    ]
+   }
+  ]
+ },
  "modules": [
   {
    "key": "01 Airframe",
@@ -948,8 +995,8 @@
    "key": "04 Cockpit",
    "label": "Cockpit",
    "color": "#B58A3C",
-   "parts": 9,
-   "faces": 9390
+   "parts": 16,
+   "faces": 15504
   },
   {
    "key": "05 Weapons bay",
@@ -970,7 +1017,7 @@
    "label": "Structure",
    "color": "#9A8F7E",
    "parts": 33,
-   "faces": 31415
+   "faces": 31419
   },
   {
    "key": "08 Engine port",
@@ -1073,6 +1120,26 @@
    "mat": "steel",
    "f": 98
   },
+  "canopy_actuator_l": {
+   "m": "04 Cockpit",
+   "mat": "steel",
+   "f": 44
+  },
+  "canopy_actuator_r": {
+   "m": "04 Cockpit",
+   "mat": "steel",
+   "f": 44
+  },
+  "canopy_actuator_rod_l": {
+   "m": "04 Cockpit",
+   "mat": "steel",
+   "f": 32
+  },
+  "canopy_actuator_rod_r": {
+   "m": "04 Cockpit",
+   "mat": "steel",
+   "f": 32
+  },
   "canopy_frame_l": {
    "m": "04 Cockpit",
    "mat": "skin_dark",
@@ -1087,6 +1154,21 @@
    "m": "04 Cockpit",
    "mat": "canopy",
    "f": 2954
+  },
+  "canopy_hinge": {
+   "m": "04 Cockpit",
+   "mat": "steel",
+   "f": 36
+  },
+  "canopy_locks": {
+   "m": "04 Cockpit",
+   "mat": "steel",
+   "f": 72
+  },
+  "canopy_rim": {
+   "m": "04 Cockpit",
+   "mat": "skin_dark",
+   "f": 5854
   },
   "cockpit_controls": {
    "m": "04 Cockpit",
@@ -2481,7 +2563,7 @@
   "fuel_tank_fwd_1": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 1631
+   "f": 1635
   },
   "fuel_tank_fwd_2": {
    "m": "07 Structure",
