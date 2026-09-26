@@ -504,7 +504,19 @@ function hingeGroup(point, axis, parts){
   return g;
 }
 const gearLegs = GEARK.legs.map(L => Object.assign(hingeGroup(L.pivot, L.axis, L.parts), {stow: L.stow}));
-const gearDoors = GEARK.doors.map(d => Object.assign(hingeGroup(d.hinge, d.axis, [d.part]), {close: d.close}));
+const gearDoors = GEARK.doors.map(d => Object.assign(hingeGroup(d.hinge, d.axis, [d.part]),
+                                                     {close: d.close, part: d.part}));
+// each pivot door is driven by a link off its leg, not on the doors'
+// schedule: wherever the leg is, the door is at the angle that keeps the
+// link its length, and the link lies between the leg's lug and the door's horn
+const gearLinks = (GEARK.links || []).map(k => {
+  const s = (v) => toScene(v).multiplyScalar(MM);
+  const lug = s(k.lug), horn = s(k.horn);
+  return {g: hingeGroup(k.lug, [0, 0, 1], [k.part]), door: gearDoors.find(d => d.part === k.door),
+          lug, horn, d0: horn.clone().sub(lug).normalize(), len: horn.distanceTo(lug),
+          P: s(k.pivot), legAx: toScene(k.leg_axis).normalize(), stow: k.stow,
+          H: s(k.hinge), ax: toScene(k.axis).normalize(), close: k.close};
+});
 // each door's actuator: the body swings about its anchor to point at the
 // door's horn, wherever the door has turned it, and the rod runs out of it
 const gearStruts = (GEARK.struts || []).map(t => {
@@ -521,6 +533,23 @@ function applyGear(){
   const ease = (t) => t * t * (3 - 2 * t);
   for (const g of gearLegs) g.quaternion.setFromAxisAngle(g.userData.axis, g.stow * ease(legs));
   for (const g of gearDoors) g.quaternion.setFromAxisAngle(g.userData.axis, g.close * ease(doors));
+  for (const k of gearLinks) {
+    const A = k.lug.clone().sub(k.P).applyAxisAngle(k.legAx, k.stow * ease(legs)).add(k.P);
+    const hornAt = (f) => k.horn.clone().sub(k.H).applyAxisAngle(k.ax, k.close * f).add(k.H);
+    const err = (f) => hornAt(f).distanceTo(A) - k.len;
+    // the door's angle, as a share of its closing: the link shortens as it shuts
+    let lo = 0, hi = 1;
+    const e0 = err(0), e1 = err(1);
+    if (e0 * e1 > 0) lo = hi = Math.abs(e0) < Math.abs(e1) ? 0 : 1;
+    else for (let i = 0; i < 30; i++) {
+      const m = (lo + hi) / 2;
+      if ((err(m) < 0) === (e0 < 0)) lo = m; else hi = m;
+    }
+    const f = (lo + hi) / 2;
+    if (k.door) k.door.quaternion.setFromAxisAngle(k.door.userData.axis, k.close * f);
+    k.g.position.copy(A);
+    k.g.quaternion.setFromUnitVectors(k.d0, hornAt(f).sub(A).normalize());
+  }
   for (const t of gearStruts) {
     const L = t.L0.clone().sub(t.H).applyAxisAngle(t.ax, t.close * ease(doors)).add(t.H);
     const d0 = t.L0.clone().sub(t.A), d1 = L.clone().sub(t.A);

@@ -428,6 +428,11 @@ def main_leg():
         mesh.pipe([(px, py - arm_y - 30.0, z_ax), (px, py + arm_y + 30.0, z_ax)],
                   30.0, 20),                                                  # axle
     ]
+    # the pivot door's link lug, on the leg's forward face
+    lx, ly, lz = pivot_lug()
+    leg.append(mesh.box(0.5 * (lx + px - G["strut_r_main"] + 6.0), ly, lz,
+                        px - G["strut_r_main"] + 6.0 - lx, 10.0, 30.0))
+    leg.append(_eye((lx, ly, lz)))
     for sy in (1.0, -1.0):                                                    # fork arms
         leg.append(mesh.box(px, py + sy * arm_y, 0.5 * (crown + z_ax),
                             96.0, 20.0, crown - z_ax + 50.0))
@@ -492,7 +497,11 @@ def pivot_door():
                            tuple(a[i] + ax[i] * (s0 + 40.0) for i in range(3))],
                           7.0, 12)
                 for s0 in (20.0, L - 60.0)]
-    return mesh.join(door, *knuckles)
+    # the link's horn: up off the door's inside to its eye
+    x, y, z = pivot_horn()
+    z_door = under_z(x, y) + DOOR_T - 1.0
+    horn = mesh.join(mesh.box(x, y, 0.5 * (z_door + z), 10.0, 30.0, z - z_door), _eye((x, y, z)))
+    return mesh.join(door, *knuckles, horn)
 
 
 def pivot_hinge():
@@ -504,6 +513,76 @@ def pivot_hinge():
 
 
 PIVOT_DOOR_OPEN = math.radians(90.0)
+
+# The pivot door is too small, and its slot too full of leg, for an
+# actuator: a link from the leg drives it, as on most fighters' small gear
+# doors -- the leg's own swing opens it on the way down and shuts it on the
+# way up. The link runs from a lug on the leg's forward face to a horn on
+# the door beside its hinge; the lug's height on the leg is solved so the
+# link is the same length gear down, door open, as gear up, door shut.
+# The horn is outboard of the lug, so as the leg swings inboard the link
+# only ever pulls: the door closes steadily all the way, 90 degrees to shut,
+# never swinging past open on the way (with the horn inboard it overshot to
+# 139 degrees).
+PIVOT_HORN = (25.0, 2960.0, 40.0)      # aft of the hinge, y, up off the door
+PIVOT_LUG_XY = (-85.0, 0.0)            # off the leg's axis: forward, in line
+
+
+def pivot_horn():
+    """The horn's eye, door shut."""
+    hp, _ = pivot_hinge()
+    dx, y, up = PIVOT_HORN
+    x = hp[0] + dx
+    return (x, y, under_z(x, y) + up)
+
+
+def _stow(p):
+    return rotate([p], main_pivot(), (1.0, 0.0, 0.0), main_stow_angle())[0]
+
+
+def _door_open(p):
+    hp, hax = pivot_hinge()
+    return rotate([p], hp, hax, PIVOT_DOOR_OPEN)[0]
+
+
+def pivot_lug():
+    """The lug's eye on the leg, gear down: as far down the leg as makes
+    the link the same length at both ends of the leg's swing."""
+    px, py, pz = main_pivot()
+    lx, ly = PIVOT_LUG_XY
+    H_shut, H_open = pivot_horn(), _door_open(pivot_horn())
+
+    def f(d):
+        P = (px + lx, py + ly, pz - d)
+        return math.dist(P, H_open) - math.dist(_stow(P), H_shut)
+    lo, hi = 40.0, 150.0
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if (f(lo) < 0) == (f(mid) < 0):
+            lo = mid
+        else:
+            hi = mid
+    return (px + lx, py + ly, pz - 0.5 * (lo + hi))
+
+
+def pivot_link_length():
+    return math.dist(pivot_lug(), _door_open(pivot_horn()))
+
+
+def _eye(c, r=8.0, half=15.0):
+    """An eye on a pin along y at c."""
+    return mesh.pipe([(c[0], c[1] - half, c[2]), (c[0], c[1] + half, c[2])], r, 12, bend=0.0)
+
+
+def pivot_link(lug, horn):
+    """The link between the lug's eye and the horn's, each end a clevis
+    over its eye, in whatever pose the two are in."""
+    ends = []
+    for c in (lug, horn):
+        for sy in (-1.0, 1.0):
+            ends.append(mesh.pipe([(c[0], c[1] + sy * 15.0, c[2]), (c[0], c[1] + sy * 22.0, c[2])],
+                                  9.0, 12, bend=0.0))
+    return mesh.join(mesh.pipe([lug, horn], 5.0, 12, bend=0.0), *ends)
 
 
 def wheel_door():
@@ -708,7 +787,9 @@ def _main_parts(up):
     if up:
         t, h, leg = (_rot_part(p, P, ax, a) for p in (t, h, leg))
         wd, pd = wheel_door(), pivot_door()
+        link = pivot_link(_stow(pivot_lug()), pivot_horn())
     else:
+        link = pivot_link(pivot_lug(), _door_open(pivot_horn()))
         door = _rot_part(door, P, ax, -a)
         hp, hax = wheel_hinge()
         wd = _rot_part(wheel_door(), hp, hax, WHEEL_DOOR_OPEN)
@@ -718,7 +799,8 @@ def _main_parts(up):
             "gear_leg_door_main": door, "gear_door_main": wd,
             # the up-lock is the well's structure: it is bolted up into the
             # well's roof, which out here is the wing's own inside
-            "gear_pivot_door_main": pd, "gear_bay_main": mesh.join(main_bay(),
+            "gear_pivot_door_main": pd, "gear_pivot_link_main": link,
+            "gear_bay_main": mesh.join(main_bay(),
                                                                     main_uplock()),
             "gear_actuator_main": main_actuator()[0],
             "gear_door_act_main": main_door_strut(up)[0],
@@ -793,6 +875,20 @@ def kinematics():
         out["doors"].append({"part": f"gear_door_nose_{side}",
                              "hinge": list(hp), "axis": list(hax),
                              "close": -sy * NOSE_DOOR_OPEN})
+    # each pivot door's link: its lug on the leg and its horn on the door,
+    # both gear down, and the leg and door they ride on
+    out["links"] = []
+    for side, sy in (("r", 1.0), ("l", -1.0)):
+        m = lambda p: [p[0], sy * p[1], p[2]]
+        hp, hax = pivot_hinge()
+        px, py, pz = main_pivot()
+        out["links"].append({"part": f"gear_pivot_link_main_{side}",
+                             "door": f"gear_pivot_door_main_{side}",
+                             "lug": m(pivot_lug()), "horn": m(_door_open(pivot_horn())),
+                             "pivot": [px, sy * py, pz], "leg_axis": [1.0, 0.0, 0.0],
+                             "stow": sy * main_stow_angle(),
+                             "hinge": m(hp), "axis": [hax[0], sy * hax[1], hax[2]],
+                             "close": -sy * PIVOT_DOOR_OPEN})
     # each door's actuator: its anchor, and its lug with the door open, which
     # turns with the door about the door's hinge
     out["struts"] = []

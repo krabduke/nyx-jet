@@ -166,6 +166,8 @@ CIRCUITS += mirrored("each main gear hangs from its wing root",
 CIRCUITS += mirrored("and its doors: on the leg, over the pivot, over the well",
                      ["gear_main_{s}", "gear_leg_door_main_{s}"])
 CIRCUITS += mirrored("", ["wing_{s}", "gear_pivot_door_main_{s}"])
+CIRCUITS += mirrored("and each pivot door is driven by a link off its leg",
+                     ["gear_main_{s}", "gear_pivot_link_main_{s}", "gear_pivot_door_main_{s}"])
 CIRCUITS += mirrored("", ["fuselage_skin", "gear_door_main_{s}"])
 CIRCUITS += mirrored("the well is built into the body",
                      ["fuselage_skin", "gear_bay_main_{s}"])

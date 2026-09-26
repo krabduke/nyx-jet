@@ -95,11 +95,13 @@ gear_door_nose_l,06 Landing gear,skin_dark,3,1699.3,118.4,365.6
 gear_door_nose_r,06 Landing gear,skin_dark,3,1699.3,118.4,365.6
 gear_leg_door_main_l,06 Landing gear,skin_dark,3,234.0,197.1,755.8
 gear_leg_door_main_r,06 Landing gear,skin_dark,3,234.0,197.1,755.8
-gear_main_l,06 Landing gear,steel,13,320.0,364.0,1378.0
-gear_main_r,06 Landing gear,steel,13,320.0,364.0,1378.0
+gear_main_l,06 Landing gear,steel,15,320.0,364.0,1378.0
+gear_main_r,06 Landing gear,steel,15,320.0,364.0,1378.0
 gear_nose,06 Landing gear,steel,16,264.4,418.0,1370.0
-gear_pivot_door_main_l,06 Landing gear,skin_dark,3,24.5,238.8,244.1
-gear_pivot_door_main_r,06 Landing gear,skin_dark,3,24.5,238.8,244.1
+gear_pivot_door_main_l,06 Landing gear,skin_dark,5,56.1,238.8,244.1
+gear_pivot_door_main_r,06 Landing gear,skin_dark,5,56.1,238.8,244.1
+gear_pivot_link_main_l,06 Landing gear,steel,5,25.8,53.3,185.3
+gear_pivot_link_main_r,06 Landing gear,steel,5,25.8,53.3,185.3
 gear_uplock_nose,06 Landing gear,steel,6,39.0,70.0,251.0
 tyre_main_l,06 Landing gear,rubber,1,700.0,230.0,700.0
 tyre_main_r,06 Landing gear,rubber,1,700.0,230.0,700.0

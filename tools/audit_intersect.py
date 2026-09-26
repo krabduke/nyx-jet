@@ -156,6 +156,9 @@ AIRFRAME = [
     ("gear_leg_door_main_", "gear_main_"),
     # the pivot doors' hinge knuckles are let into the slot's edge
     ("gear_pivot_door_main_", "wing_"),
+    # each pivot door's link is pinned through the lug on its leg and the
+    # horn on its door
+    ("gear_pivot_link_main_", "gear_main_"), ("gear_pivot_link_main_", "gear_pivot_door_main_"),
     # cockpit furniture is bolted to the tub
     ("seat", "cockpit_tub"), ("cockpit_panel", "cockpit_tub"),
     ("cockpit_controls", "cockpit_tub"), ("cockpit_hud", "cockpit_panel"),

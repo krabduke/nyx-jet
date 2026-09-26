@@ -1041,6 +1041,80 @@
     ],
     "close": 1.65806
    }
+  ],
+  "links": [
+   {
+    "part": "gear_pivot_link_main_r",
+    "door": "gear_pivot_door_main_r",
+    "lug": [
+     9415.0,
+     2968.0,
+     58.3751
+    ],
+    "horn": [
+     9422.8398,
+     2958.7278,
+     -108.875
+    ],
+    "pivot": [
+     9500.0,
+     2968.0,
+     128.0
+    ],
+    "leg_axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "stow": -1.35827,
+    "hinge": [
+     9382.0,
+     2768.0,
+     -80.1844
+    ],
+    "axis": [
+     0.0,
+     0.9998,
+     -0.0193
+    ],
+    "close": -1.5708
+   },
+   {
+    "part": "gear_pivot_link_main_l",
+    "door": "gear_pivot_door_main_l",
+    "lug": [
+     9415.0,
+     -2968.0,
+     58.3751
+    ],
+    "horn": [
+     9422.8398,
+     -2958.7278,
+     -108.875
+    ],
+    "pivot": [
+     9500.0,
+     -2968.0,
+     128.0
+    ],
+    "leg_axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "stow": 1.35827,
+    "hinge": [
+     9382.0,
+     -2768.0,
+     -80.1844
+    ],
+    "axis": [
+     0.0,
+     -0.9998,
+     -0.0193
+    ],
+    "close": 1.5708
+   }
   ]
  },
  "canopy": {
@@ -2067,8 +2141,8 @@
    "key": "06 Landing gear",
    "label": "Landing gear",
    "color": "#5C6166",
-   "parts": 32,
-   "faces": 28148
+   "parts": 34,
+   "faces": 28368
   },
   {
    "key": "07 Structure",
@@ -3998,12 +4072,12 @@
   "gear_main_l": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 646
+   "f": 666
   },
   "gear_main_r": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 646
+   "f": 666
   },
   "gear_nose": {
    "m": "06 Landing gear",
@@ -4013,12 +4087,22 @@
   "gear_pivot_door_main_l": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 476
+   "f": 496
   },
   "gear_pivot_door_main_r": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 476
+   "f": 496
+  },
+  "gear_pivot_link_main_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 70
+  },
+  "gear_pivot_link_main_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 70
   },
   "gear_uplock_nose": {
    "m": "06 Landing gear",
