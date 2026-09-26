@@ -146,6 +146,10 @@
     <button class="toggle" id="gear" aria-pressed="false">Lower the gear</button>
   </div>
   <div class="group">
+    <span>Weapons bay</span>
+    <button class="toggle" id="bay" aria-pressed="false">Open the bay</button>
+  </div>
+  <div class="group">
     <span>Canopy</span>
     <button class="toggle" id="canopy" aria-pressed="false">Open the canopy</button>
   </div>
@@ -539,6 +543,45 @@ if (CANK) {
   $('canopy').closest('.group').remove();
 }
 
+/* ---------------- weapons bay ----------------
+   Each door swings out about its hinge at the bay's side; its two
+   actuators swing on their anchors and run their rods out after it. */
+const BAYK = M.bay;
+const bayState = {u: 0, target: 0};
+let applyBay = () => {};
+if (BAYK) {
+  const bayDoors = BAYK.doors.map(d => Object.assign(hingeGroup(d.hinge, d.axis, [d.part]),
+                                                      {open: d.open}));
+  const s = (v) => toScene(v).multiplyScalar(MM);
+  const bayStruts = BAYK.struts.map(t => {
+    const rod = hingeGroup(t.anchor, [0, 0, 1], [t.rod]);
+    return {body: hingeGroup(t.anchor, [0, 0, 1], [t.body]), rod, base: rod.position.clone(),
+            A: s(t.anchor), L0: s(t.lug), H: s(t.hinge), ax: toScene(t.axis).normalize(),
+            open: t.open};
+  });
+  applyBay = () => {
+    const e = bayState.u * bayState.u * (3 - 2 * bayState.u);
+    for (const g of bayDoors) g.quaternion.setFromAxisAngle(g.userData.axis, g.open * e);
+    for (const t of bayStruts) {
+      const L = t.L0.clone().sub(t.H).applyAxisAngle(t.ax, t.open * e).add(t.H);
+      const d0 = t.L0.clone().sub(t.A), d1 = L.clone().sub(t.A);
+      const q = new THREE.Quaternion().setFromUnitVectors(d0.clone().normalize(),
+                                                          d1.clone().normalize());
+      t.body.quaternion.copy(q);
+      t.rod.quaternion.copy(q);
+      t.rod.position.copy(t.base).addScaledVector(d1.clone().normalize(), d1.length() - d0.length());
+    }
+  };
+  $('bay').addEventListener('click', () => {
+    const open = $('bay').getAttribute('aria-pressed') !== 'true';
+    $('bay').setAttribute('aria-pressed', open);
+    $('bay').textContent = open ? 'Close the bay' : 'Open the bay';
+    bayState.target = open ? 1 : 0;
+  });
+} else {
+  $('bay').closest('.group').remove();
+}
+
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
 const clock = new THREE.Clock();
@@ -557,6 +600,14 @@ renderer.setAnimationLoop(() => {
       : (Math.abs(gearState.target - gearState.u) < v ? gearState.target
          : gearState.u + Math.sign(gearState.target - gearState.u) * v);
     applyGear();
+  }
+  // the bay's doors snap open in about a second, as weapons bays do
+  if (bayState.u !== bayState.target) {
+    const v = dt / 1.2;
+    bayState.u = reduced ? bayState.target
+      : (Math.abs(bayState.target - bayState.u) < v ? bayState.target
+         : bayState.u + Math.sign(bayState.target - bayState.u) * v);
+    applyBay();
   }
   // the canopy takes about four seconds to open or shut
   if (canState.u !== canState.target) {

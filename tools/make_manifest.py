@@ -22,6 +22,7 @@ import vlm       # noqa: E402
 from parts import engines   # noqa: E402
 from parts import gear      # noqa: E402
 from parts import cockpit   # noqa: E402
+from parts import bay       # noqa: E402
 
 MODULES = [
     ("01 Airframe", "Airframe", "#C9CDD1"),
@@ -122,6 +123,16 @@ def canopy_kinematics():
                        for t in k["struts"]]}
 
 
+def bay_kinematics():
+    k = bay.kinematics()
+    rd = lambda v: [r1(c, 4) for c in v]
+    return {"doors": [{"part": d["part"], "hinge": rd(d["hinge"]), "axis": rd(d["axis"]),
+                       "open": r1(d["open"], 5)} for d in k["doors"]],
+            "struts": [{"body": t["body"], "rod": t["rod"], "anchor": rd(t["anchor"]),
+                        "lug": rd(t["lug"]), "hinge": rd(t["hinge"]), "axis": rd(t["axis"]),
+                        "open": r1(t["open"], 5)} for t in k["struts"]]}
+
+
 def main():
     rows = list(csv.DictReader(open(os.path.join(ROOT, "build", "parts.csv"))))
     mods = []
@@ -141,6 +152,7 @@ def main():
         "nozzles": nozzles(),
         "gear": gear_kinematics(),
         "canopy": canopy_kinematics(),
+        "bay": bay_kinematics(),
         "modules": mods,
         "parts": parts,
     }

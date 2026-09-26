@@ -150,6 +150,25 @@ def bay_hinge(sy):
     return (xm, sy * B["half_w"], shapes.z_dn(xm, sy * B["half_w"])), (1.0, 0.0, 0.0)
 
 
+BAY_OPEN = math.radians(100.0)
+
+
+def kinematics():
+    """What the viewer needs to open the bay: each door's hinge and opening
+    angle, and each actuator's anchor and lug with the doors shut."""
+    out = {"doors": [], "struts": []}
+    for side, sy in (("r", 1.0), ("l", -1.0)):
+        hp, ax = bay_hinge(sy)
+        out["doors"].append({"part": f"bay_door_{side}", "hinge": list(hp), "axis": list(ax),
+                             "open": sy * BAY_OPEN})
+        for k, x in enumerate(BAY_ACT_X):
+            out["struts"].append({"body": f"bay_door_act_{k + 1}_{side}",
+                                  "rod": f"bay_door_act_rod_{k + 1}_{side}",
+                                  "anchor": list(bay_anchor(x, sy)), "lug": list(bay_horn(x, sy)),
+                                  "hinge": list(hp), "axis": list(ax), "open": sy * BAY_OPEN})
+    return out
+
+
 def bay_actuators():
     from parts import gear
     out = {}
