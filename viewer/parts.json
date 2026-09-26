@@ -939,6 +939,108 @@
     ],
     "close": 1.65806
    }
+  ],
+  "struts": [
+   {
+    "body": "gear_door_act_main_r",
+    "rod": "gear_door_act_rod_main_r",
+    "anchor": [
+     9500.0,
+     1334.0,
+     -390.0
+    ],
+    "lug": [
+     9500.0931,
+     1391.9919,
+     -641.9761
+    ],
+    "hinge": [
+     9070.0,
+     1318.0,
+     -629.8467
+    ],
+    "axis": [
+     1.0,
+     0.0,
+     0.0011
+    ],
+    "close": 1.6057
+   },
+   {
+    "body": "gear_door_act_nose_r",
+    "rod": "gear_door_act_rod_nose_r",
+    "anchor": [
+     3000.0,
+     189.0,
+     -117.4139
+    ],
+    "lug": [
+     2991.4845,
+     135.4831,
+     -373.7725
+    ],
+    "hinge": [
+     1750.0,
+     205.0,
+     -235.1557
+    ],
+    "axis": [
+     0.9952,
+     0.0,
+     -0.0981
+    ],
+    "close": -1.65806
+   },
+   {
+    "body": "gear_door_act_main_l",
+    "rod": "gear_door_act_rod_main_l",
+    "anchor": [
+     9500.0,
+     -1334.0,
+     -390.0
+    ],
+    "lug": [
+     9500.0931,
+     -1391.9919,
+     -641.9761
+    ],
+    "hinge": [
+     9070.0,
+     -1318.0,
+     -629.8467
+    ],
+    "axis": [
+     1.0,
+     -0.0,
+     0.0011
+    ],
+    "close": -1.6057
+   },
+   {
+    "body": "gear_door_act_nose_l",
+    "rod": "gear_door_act_rod_nose_l",
+    "anchor": [
+     3000.0,
+     -189.0,
+     -117.4139
+    ],
+    "lug": [
+     2991.4845,
+     -135.4831,
+     -373.7725
+    ],
+    "hinge": [
+     1750.0,
+     -205.0,
+     -235.1557
+    ],
+    "axis": [
+     0.9952,
+     0.0,
+     -0.0981
+    ],
+    "close": 1.65806
+   }
   ]
  },
  "canopy": {
@@ -994,14 +1096,14 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42554
+   "faces": 42588
   },
   {
    "key": "02 Flying surfaces",
    "label": "Flying surfaces",
    "color": "#8E979E",
    "parts": 26,
-   "faces": 26061
+   "faces": 27414
   },
   {
    "key": "03 Intakes",
@@ -1028,8 +1130,8 @@
    "key": "06 Landing gear",
    "label": "Landing gear",
    "color": "#5C6166",
-   "parts": 23,
-   "faces": 26722
+   "parts": 32,
+   "faces": 28076
   },
   {
    "key": "07 Structure",
@@ -1056,8 +1158,8 @@
    "key": "10 Systems",
    "label": "Systems",
    "color": "#4F8A8B",
-   "parts": 28,
-   "faces": 24628
+   "parts": 31,
+   "faces": 26316
   }
  ],
  "parts": {
@@ -2664,12 +2766,12 @@
   "fin_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 2131
+   "f": 2540
   },
   "fin_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 2215
+   "f": 2617
   },
   "flaperon_act_in_l": {
    "m": "02 Flying surfaces",
@@ -2814,7 +2916,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35768
+   "f": 35802
   },
   "gear_actuator_main_l": {
    "m": "06 Landing gear",
@@ -2834,37 +2936,77 @@
   "gear_bay_main_l": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 204
+   "f": 228
   },
   "gear_bay_main_r": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 204
+   "f": 228
   },
   "gear_bay_nose": {
    "m": "06 Landing gear",
    "mat": "steel",
    "f": 414
   },
+  "gear_door_act_main_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 38
+  },
+  "gear_door_act_main_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 38
+  },
+  "gear_door_act_nose_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 38
+  },
+  "gear_door_act_nose_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 38
+  },
+  "gear_door_act_rod_main_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 36
+  },
+  "gear_door_act_rod_main_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 36
+  },
+  "gear_door_act_rod_nose_l": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 36
+  },
+  "gear_door_act_rod_nose_r": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 36
+  },
   "gear_door_main_l": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 848
+   "f": 868
   },
   "gear_door_main_r": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 848
+   "f": 868
   },
   "gear_door_nose_l": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 3248
+   "f": 3268
   },
   "gear_door_nose_r": {
    "m": "06 Landing gear",
    "mat": "skin_dark",
-   "f": 3248
+   "f": 3268
   },
   "gear_leg_door_main_l": {
    "m": "06 Landing gear",
@@ -2879,17 +3021,17 @@
   "gear_main_l": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 304
+   "f": 646
   },
   "gear_main_r": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 304
+   "f": 646
   },
   "gear_nose": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 410
+   "f": 604
   },
   "gear_pivot_door_main_l": {
    "m": "06 Landing gear",
@@ -2900,6 +3042,21 @@
    "m": "06 Landing gear",
    "mat": "skin_dark",
    "f": 476
+  },
+  "gear_uplock_nose": {
+   "m": "06 Landing gear",
+   "mat": "steel",
+   "f": 52
+  },
+  "ground_power": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 106
+  },
+  "ground_power_door": {
+   "m": "10 Systems",
+   "mat": "skin_dark",
+   "f": 56
   },
   "gun": {
    "m": "05 Weapons bay",
@@ -2959,12 +3116,17 @@
   "loom_fin_l": {
    "m": "10 Systems",
    "mat": "rubber",
-   "f": 290
+   "f": 660
   },
   "loom_fin_r": {
    "m": "10 Systems",
    "mat": "rubber",
-   "f": 290
+   "f": 660
+  },
+  "loom_formation": {
+   "m": "10 Systems",
+   "mat": "rubber",
+   "f": 374
   },
   "loom_fuselage_l": {
    "m": "10 Systems",
@@ -2984,12 +3146,12 @@
   "loom_wing_l": {
    "m": "10 Systems",
    "mat": "rubber",
-   "f": 1034
+   "f": 1240
   },
   "loom_wing_r": {
    "m": "10 Systems",
    "mat": "rubber",
-   "f": 1034
+   "f": 1240
   },
   "missiles": {
    "m": "05 Weapons bay",
@@ -3114,12 +3276,12 @@
   "wing_l": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 4506
+   "f": 4777
   },
   "wing_r": {
    "m": "02 Flying surfaces",
    "mat": "skin",
-   "f": 4495
+   "f": 4766
   }
  }
 }

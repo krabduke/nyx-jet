@@ -98,6 +98,18 @@ AIRFRAME = [
     ("ecs_fuel_lines", "ecs_pack"), ("ecs_mount", "keel"), ("ecs_mount", "ecs_pack"),
     ("ecs_bleed_", "ecs_pack"),
     ("ecs_obogs", "ecs_oxygen"), ("ecs_oxygen", "ecs_pack"), ("ecs_oxygen", "seat"),
+    # each gear door's actuator: bracketed to its bay's wall, its rod running
+    # in its body and pinned through the horn on the door
+    ("gear_bay_", "gear_door_act_"), ("gear_door_act_", "gear_door_act_rod_"),
+    ("gear_bay_nose", "gear_uplock_nose"),
+    ("gear_door_act_rod_", "gear_door_"),
+    # the looms' ends in the lights: each wing's in its tip's navigation
+    # light, each fin's in its tip light (the formation strips' feeds end
+    # just under the skin beneath them)
+    ("loom_wing_", "nav_light_"), ("loom_fin_", "tail_light_"),
+    ("loom_formation", "loom_nose_gear"), ("loom_formation", "loom_fuselage_l"),
+    # the ground power receptacle's cable into the PDU, its feet on the skin
+    ("ground_power", "pdu"), ("fuselage_skin", "ground_power"),
     ("canopy_glass", "canopy_rim"), ("canopy_hinge", "canopy_rim"),
     ("canopy_hinge", "frame_5680"), ("canopy_actuator_", "canopy_actuator_rod_"),
     ("canopy_actuator_", "cockpit_tub"), ("canopy_locks", "fuselage_skin"),

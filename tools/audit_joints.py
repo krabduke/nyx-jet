@@ -101,6 +101,24 @@ CIRCUITS += [("and the pack's air to the cockpit, the pack on the keel",
              ("oxygen: the generator off the pack, to the seat",
               ["ecs_pack", "ecs_oxygen", "ecs_obogs"]),
              ("", ["ecs_oxygen", "seat"])]
+CIRCUITS += mirrored("each wheel door is driven by its actuator off the bay",
+                     ["gear_bay_main_{s}", "gear_door_act_main_{s}",
+                      "gear_door_act_rod_main_{s}", "gear_door_main_{s}"])
+CIRCUITS += [("and each nose door", ["gear_bay_nose", "gear_door_act_nose_r",
+                                     "gear_door_act_rod_nose_r", "gear_door_nose_r"]),
+             ("", ["gear_bay_nose", "gear_door_act_nose_l", "gear_door_act_rod_nose_l",
+                   "gear_door_nose_l"]),
+             ("the nose leg's up-lock hangs in its bay", ["gear_bay_nose", "gear_uplock_nose"])]
+# (each main leg's up-lock is part of its well's structure, gear_bay_main)
+CIRCUITS += mirrored("the lights are wired: each wing's navigation light",
+                     ["loom_wing_{s}", "nav_light_{s}"])
+CIRCUITS += mirrored("each fin's tip light and formation strip",
+                     ["loom_fin_{s}", "tail_light_{s}"])
+CIRCUITS += mirrored("", ["loom_fin_{s}", "formation_light_{s}"])
+CIRCUITS += [("and the forebody's strips",
+              ["loom_nose_gear", "loom_formation", "formation_light_r"]),
+             ("", ["loom_fuselage_l", "loom_formation", "formation_light_l"]),
+             ("ground power to the PDU", ["fuselage_skin", "ground_power", "pdu"])]
 CIRCUITS += [("the boxes stand on the rack on the nose gear bay's roof",
               ["gear_bay_nose", "avionics_rack", "avionics_fcc_2"])]
 CIRCUITS += mirrored("and is carried and driven off the cockpit tub",

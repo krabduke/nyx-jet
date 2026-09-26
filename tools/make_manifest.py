@@ -103,7 +103,11 @@ def gear_kinematics():
                      for L in k["legs"]],
             "doors": [{"part": d["part"], "hinge": rd(d["hinge"]),
                        "axis": rd(d["axis"]), "close": r1(d["close"], 5)}
-                      for d in k["doors"]]}
+                      for d in k["doors"]],
+            "struts": [{"body": t["body"], "rod": t["rod"], "anchor": rd(t["anchor"]),
+                        "lug": rd(t["lug"]), "hinge": rd(t["hinge"]),
+                        "axis": rd(t["axis"]), "close": r1(t["close"], 5)}
+                       for t in k.get("struts", [])]}
 
 
 def canopy_kinematics():

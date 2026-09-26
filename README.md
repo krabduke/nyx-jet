@@ -71,6 +71,15 @@ The brief was agility over top speed. Each choice follows from it.
   fuel cells' tops and through the frames, to a grille in the seat
   bulkhead; an oxygen generator off the pack sends the pilot's oxygen
   forward beside it to the seat.
+- **Gear that locks, brakes and steers.** Each gear door has an actuator
+  from its bay's wall to a horn at its hinge, which the viewer runs with the
+  door; each leg has an up-lock roller that a hook in its bay's roof takes
+  when it is stowed (it is held down by its rotary actuator's no-back brake);
+  each main wheel's brake has its own electro-hydrostatic unit, and the nose
+  leg a steering actuator, all wired up the legs into the hollow trunnions.
+- **Lights and ground power.** The looms run on to the navigation lights at
+  the wing tips, the fin-tip lights and all four formation strips, and a
+  ground cart plugs into a receptacle behind a flush door under the PDU.
 - **A canopy that opens.** It hinges at its aft end on a beam across the
   opening, is lifted by two actuators behind the seat, and is held down by
   three hooks a side.

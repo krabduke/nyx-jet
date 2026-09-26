@@ -315,6 +315,22 @@ def nose_leg():
     for sy in (1.0, -1.0):                                               # A-frame
         leg.append(mesh.pipe([(px, sy * (NHW - 30.0), pz),
                               (px, sy * 44.0, pz - 430.0)], 16.0, 14))
+    # the up-lock's roller on the yoke's front, which is up when the leg is
+    # stowed forward
+    leg.append(mesh.box(px - 40.0 - 6.0, 0.0, z_ax + 55.0, 14.0, 30.0, 26.0))
+    leg.append(mesh.pipe([(px - 40.0 - 14.0, -25.0, z_ax + 55.0),
+                          (px - 40.0 - 14.0, 25.0, z_ax + 55.0)], 10.0, 16, bend=0.0))
+    # the steering's electro-hydrostatic actuator on the steering collar's aft
+    # side, and its cable, with the taxi light's, up the leg into the
+    # trunnion, which is hollow
+    sz = pz - 330.0
+    leg.append(mesh.box(px + 66.0 + 18.0, 0.0, sz, 40.0, 60.0, 70.0))
+    leg.append(mesh.pipe([(px + 84.0, 0.0, sz + 30.0), (px + 84.0, 0.0, sz + 80.0),
+                          (px + 50.0, 20.0, pz - 80.0), (px + 12.0, 30.0, pz - 8.0)],
+                         5.0, 10, bend=20.0))
+    leg.append(mesh.pipe([(px - 80.0, 0.0, sz + 15.0), (px - 80.0, 0.0, sz + 60.0),
+                          (px - 50.0, -20.0, pz - 80.0), (px - 12.0, -30.0, pz - 8.0)],
+                         4.0, 10, bend=20.0))
     tyres, hubs = [], []
     for sy in (1.0, -1.0):
         t, h = wheel(px, sy * yw, z_ax, r, w, out=sy)
@@ -328,8 +344,9 @@ def nose_door(sy):
     # laid out on the whole opening's teeth, so the two doors' teeth are the
     # opening's
     # (the aft end straight: the leg comes out through it)
-    return panel(NX0, NX1, sy * 2.0, sy * NHW, teeth=8, tooth=70.0, n=64,
-                 frame=(-NHW, NHW), ends=(True, False))
+    return mesh.join(panel(NX0, NX1, sy * 2.0, sy * NHW, teeth=8, tooth=70.0, n=64,
+                           frame=(-NHW, NHW), ends=(True, False)),
+                     _horn(nose_horn(sy), sy))
 
 
 def nose_hinge(sy):
@@ -412,6 +429,24 @@ def main_leg():
     for sy in (1.0, -1.0):                                                    # fork arms
         leg.append(mesh.box(px, py + sy * arm_y, 0.5 * (crown + z_ax),
                             96.0, 20.0, crown - z_ax + 50.0))
+    # the up-lock's roller, on the crown's inboard face: that face is up
+    # when the leg is stowed, and the roller rides into the hook in the
+    # well's roof
+    # (45 mm aft of the leg's middle: the torque link is down the middle)
+    yc = py - (arm_y + 18.0)
+    ux = px + UPLOCK_DX
+    leg.append(mesh.box(ux, yc - 6.0, crown, 24.0, 14.0, 26.0))
+    leg.append(mesh.pipe([(ux - 14.0, yc - 10.0 - 4.0, crown),
+                          (ux + 14.0, yc - 10.0 - 4.0, crown)], 10.0, 16, bend=0.0))
+    # the brake's own electro-hydrostatic unit on the inboard fork arm, and
+    # its cable up the leg's front into the trunnion, which is hollow and
+    # carries it to the rotary actuator on the pivot
+    by = py - arm_y - 10.0 - 25.0
+    leg.append(mesh.box(px + 10.0, by, z_ax + 170.0, 70.0, 50.0, 80.0))
+    leg.append(mesh.pipe([(px + 10.0, by, z_ax + 206.0), (px + 10.0, by, crown + 50.0),
+                          (px - 80.0, py - 40.0, crown + 90.0),
+                          (px - 80.0, py - 40.0, pz - 90.0),
+                          (px - 40.0, py - 12.0, pz - 12.0)], 5.0, 10, bend=20.0))
     t, h = wheel(px, py, z_ax, r, w, out=1.0)
     h = mesh.join(h, brake(px, py, z_ax, r, w, -1.0))
     return t, h, mesh.join(*leg)
@@ -473,7 +508,78 @@ def wheel_door():
     """The wheel-well door, shut: flush over the well, its fore and aft
     ends serrated, hinged along the well's inboard edge."""
     x0, x1, y0, y1 = WELL
-    return panel(x0, x1, y0, y1, teeth=4, tooth=70.0)
+    return mesh.join(panel(x0, x1, y0, y1, teeth=4, tooth=70.0),
+                     _horn(MAIN_HORN, 1.0))
+
+
+# --------------------------------------------------------------------------
+# door actuators
+#
+# Each gear door is opened and shut by a linear actuator from its bay's wall
+# to a horn on the door beside its hinge -- they swung on their hinges
+# driven by nothing. The horn stands up into the bay when the door is shut;
+# the actuator is drawn for whichever pose the aircraft is built in, and the
+# viewer swings its body and runs its rod out to follow the horn.
+
+# the horn's eye, door shut: (x, y, z) of the pin
+MAIN_HORN = (MX, WELL[2] + 10.0, -555.0)
+MAIN_ANCHOR = (MX, WELL[2] + 16.0, -390.0)
+NOSE_HORN_X = 3000.0
+STRUT_BODY = 140.0
+
+
+def _horn(eye, side):
+    """A lug on the door's inside, up from its hinge edge to its eye, and
+    the eye: across it along x. `side` puts the lug on the eye's outboard
+    face."""
+    x, y, z = eye
+    z_door = z - 71.0
+    return mesh.join(mesh.box(x, y, 0.5 * (z_door + z), 30.0, 10.0, z - z_door),
+                     mesh.pipe([(x - 15.0, y, z), (x + 15.0, y, z)], 8.0, 12, bend=0.0))
+
+
+def _strut(A, L, bracket_to):
+    """(body, rod) from anchor A to lug L, the body's bracket reaching to y
+    bracket_to on the bay's wall."""
+    d = [L[i] - A[i] for i in range(3)]
+    n = math.sqrt(sum(c * c for c in d))
+    u = [c / n for c in d]
+    at = lambda t: tuple(A[i] + u[i] * t for i in range(3))
+    body = mesh.join(
+        mesh.pipe([A, at(STRUT_BODY)], 13.0, 16, bend=0.0),
+        mesh.pipe([(A[0] - 13.0, A[1], A[2]), (A[0] + 13.0, A[1], A[2])], 9.0, 12,
+                  bend=0.0),
+        mesh.box(A[0], 0.5 * (A[1] + bracket_to), A[2], 30.0, abs(bracket_to - A[1]),
+                 26.0))
+    rod = mesh.join(
+        mesh.pipe([at(STRUT_BODY - 20.0), L], 6.0, 16, bend=0.0),
+        mesh.pipe([(L[0] - 22.0, L[1], L[2]), (L[0] - 15.0, L[1], L[2])], 9.0, 16,
+                  bend=0.0))
+    return body, rod
+
+
+def main_door_strut(up):
+    L = MAIN_HORN
+    if not up:
+        hp, hax = wheel_hinge()
+        L = rotate([L], hp, hax, WHEEL_DOOR_OPEN)[0]
+    return _strut(MAIN_ANCHOR, L, WELL[2] - 2.0)
+
+
+def nose_horn(sy):
+    hp, hax = nose_hinge(sy)
+    t = (NOSE_HORN_X - hp[0]) / hax[0]
+    x, y, z = (hp[i] + hax[i] * t for i in range(3))
+    return (x, sy * (NHW - 10.0), z + 71.0)
+
+
+def nose_door_strut(sy, up):
+    L = nose_horn(sy)
+    A = (NOSE_HORN_X, sy * (NHW - 16.0), L[2] + 170.0)
+    if not up:
+        hp, hax = nose_hinge(sy)
+        L = rotate([L], hp, hax, sy * NOSE_DOOR_OPEN)[0]
+    return _strut(A, L, sy * (NHW + 2.0))
 
 
 def wheel_hinge():
@@ -526,6 +632,7 @@ def _rotary(p0, axis, flange_at_far_end=True):
 
 
 MAIN_ACT_R = 28.0      # the wing's top skin is 40 mm over the pivot's axis
+UPLOCK_DX = 45.0
 
 
 def main_actuator():
@@ -552,6 +659,45 @@ def nose_actuator():
     return _rotary((px, NHW + 4.0, pz), (0.0, 1.0, 0.0))
 
 
+def main_uplock():
+    """The starboard main leg's up-lock: a hook hung from the well's roof
+    where the leg's roller arrives when it is stowed, its jaw under it."""
+    px, py, pz = main_pivot()
+    r, w = G["main_wheel_r"], G["main_wheel_w"]
+    crown = spec.GROUND_Z + 2 * r + 45.0
+    yc = py - (0.5 * w + 22.0 + 18.0) - 14.0
+    x, y, z = rotate([(px + UPLOCK_DX, yc, crown)], (px, py, pz), (1.0, 0.0, 0.0),
+                     main_stow_angle())[0]
+    # bolted up into the well's roof, which is the wing's own inside here
+    top = ROOF[0] + 2.0
+    # the cheeks come down over the roller only as far as the crown's face,
+    # 14 mm under its centre, and the jaw closes across its far side
+    parts = [mesh.box(x + sx * 20.0, y, 0.5 * (top + z - 8.0), 8.0, 30.0, top - z + 8.0)
+             for sx in (-1.0, 1.0)]
+    parts.append(mesh.box(x, y, top - 10.0, 48.0, 30.0, 20.0))
+    parts.append(mesh.box(x, y - 19.0, z + 2.0, 48.0, 10.0, 20.0))   # the jaw
+    return mesh.join(*parts)
+
+
+def nose_uplock():
+    """The nose leg's up-lock: a hook on a hanger from the tall bay's roof
+    where the yoke's roller arrives with the leg stowed forward."""
+    px, _, pz = nose_pivot()
+    z_ax = spec.GROUND_Z + G["nose_wheel_r"]
+    x, y, z = rotate([(px - 54.0, 0.0, z_ax + 55.0)], nose_pivot(), (0.0, 1.0, 0.0),
+                     0.5 * math.pi)[0]
+    top = N_ROOF[0] + 2.0
+    parts = [mesh.box(x, sy * 31.0, 0.5 * (top + z - 8.0), 30.0, 8.0, top - z + 8.0)
+             for sy in (-1.0, 1.0)]
+    parts.append(mesh.box(x, 0.0, top - 10.0, 30.0, 70.0, 20.0))
+    parts.append(mesh.box(x - 19.0, 0.0, z + 8.0, 10.0, 70.0, 20.0))  # the jaw
+    # the bolts holding it up to the roof, their heads under the block
+    for dy in (-24.0, 24.0):
+        parts.append(mesh.pipe([(x, dy, top - 20.0), (x, dy, top - 25.0)], 6.0, 12,
+                               bend=0.0))
+    return mesh.join(*parts)
+
+
 def _main_parts(up):
     t, h, leg = main_leg()
     door = leg_door_stowed()
@@ -567,8 +713,13 @@ def _main_parts(up):
         pd = _rot_part(pivot_door(), hp, hax, PIVOT_DOOR_OPEN)
     return {"gear_main": leg, "tyre_main": t, "wheel_main": h,
             "gear_leg_door_main": door, "gear_door_main": wd,
-            "gear_pivot_door_main": pd, "gear_bay_main": main_bay(),
-            "gear_actuator_main": main_actuator()[0]}
+            # the up-lock is the well's structure: it is bolted up into the
+            # well's roof, which out here is the wing's own inside
+            "gear_pivot_door_main": pd, "gear_bay_main": mesh.join(main_bay(),
+                                                                    main_uplock()),
+            "gear_actuator_main": main_actuator()[0],
+            "gear_door_act_main": main_door_strut(up)[0],
+            "gear_door_act_rod_main": main_door_strut(up)[1]}
 
 
 def pose():
@@ -585,13 +736,17 @@ def build():
         P, ax, a = nose_pivot(), (0.0, 1.0, 0.0), 0.5 * math.pi
         t, h, leg = (_rot_part(p, P, ax, a) for p in (t, h, leg))
     out.update({"gear_nose": leg, "tyres_nose": t, "wheels_nose": h,
-                "gear_bay_nose": nose_bay(), "gear_actuator_nose": nose_actuator()})
+                "gear_bay_nose": nose_bay(), "gear_actuator_nose": nose_actuator(),
+                "gear_uplock_nose": nose_uplock()})
     for side, sy in (("r", 1.0), ("l", -1.0)):
         d = nose_door(sy)
         if not up:
             hp, hax = nose_hinge(sy)
             d = _rot_part(d, hp, hax, sy * NOSE_DOOR_OPEN)
         out[f"gear_door_nose_{side}"] = d
+        body, rod = nose_door_strut(sy, up)
+        out[f"gear_door_act_nose_{side}"] = body
+        out[f"gear_door_act_rod_nose_{side}"] = rod
     mp = _main_parts(up)
     for k, v in mp.items():
         out[f"{k}_r"] = v
@@ -635,4 +790,24 @@ def kinematics():
         out["doors"].append({"part": f"gear_door_nose_{side}",
                              "hinge": list(hp), "axis": list(hax),
                              "close": -sy * NOSE_DOOR_OPEN})
+    # each door's actuator: its anchor, and its lug with the door open, which
+    # turns with the door about the door's hinge
+    out["struts"] = []
+    for side, sy in (("r", 1.0), ("l", -1.0)):
+        hp, hax = wheel_hinge()
+        L = rotate([MAIN_HORN], hp, hax, WHEEL_DOOR_OPEN)[0]
+        m = lambda p: (p[0], sy * p[1], p[2])
+        out["struts"].append({"body": f"gear_door_act_main_{side}",
+                              "rod": f"gear_door_act_rod_main_{side}",
+                              "anchor": list(m(MAIN_ANCHOR)), "lug": list(m(L)),
+                              "hinge": list(m(hp)), "axis": [hax[0], sy * hax[1], hax[2]],
+                              "close": -sy * WHEEL_DOOR_OPEN})
+        hp, hax = nose_hinge(sy)
+        A = (NOSE_HORN_X, sy * (NHW - 16.0), nose_horn(sy)[2] + 170.0)
+        L = rotate([nose_horn(sy)], hp, hax, sy * NOSE_DOOR_OPEN)[0]
+        out["struts"].append({"body": f"gear_door_act_nose_{side}",
+                              "rod": f"gear_door_act_rod_nose_{side}",
+                              "anchor": list(A), "lug": list(L),
+                              "hinge": list(hp), "axis": list(hax),
+                              "close": -sy * NOSE_DOOR_OPEN})
     return out

@@ -439,6 +439,15 @@ function hingeGroup(point, axis, parts){
 }
 const gearLegs = GEARK.legs.map(L => Object.assign(hingeGroup(L.pivot, L.axis, L.parts), {stow: L.stow}));
 const gearDoors = GEARK.doors.map(d => Object.assign(hingeGroup(d.hinge, d.axis, [d.part]), {close: d.close}));
+// each door's actuator: the body swings about its anchor to point at the
+// door's horn, wherever the door has turned it, and the rod runs out of it
+const gearStruts = (GEARK.struts || []).map(t => {
+  const rod = hingeGroup(t.anchor, [0, 0, 1], [t.rod]);
+  const s = (v) => toScene(v).multiplyScalar(MM);
+  return {body: hingeGroup(t.anchor, [0, 0, 1], [t.body]), rod, base: rod.position.clone(),
+          A: s(t.anchor), L0: s(t.lug), H: s(t.hinge),
+          ax: toScene(t.axis).normalize(), close: t.close};
+});
 const gearState = {u: 1, target: 1};           // 0 down, 1 up
 function applyGear(){
   const legs = THREE.MathUtils.clamp(gearState.u / 0.7, 0, 1);
@@ -446,6 +455,15 @@ function applyGear(){
   const ease = (t) => t * t * (3 - 2 * t);
   for (const g of gearLegs) g.quaternion.setFromAxisAngle(g.userData.axis, g.stow * ease(legs));
   for (const g of gearDoors) g.quaternion.setFromAxisAngle(g.userData.axis, g.close * ease(doors));
+  for (const t of gearStruts) {
+    const L = t.L0.clone().sub(t.H).applyAxisAngle(t.ax, t.close * ease(doors)).add(t.H);
+    const d0 = t.L0.clone().sub(t.A), d1 = L.clone().sub(t.A);
+    const q = new THREE.Quaternion().setFromUnitVectors(d0.clone().normalize(),
+                                                        d1.clone().normalize());
+    t.body.quaternion.copy(q);
+    t.rod.quaternion.copy(q);
+    t.rod.position.copy(t.base).addScaledVector(d1.clone().normalize(), d1.length() - d0.length());
+  }
 }
 applyGear();
 $('gear').addEventListener('click', () => {

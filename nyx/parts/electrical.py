@@ -125,6 +125,13 @@ def wing_looms():
     runs.append(([_wing_pt(y3, FS_U), m3], BRANCH_R))
     m1, _ = _act_mount(P, spec.wing_chord, y1, None, g(y1), fwd=True, u_hinge=lf)
     runs.append(([_wing_pt(y1, FS_U), m1], BRANCH_R))
+    # and on from the front spar's end to the navigation light at the tip,
+    # which had no wire to it
+    y_t = W["y_tip"]
+    xl, _yl, zl = P(y_t, 0.30, 0.0)
+    ys = [y3 + (6450.0 - y3) * i / 8 for i in range(9)]
+    runs.append(([_wing_pt(y, FS_U) for y in ys] + [_wing_pt(6560.0, 0.30),
+                                                    (xl, y_t - 3.0, zl)], BRANCH_R))
     looms = mesh.join(*[mesh.pipe(p, r, 12, bend=3.0 * r) for (p, r) in runs])
     # each conduit runs the loom's whole length, into its actuator's pocket,
     # and 6 mm past both its ends: a conduit ending flush with its loom
@@ -169,8 +176,21 @@ def fin_loom():
     m, u0 = _act_mount(P, P.chord, sa, F["rudder_cf"], g)
     path = [P(-80.0, 0.62, 0.0), P(0.0, 0.62, 0.0), P(sa, 0.62, 0.0),
             P(sa, u0 + 20.0 / P.chord(sa), 0.0), m]
-    loom = mesh.pipe(path, LOOM_R["fin"], 12, bend=15.0)
-    conduit = mesh.pipe(path[1:], LOOM_R["fin"] + CONDUIT, 12, bend=15.0)
+    # up past the rudder's top to the light on the fin's tip, and a spur
+    # forward to the formation strip on its outboard face
+    s_top = F["rudder_span"][1] * F["span"]
+    tip = [P(sa, 0.62, 0.0), P(s_top + 20.0, 0.62, 0.0), P(s_top + 75.0, 0.80, 0.0),
+           P(F["span"] - 12.0, 0.80, 0.0)]
+    sf = 900.0
+    c = P.chord(sf)
+    strip = [P(sf, 0.62, 0.0), P(sf, 0.47, 0.0), P(sf, 0.42, 0.0),
+             P(sf, 0.42, shapes.naca_t(0.42, F["tc"]) - 1.0 / c)]
+    loom = mesh.join(mesh.pipe(path, LOOM_R["fin"], 12, bend=15.0),
+                     mesh.pipe(tip, BRANCH_R, 12, bend=12.0),
+                     mesh.pipe(strip, 2.5, 10, bend=8.0))
+    conduit = mesh.join(mesh.pipe(path[1:], LOOM_R["fin"] + CONDUIT, 12, bend=15.0),
+                        mesh.pipe(_extend(tip, 4.0), BRANCH_R + CONDUIT, 12, bend=12.0),
+                        mesh.pipe(_extend(strip, 3.0), 2.5 + 2.0, 10, bend=8.0))
     # and where it passes out of the body into the fin, a grommeted hole in
     # the skin -- the conduit, from inside the body
     hole = mesh.pipe(path, LOOM_R["fin"] + CONDUIT, 12, bend=15.0)
@@ -229,19 +249,78 @@ def _mirror(part):
                           [tuple(reversed(c)) for c in f]))
 
 
+GPU_X = 10470.0      # under the PDU
+
+
+def ground_power():
+    """The external power receptacle: a ground cart plugs in here to start
+    and to service the aircraft with the engines off. The receptacle stands
+    on the belly skin's inside with its pins down into a recess behind a
+    flush door, and its cable runs straight up into the PDU above. The
+    aircraft had nowhere to plug anything in."""
+    zi = shapes.z_dn(GPU_X, 0.0, spec.SKIN_T)
+    zo = shapes.z_dn(GPU_X, 0.0)
+    # its pin face 12 mm above the door, in the recess the door closes over
+    zb = zi + 30.0
+    body = mesh.box(GPU_X, 0.0, zb + 36.0, 100.0, 80.0, 72.0)
+    pins = [mesh.pipe([(GPU_X + dx, dy, zb + 2.0), (GPU_X + dx, dy, zi + 12.0)], 5.0, 10,
+                      bend=0.0) for (dx, dy) in ((-25.0, -18.0), (-25.0, 18.0), (25.0, 0.0))]
+    feet = [mesh.box(GPU_X + sx * 40.0, sy * 55.0, 0.5 * (zi - 1.0 + zb + 2.0), 16.0, 12.0,
+                     zb + 3.0 - zi) for sx in (-1.0, 1.0) for sy in (-1.0, 1.0)]
+    # (each foot's arm in to the body's side)
+    arms = [mesh.box(GPU_X + sx * 40.0, sy * 45.0, zb + 6.0, 16.0, 22.0, 12.0)
+            for sx in (-1.0, 1.0) for sy in (-1.0, 1.0)]
+    cable = mesh.pipe([(GPU_X, 0.0, zb + 70.0), (GPU_X, 0.0, PDU["z"][0] + 3.0)], 9.0, 14,
+                      bend=0.0)
+    # the door is the patch of skin over the recess
+    door = mesh.join(
+        mesh.box(GPU_X, 0.0, 0.5 * (zi + zo), 90.0, 70.0, zi - zo),
+        # its hinge along its forward edge, inside, and two flush latches
+        mesh.pipe([(GPU_X - 42.0, -30.0, zi + 3.0), (GPU_X - 42.0, 30.0, zi + 3.0)], 4.0,
+                  12, bend=0.0),
+        *[mesh.pipe([(GPU_X + 30.0, dy, zo + 0.5), (GPU_X + 30.0, dy, zo + 2.5)], 7.0, 16,
+                    bend=0.0) for dy in (-20.0, 20.0)])
+    recess = mesh.box(GPU_X, 0.0, 0.5 * (zi + zo), 92.0, 72.0, zi - zo + 6.0)
+    return mesh.join(body, *pins, *feet, *arms, cable), door, recess
+
+
 def build():
     out = {"pdu": pdu()}
+    gp, gdoor, recess = ground_power()
+    out["ground_power"] = gp
+    out["ground_power_door"] = gdoor
     out.update(fuselage_looms())
     looms, conduits = wing_looms()
     out["loom_wing_r"], out["loom_wing_l"] = looms, _mirror(looms)
     out["cut:wing_r"], out["cut:wing_l"] = conduits, _mirror(conduits)
+    # the forebody's formation strips: each fed from its side's loom -- the
+    # nose gear's run on the right, the fuselage loom's end on the left --
+    # to inside the skin under it, and out through a hole into the strip.
+    # (found clear by tools/route_solve; not mirrored, so one part)
+    # (the last 60 mm square to the skin, ending 2.5 mm under its surface
+    # under the strip: arriving at a slant, the end's rim stood through it)
+    n = (0.72, 0.70)
+    def to_strip(sy):
+        ys, zs = 668.0, 388.1
+        # (the body's edge is solid here, 56 mm deep along the normal)
+        return [(3000.0, sy * (ys - 60.0 * n[0]), zs - 60.0 * n[1]),
+                (3000.0, sy * (ys - 2.5 * n[0]), zs - 2.5 * n[1])]
+    feeds = [[(3500.0, 660.0, 100.0), (3000.0, 622.0, 330.0)] + to_strip(1.0),
+             [(4850.0, -700.0, 260.0), (3000.0, -622.0, 330.0)] + to_strip(-1.0)]
+    out["loom_formation"] = mesh.join(*[mesh.pipe(f, 3.0, 10, bend=20.0) for f in feeds])
+    # the hole through the skin along the square approach, out to the surface
+    strip_holes = [mesh.pipe([tuple(f[-2][i] - (f[-1][i] - f[-2][i]) * 0.1
+                                    for i in range(3)),
+                              tuple(f[-1][i] + (f[-1][i] - f[-2][i]) * 0.2
+                                    for i in range(3))], 6.0, 12, bend=0.0)
+                   for f in feeds]
     loom, conduit, hole = fin_loom()
     out["loom_fin_r"], out["loom_fin_l"] = loom, _mirror(loom)
     out["cut:fin_r"], out["cut:fin_l"] = conduit, _mirror(conduit)
     # where the looms pass through the skin: the wings' chine edges, where
     # the wing's root is let into the body's solid edge, and the fins' roots
     out["cut:fuselage_skin"] = mesh.join(hole, _mirror(hole), conduits,
-                                         _mirror(conduits))
+                                         _mirror(conduits), *strip_holes, recess)
     return out
 
 

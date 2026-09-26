@@ -26,6 +26,8 @@ UNIT = 1.0
 
 FREE = {
     "end gun @ 6420*": "the cannon's six muzzles, at the gun port",
+    "end ground_power @*": "the external power receptacle's pins, which a "
+                           "ground cart's plug goes onto",
     "end static_wicks_r*": "a static wick's tip, which is how it discharges",
     "end seat_bulkhead*": "the seat rails' bolt heads on the bulkhead's back",
     "end cockpit_controls @ 4150,-380,500": "the throttle's grip",
