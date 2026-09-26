@@ -33,6 +33,7 @@ MODULES = [
     ("07 Structure", "Structure", "#9A8F7E"),
     ("08 Engine port", "Engine, port", "#B8562E"),
     ("09 Engine starboard", "Engine, starboard", "#B8562E"),
+    ("10 Systems", "Systems", "#4F8A8B"),
 ]
 
 

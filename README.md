@@ -58,6 +58,15 @@ The brief was agility over top speed. Each choice follows from it.
   actuator. Each flaperon, leading-edge flap and rudder has its actuator in
   a pocket in the fixed surface beside its hinge, sized to the section's
   depth there, pushing on a horn below the hinge line.
+- **Flown by computers, and they are in it.** Relaxed stability needs a
+  flight control system that never stops, so three flight control computers
+  vote, beside an inertial unit, a mission computer and two air data
+  computers, on a rack over the nose gear's bay. Each probe's pitot and
+  static lines run inside the radome, over the radar and through its
+  bulkhead to its air data computer; the rack's loom comes off the PDU's.
+- **A canopy that opens.** It hinges at its aft end on a beam across the
+  opening, is lifted by two actuators behind the seat, and is held down by
+  three hooks a side.
 
 ## What that buys
 

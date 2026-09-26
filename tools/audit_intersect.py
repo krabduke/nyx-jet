@@ -80,6 +80,12 @@ AIRFRAME = [
     # the hinge beam bolts across frame 5680's cut ends and its pin is
     # through the rim's lug; each actuator's rod runs in its body and its
     # bracket is on the tub's aft wall; the lock hooks hang from the skin
+    # the pitot and static lines start in their probe's root and end in the
+    # front of their air data computer
+    ("air_data_probe_", "avionics_pitot_lines_"),
+    ("avionics_adc_", "avionics_pitot_lines_"),
+    # the avionics loom comes off the nose gear's run of the starboard loom
+    ("avionics_loom", "loom_nose_gear"),
     ("canopy_glass", "canopy_rim"), ("canopy_hinge", "canopy_rim"),
     ("canopy_hinge", "frame_5680"), ("canopy_actuator_", "canopy_actuator_rod_"),
     ("canopy_actuator_", "cockpit_tub"), ("canopy_locks", "fuselage_skin"),

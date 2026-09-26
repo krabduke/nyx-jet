@@ -444,6 +444,10 @@ MATERIAL_MAP = {
     "fuel_feed": "steel",
     "fuel_gallery": "steel",
     "loom_": "rubber",
+    "avionics_": "avionics",
+    "avionics_rack": "structure",
+    "avionics_loom": "rubber",
+    "avionics_pitot": "steel",
     "refuel_receptacle": "steel",
     "rudder_act": "steel",
 }
@@ -460,6 +464,8 @@ PALETTE = {
     "missile":   ((0.62, 0.63, 0.62), 0.00, 0.45),
     "canopy":    ((0.60, 0.45, 0.20), 0.60, 0.06),
     "cockpit":   ((0.040, 0.042, 0.046), 0.00, 0.70),
+    # black anodised avionics boxes
+    "avionics":  ((0.030, 0.032, 0.036), 0.60, 0.45),
     "seat":      ((0.10, 0.10, 0.09), 0.00, 0.75),
     "rubber":    ((0.030, 0.030, 0.032), 0.00, 0.90),
     "wheel":     ((0.40, 0.41, 0.42), 1.00, 0.35),

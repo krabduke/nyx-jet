@@ -174,6 +174,15 @@
    "metal": 0.0,
    "rough": 0.7
   },
+  "avionics": {
+   "rgb": [
+    0.03,
+    0.032,
+    0.036
+   ],
+   "metal": 0.6,
+   "rough": 0.45
+  },
   "seat": {
    "rgb": [
     0.1,
@@ -975,7 +984,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42519
+   "faces": 42550
   },
   {
    "key": "02 Flying surfaces",
@@ -1016,8 +1025,8 @@
    "key": "07 Structure",
    "label": "Structure",
    "color": "#9A8F7E",
-   "parts": 33,
-   "faces": 31419
+   "parts": 25,
+   "faces": 20731
   },
   {
    "key": "08 Engine port",
@@ -1032,6 +1041,13 @@
    "color": "#B8562E",
    "parts": 124,
    "faces": 741760
+  },
+  {
+   "key": "10 Systems",
+   "label": "Systems",
+   "color": "#4F8A8B",
+   "parts": 19,
+   "faces": 18652
   }
  ],
  "parts": {
@@ -1074,6 +1090,61 @@
    "m": "01 Airframe",
    "mat": "steel",
    "f": 32
+  },
+  "avionics_adc_l": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 530
+  },
+  "avionics_adc_r": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 530
+  },
+  "avionics_fcc_1": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 472
+  },
+  "avionics_fcc_2": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 472
+  },
+  "avionics_fcc_3": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 472
+  },
+  "avionics_ins": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 560
+  },
+  "avionics_loom": {
+   "m": "10 Systems",
+   "mat": "rubber",
+   "f": 3096
+  },
+  "avionics_mission": {
+   "m": "10 Systems",
+   "mat": "avionics",
+   "f": 568
+  },
+  "avionics_pitot_lines_l": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 528
+  },
+  "avionics_pitot_lines_r": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 528
+  },
+  "avionics_rack": {
+   "m": "10 Systems",
+   "mat": "structure",
+   "f": 174
   },
   "bay_door_l": {
    "m": "05 Weapons bay",
@@ -2588,7 +2659,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35737
+   "f": 35768
   },
   "gear_actuator_main_l": {
    "m": "06 Landing gear",
@@ -2731,37 +2802,37 @@
    "f": 1590
   },
   "loom_fin_l": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 290
   },
   "loom_fin_r": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 290
   },
   "loom_fuselage_l": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 3814
   },
   "loom_fuselage_r": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 3814
   },
   "loom_nose_gear": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 386
   },
   "loom_wing_l": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 1034
   },
   "loom_wing_r": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "rubber",
    "f": 1034
   },
@@ -2786,7 +2857,7 @@
    "f": 2704
   },
   "pdu": {
-   "m": "07 Structure",
+   "m": "10 Systems",
    "mat": "structure",
    "f": 60
   },
@@ -2798,7 +2869,7 @@
   "radar_bulkhead": {
    "m": "07 Structure",
    "mat": "radar",
-   "f": 98
+   "f": 132
   },
   "refuel_receptacle": {
    "m": "07 Structure",

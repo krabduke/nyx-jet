@@ -234,13 +234,21 @@ CLOSE = {
     "c4_bay": ((6.6, -4.8, -3.2), (7.0, 0.0, -0.9), 38),
     "c5_main_gear": ((6.4, -7.4, -0.7), (9.5, -2.9, -1.05), 38),
     "c6_wing": ((12.0, -10.0, 4.0), (10.5, -4.0, 0.0), 45),
+    "c7_avionics": ((1.15, -1.55, 1.35), (2.25, 0.0, 0.38), 32),
 }
+# what the avionics close-up takes off to see into the forward bay
+SKIN_OFF = ("fuselage_skin", "panel_seams", "irst_", "canopy_glass",
+            "canopy_rim", "canopy_frame_", "air_data_probe_", "formation_light_")
 
 
 def mode_close(name, samples):
     reset(); setup(samples, (1600, 900)); world(); ground(); lights(0.8)
     if name == "c4_bay":
         open_bay()
+    if name == "c7_avionics":
+        for o in bpy.data.objects:
+            if o.type == "MESH" and o.name.startswith(SKIN_OFF):
+                o.hide_render = True
     loc, tgt, lens = CLOSE[name]
     if tgt[2] < -0.3:
         # under the aircraft the key and top lights are behind the airframe:

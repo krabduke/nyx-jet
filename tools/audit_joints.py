@@ -73,6 +73,26 @@ CIRCUITS += mirrored("each engine is fed from the collector",
                      ["fuel_tank_centre", "fuel_feed_{s}", "engine_{s}_fuel_pump"])
 CIRCUITS += [("the seat's rails are bolted to the bulkhead in the tub",
               ["seat", "seat_bulkhead", "cockpit_tub"])]
+CIRCUITS += [("the canopy turns on its hinge, pushed by its actuators",
+              ["canopy_glass", "canopy_rim", "canopy_hinge", "frame_5680"]),
+             ("", ["cockpit_tub", "canopy_actuator_r", "canopy_actuator_rod_r",
+                   "canopy_rim"]),
+             ("", ["cockpit_tub", "canopy_actuator_l", "canopy_actuator_rod_l",
+                   "canopy_rim"]),
+             ("and is held shut by its locks", ["canopy_rim", "canopy_locks",
+                                                "fuselage_skin"])]
+CIRCUITS += [("the flight computers are on the PDU",
+              ["pdu", "loom_fuselage_r", "loom_nose_gear", "avionics_loom",
+               "avionics_fcc_1"]),
+             ("", ["avionics_loom", "avionics_fcc_2"]),
+             ("", ["avionics_loom", "avionics_fcc_3"]),
+             ("", ["avionics_loom", "avionics_ins"]),
+             ("", ["avionics_loom", "avionics_mission"])]
+CIRCUITS += mirrored("each air data computer reads its probe, and is powered",
+                     ["air_data_probe_{s}", "avionics_pitot_lines_{s}",
+                      "avionics_adc_{s}", "avionics_loom"])
+CIRCUITS += [("the boxes stand on the rack on the nose gear bay's roof",
+              ["gear_bay_nose", "avionics_rack", "avionics_fcc_2"])]
 CIRCUITS += mirrored("and is carried and driven off the cockpit tub",
                      ["cockpit_tub", "canard_drive_{s}", "canard_spindle_{s}"])
 CIRCUITS += mirrored("each fin stands on the body and carries its rudder",
