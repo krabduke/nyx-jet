@@ -1123,15 +1123,15 @@
    "key": "05 Weapons bay",
    "label": "Weapons bay",
    "color": "#7D8570",
-   "parts": 6,
-   "faces": 5242
+   "parts": 14,
+   "faces": 5690
   },
   {
    "key": "06 Landing gear",
    "label": "Landing gear",
    "color": "#5C6166",
    "parts": 32,
-   "faces": 28076
+   "faces": 28148
   },
   {
    "key": "07 Structure",
@@ -1258,15 +1258,55 @@
    "mat": "structure",
    "f": 174
   },
+  "bay_door_act_1_l": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 38
+  },
+  "bay_door_act_1_r": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 38
+  },
+  "bay_door_act_2_l": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 38
+  },
+  "bay_door_act_2_r": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 38
+  },
+  "bay_door_act_rod_1_l": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 54
+  },
+  "bay_door_act_rod_1_r": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 54
+  },
+  "bay_door_act_rod_2_l": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 54
+  },
+  "bay_door_act_rod_2_r": {
+   "m": "05 Weapons bay",
+   "mat": "steel",
+   "f": 54
+  },
   "bay_door_l": {
    "m": "05 Weapons bay",
    "mat": "skin_dark",
-   "f": 1392
+   "f": 1432
   },
   "bay_door_r": {
    "m": "05 Weapons bay",
    "mat": "skin_dark",
-   "f": 1392
+   "f": 1432
   },
   "bay_structure": {
    "m": "05 Weapons bay",
@@ -2971,22 +3011,22 @@
   "gear_door_act_rod_main_l": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 36
+   "f": 54
   },
   "gear_door_act_rod_main_r": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 36
+   "f": 54
   },
   "gear_door_act_rod_nose_l": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 36
+   "f": 54
   },
   "gear_door_act_rod_nose_r": {
    "m": "06 Landing gear",
    "mat": "steel",
-   "f": 36
+   "f": 54
   },
   "gear_door_main_l": {
    "m": "06 Landing gear",

@@ -119,6 +119,11 @@ CIRCUITS += [("and the forebody's strips",
               ["loom_nose_gear", "loom_formation", "formation_light_r"]),
              ("", ["loom_fuselage_l", "loom_formation", "formation_light_l"]),
              ("ground power to the PDU", ["fuselage_skin", "ground_power", "pdu"])]
+CIRCUITS += mirrored("each bay door is driven by its actuators off the bay's wall",
+                     ["bay_structure", "bay_door_act_1_{s}", "bay_door_act_rod_1_{s}",
+                      "bay_door_{s}"])
+CIRCUITS += mirrored("", ["bay_structure", "bay_door_act_2_{s}", "bay_door_act_rod_2_{s}",
+                          "bay_door_{s}"])
 CIRCUITS += [("the boxes stand on the rack on the nose gear bay's roof",
               ["gear_bay_nose", "avionics_rack", "avionics_fcc_2"])]
 CIRCUITS += mirrored("and is carried and driven off the cockpit tub",

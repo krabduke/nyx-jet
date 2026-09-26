@@ -103,6 +103,9 @@ AIRFRAME = [
     ("gear_bay_", "gear_door_act_"), ("gear_door_act_", "gear_door_act_rod_"),
     ("gear_bay_nose", "gear_uplock_nose"),
     ("gear_door_act_rod_", "gear_door_"),
+    # and each weapons-bay door's two, off the bay's side walls
+    ("bay_door_act_", "bay_structure"), ("bay_door_act_", "bay_door_act_rod_"),
+    ("bay_door_act_rod_", "bay_door_"),
     # the looms' ends in the lights: each wing's in its tip's navigation
     # light, each fin's in its tip light (the formation strips' feeds end
     # just under the skin beneath them)

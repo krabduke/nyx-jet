@@ -173,6 +173,27 @@ def open_bay():
         import shapes
         z = shapes.z_dn(0.5 * (B["x0"] + B["x1"]), sy * B["half_w"]) * MM
         swing(f"bay_door_{side}", (x, y, z), "X", sy * 100.0)
+        # and each door's actuators after it: the body turned about its
+        # anchor to point at the horn where the door has taken it, the rod
+        # run out along it
+        from parts import bay
+        from mathutils import Matrix
+        H = Vector((x, y, z))
+        R = Matrix.Rotation(math.radians(sy * 100.0), 4, "X")
+        for k, bx in enumerate(bay.BAY_ACT_X):
+            A = Vector(bay.bay_anchor(bx, sy)) * MM
+            L0 = Vector(bay.bay_horn(bx, sy)) * MM
+            L1 = H + (R @ (L0 - H).to_4d()).to_3d()
+            q = (L0 - A).rotation_difference(L1 - A).to_matrix().to_4x4()
+            ext = (L1 - A).length - (L0 - A).length
+            TA = Matrix.Translation(A)
+            for name, shift in ((f"bay_door_act_{k + 1}_{side}", 0.0),
+                                (f"bay_door_act_rod_{k + 1}_{side}", ext)):
+                o = bpy.data.objects.get(name)
+                if o is None:
+                    continue
+                d = (L1 - A).normalized() * shift
+                o.matrix_world = Matrix.Translation(d) @ TA @ q @ TA.inverted() @ o.matrix_world
 
 
 # --------------------------------------------------------------------------
@@ -231,7 +252,7 @@ CLOSE = {
     "c1_cockpit": ((3.2, -4.2, 2.6), (4.4, 0.0, 0.6), 50),
     "c2_intake": ((2.8, -4.6, -0.9), (5.4, -1.3, -0.4), 42),
     "c3_nozzles": ((17.6, 4.2, 1.8), (14.1, 0.0, 0.0), 45),
-    "c4_bay": ((6.6, -4.8, -3.2), (7.0, 0.0, -0.9), 38),
+    "c4_bay": ((6.3, -0.2, -2.3), (7.3, 0.05, -0.45), 24),
     "c5_main_gear": ((6.4, -7.4, -0.7), (9.5, -2.9, -1.05), 38),
     "c6_wing": ((12.0, -10.0, 4.0), (10.5, -4.0, 0.0), 45),
     "c7_avionics": ((1.15, -1.55, 1.35), (2.25, 0.0, 0.38), 32),
@@ -246,6 +267,10 @@ def mode_close(name, samples):
     reset(); setup(samples, (1600, 900)); world(); ground(); lights(0.8)
     if name == "c4_bay":
         open_bay()
+        # the camera is under the aircraft, below where the ground plane is:
+        # it was photographing the floor's underside, and the shot was black
+        if "__ground" in bpy.data.objects:
+            bpy.data.objects["__ground"].hide_render = True
     if name in ("c7_avionics", "c8_ecs"):
         off = SKIN_OFF + (("fuel_tank_centre", "keel", "frame_engine_fwd")
                           if name == "c8_ecs" else ())

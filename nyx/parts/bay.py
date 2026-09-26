@@ -121,7 +121,43 @@ def doors():
             for k in range(n - 1):
                 q = (base + k, base + k + 1, base + m - 2 - k, base + m - 1 - k)
                 f.append(tuple(reversed(q)) if flip else q)
-        out[f"bay_door_{side}"] = shapes.orient((v, f))
+        from parts import gear
+        horns = [gear._horn(bay_horn(x, sy), sy) for x in BAY_ACT_X]
+        out[f"bay_door_{side}"] = mesh.join(shapes.orient((v, f)), *horns)
+    return out
+
+
+# Each bay door is opened by two actuators from the bay's side wall to horns
+# on the door at its hinge edge, under the missiles. The doors hung on their
+# hinges driven by nothing.
+BAY_ACT_X = (6100.0, 8200.0)
+
+
+def bay_horn(x, sy):
+    """The eye of the horn on a door's inside at station x, door shut."""
+    y = sy * (B["half_w"] - 10.0)
+    return (x, y, shapes.z_dn(x, y, spec.SKIN_T) + 71.0)
+
+
+def bay_anchor(x, sy):
+    return (x, sy * (B["half_w"] - 16.0), bay_horn(x, sy)[2] + 170.0)
+
+
+def bay_hinge(sy):
+    """The door's hinge line, as the renders swing it: along x, through the
+    bay's side at its mid-station."""
+    xm = 0.5 * (B["x0"] + B["x1"])
+    return (xm, sy * B["half_w"], shapes.z_dn(xm, sy * B["half_w"])), (1.0, 0.0, 0.0)
+
+
+def bay_actuators():
+    from parts import gear
+    out = {}
+    for side, sy in (("r", 1.0), ("l", -1.0)):
+        for k, x in enumerate(BAY_ACT_X):
+            b, r = gear._strut(bay_anchor(x, sy), bay_horn(x, sy), sy * (B["half_w"] + 2.0))
+            out[f"bay_door_act_{k + 1}_{side}"] = b
+            out[f"bay_door_act_rod_{k + 1}_{side}"] = r
     return out
 
 
@@ -176,4 +212,5 @@ def build():
     out = {"bay_structure": structure(), "cut:fuselage_skin": opening_cutter(),
            "missiles": m, "launchers": l}
     out.update(doors())
+    out.update(bay_actuators())
     return out

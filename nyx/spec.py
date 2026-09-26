@@ -427,6 +427,7 @@ MATERIAL_MAP = {
     "gear_leg_door": "skin_dark",
     "gear_actuator": "steel",
     "gear_door_act": "steel",
+    "bay_door_act": "steel",
     "ground_power": "steel",
     "ground_power_door": "skin_dark",
     "gear_pivot_door": "skin_dark",

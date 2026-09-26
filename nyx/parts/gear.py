@@ -551,10 +551,11 @@ def _strut(A, L, bracket_to):
                   bend=0.0),
         mesh.box(A[0], 0.5 * (A[1] + bracket_to), A[2], 30.0, abs(bracket_to - A[1]),
                  26.0))
+    # the rod end a clevis: a cheek either side of the horn's eye
     rod = mesh.join(
         mesh.pipe([at(STRUT_BODY - 20.0), L], 6.0, 16, bend=0.0),
-        mesh.pipe([(L[0] - 22.0, L[1], L[2]), (L[0] - 15.0, L[1], L[2])], 9.0, 16,
-                  bend=0.0))
+        *[mesh.pipe([(L[0] + sx * 22.0, L[1], L[2]), (L[0] + sx * 15.0, L[1], L[2])],
+                    9.0, 16, bend=0.0) for sx in (-1.0, 1.0)])
     return body, rod
 
 
