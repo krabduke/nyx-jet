@@ -161,6 +161,10 @@
     <span>Inside</span>
     <button class="toggle" id="xray" aria-pressed="false">See through the skin</button>
   </div>
+  <div class="group">
+    <label for="cut">Cut away the port side <span class="val" id="cutval">none</span></label>
+    <input id="cut" type="range" min="0" max="100" step="1" value="0">
+  </div>
 </div>
 
 <figure id="turn" aria-label="Turn rate at sea level">
@@ -353,6 +357,21 @@ $('xray').addEventListener('click', () => {
   }
 });
 
+/* ---------------- section ----------------
+   A plane down the aircraft's length, slid in from the port side to its
+   centreline: everything outboard of it goes, and what is inside -- the
+   ducts, the engines, the tanks, the systems -- shows where it is. */
+renderer.localClippingEnabled = true;
+const cutPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e6);
+for (const list of meshes.values()) for (const m of list) m.material.clippingPlanes = [cutPlane];
+const cutFrom = box.max.z;                 // the port wing tip, in the scene
+$('cut').addEventListener('input', (e) => {
+  const f = +e.target.value / 100;
+  cutPlane.constant = f === 0 ? 1e6 : cutFrom * (1 - f);
+  $('cutval').textContent = f === 0 ? 'none'
+    : f === 1 ? 'to the centreline' : `${Math.round(cutFrom * (1 - f) / MM)} mm out`;
+});
+
 /* ---------------- inspection ---------------- */
 const describe = (name) => {
   const mod = M.modules.find(m => m.key === M.parts[name].m);
@@ -369,7 +388,8 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(mouse, camera);
   const hit = ray.intersectObjects(gltf.scene.children, true).find(h => h.object.visible &&
-    !(h.object.material.transparent && h.object.material.opacity < 0.3));
+    !(h.object.material.transparent && h.object.material.opacity < 0.3) &&
+    cutPlane.distanceToPoint(h.point) >= 0);
   const name = hit ? hit.object.userData.part : null;
   if (name === lastHover) return;
   if (lastHover) for (const m of meshes.get(lastHover)) m.material.emissive.setHex(0x000000);

@@ -149,7 +149,9 @@ Serve the repository root (for example `python3 -m http.server`) and open
 - switch between four camera views;
 - hide or show each group of parts — the port engine is marked red and the
   starboard green, as the navigation lights are;
-- see through the skin to the intake ducts, engines, cockpit and weapons bay;
+- see through the skin to the intake ducts, engines, cockpit and weapons bay,
+  or cut the port side away down to the centreline, to see everything inside
+  where it is;
 - raise and lower the landing gear: it loads gear-up, as it flies. Coming
   down, the doors open and the legs swing out; going up, the legs fold into
   their bays and the doors shut flush behind them;
