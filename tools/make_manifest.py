@@ -23,6 +23,9 @@ from parts import engines   # noqa: E402
 from parts import gear      # noqa: E402
 from parts import cockpit   # noqa: E402
 from parts import bay       # noqa: E402
+from parts import fuel      # noqa: E402
+from parts import ecs       # noqa: E402
+from parts import intakes   # noqa: E402
 
 MODULES = [
     ("01 Airframe", "Airframe", "#C9CDD1"),
@@ -133,6 +136,53 @@ def bay_kinematics():
                         "open": r1(t["open"], 5)} for t in k["struts"]]}
 
 
+def flows():
+    """What moves through the aircraft, each as a centreline from where it
+    comes from to where it goes, for the viewer to run along."""
+    I = spec.INTAKE
+    R = json.load(open(ecs.ROUTES))
+    mirror = lambda pts: [(x, -y, z) for (x, y, z) in pts]
+    NOZZLE_START = engines.info()["nozzle"]["bearings"][0][0][0]
+    out = []
+
+    def add(kind, label, note, pts, r):
+        out.append({"kind": kind, "label": label, "note": note, "r": r1(r),
+                    "pts": [[r1(c) for c in p] for p in pts]})
+
+    air = []
+    for k in range(25):
+        x = I["x_mouth"] + (I["x_end"] - I["x_mouth"]) * k / 24
+        air.append((x, *intakes.centre(x)))
+    air += [(spec.ENGINE_FAN_FACE_X, spec.ENGINE_Y, spec.ENGINE_Z),
+            (spec.ENGINE_FAN_FACE_X + NOZZLE_START, spec.ENGINE_Y, spec.ENGINE_Z)]
+    note = ("In at the caret intake, round the S-duct to the fan face, and through the "
+            "engine to its swivel nozzle.")
+    add("air", "Intake air, starboard engine", note, air, 45.0)
+    add("air", "Intake air, port engine", note, mirror(air), 45.0)
+
+    add("fuel", "Refuelling", "From the boom's receptacle on the spine down into the "
+        "gallery, and aft through the three forward cells to the collector tank.",
+        fuel.refuel_path(), fuel.GALLERY_R)
+    note = "From the boost pump on the collector tank's back to the fuel pump on the engine's gearbox."
+    add("fuel", "Engine feed, starboard", note, fuel.feed_path(), 15.0)
+    add("fuel", "Engine feed, port", note, mirror(fuel.feed_path()), 15.0)
+    for y, lab, a, b in ((-100.0, "Fuel to the air-conditioning pack", 10174.0, ecs.PACK_X[0] + 4.0),
+                         (100.0, "Fuel back from the air-conditioning pack", ecs.PACK_X[0] + 4.0, 10174.0)):
+        add("fuel", lab, "The pack's heat exchanger dumps its heat into the fuel, which "
+            "the engines then burn.", [(a, y, 245.0), (b, y, 245.0)], ecs.FUEL_R)
+
+    note = "Hot air off each engine's compressor, forward and inboard to the air-cycle pack."
+    add("bleed", "Bleed air, starboard engine", note, R["bleed_r"], ecs.BLEED_R)
+    add("bleed", "Bleed air, port engine", note, mirror(R["bleed_r"]), ecs.BLEED_R)
+    add("cool", "Cockpit air", "Cooled and dried in the pack, forward under the spine to "
+        "the outlet behind the pilot's seat.", R["duct"], ecs.DUCT_R)
+    add("cool", "Oxygen generator's supply", "Off the pack's outlet, down to the oxygen "
+        "generator beside it.", R["obogs_feed"], ecs.HOSE_R + 2.0)
+    add("oxygen", "Oxygen", "From the generator's sieve beds forward beside the cockpit "
+        "air duct to the seat's connector.", R["oxygen"], ecs.HOSE_R)
+    return out
+
+
 def main():
     rows = list(csv.DictReader(open(os.path.join(ROOT, "build", "parts.csv"))))
     mods = []
@@ -153,6 +203,7 @@ def main():
         "gear": gear_kinematics(),
         "canopy": canopy_kinematics(),
         "bay": bay_kinematics(),
+        "flows": flows(),
         "modules": mods,
         "parts": parts,
     }

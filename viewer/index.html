@@ -100,6 +100,14 @@
   #probe h2{margin:0 0 4px; font-size:17px; font-weight:600}
   #probe p{margin:0; color:var(--muted); font-size:14px; line-height:1.4}
 
+  #flowkey{
+    position:fixed; top:196px; right:24px; z-index:5; margin:0; padding:0; list-style:none;
+    display:none; flex-direction:column; gap:5px; font-size:14px; pointer-events:none; text-align:right;
+  }
+  #flowkey.on{display:flex}
+  #flowkey li{display:flex; align-items:center; justify-content:flex-end; gap:9px}
+  #flowkey i{width:18px; height:4px; border-radius:2px; background:var(--fc)}
+
   #loading{position:fixed; inset:0; display:grid; place-items:center; z-index:20; background:var(--night); transition:opacity .5s}
   #loading.gone{opacity:0; pointer-events:none}
   #loading p{color:var(--muted); max-width:36em; text-align:center; line-height:1.5}
@@ -115,6 +123,8 @@
     #turn p{display:none}
     #controls{left:12px; right:12px; bottom:14px}
     #probe{top:auto; bottom:120px; right:12px; transform:none; width:200px}
+    #flowkey{top:64px; right:auto; left:12px; text-align:left; font-size:13px}
+    #flowkey li{justify-content:flex-start; flex-direction:row-reverse}
   }
   @media (prefers-reduced-motion: reduce){ *{transition-duration:.01ms !important} }
 </style>
@@ -130,6 +140,7 @@
 <dl id="figures" aria-label="The aircraft at combat weight"></dl>
 
 <ul id="modules" aria-label="Show or hide parts of the aircraft"></ul>
+<ul id="flowkey" aria-label="What each colour of flow carries"></ul>
 
 <div id="controls">
   <div class="group">
@@ -164,6 +175,10 @@
   <div class="group">
     <span>Inside</span>
     <button class="toggle" id="xray" aria-pressed="false">See through the skin</button>
+  </div>
+  <div class="group">
+    <span>Systems</span>
+    <button class="toggle" id="flow" aria-pressed="false">Show what flows</button>
   </div>
   <div class="group">
     <label for="cut">Cut away the port side <span class="val" id="cutval">none</span></label>
@@ -347,18 +362,27 @@ for (const b of document.querySelectorAll('#modules button')) b.addEventListener
 });
 
 /* ---------------- x-ray ---------------- */
-$('xray').addEventListener('click', () => {
-  const on = $('xray').getAttribute('aria-pressed') !== 'true';
-  $('xray').setAttribute('aria-pressed', on);
+// how see-through each part is: the skin under x-ray, and everything when
+// the flows are showing, so the lines read through the structure
+const look = {xray: false, flow: false};
+function restyle(){
   for (const [name, list] of meshes) {
-    if (!SKIN.some(s => name.startsWith(s))) continue;
+    const glass = name === 'canopy_glass';
+    let op = glass ? 0.45 : 1;
+    if (look.xray && SKIN.some(s => name.startsWith(s))) op = 0.14;
+    if (look.flow) op = Math.min(op, SKIN.some(s => name.startsWith(s)) ? 0.05 : 0.1);
     for (const m of list) {
-      m.material.transparent = on || name === 'canopy_glass';
-      m.material.opacity = on ? 0.14 : (name === 'canopy_glass' ? 0.45 : 1);
-      m.material.depthWrite = !on;
+      m.material.transparent = op < 1;
+      m.material.opacity = op;
+      m.material.depthWrite = op === 1;
       m.material.needsUpdate = true;
     }
   }
+}
+$('xray').addEventListener('click', () => {
+  look.xray = $('xray').getAttribute('aria-pressed') !== 'true';
+  $('xray').setAttribute('aria-pressed', look.xray);
+  restyle();
 });
 
 /* ---------------- section ----------------
@@ -391,6 +415,17 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   const r = renderer.domElement.getBoundingClientRect();
   mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(mouse, camera);
+  if (flowGroup.visible) {
+    const fh = ray.intersectObjects(flowGroup.children, false)[0];
+    if (lastHover) for (const m of meshes.get(lastHover)) m.material.emissive.setHex(0x000000);
+    lastHover = null;
+    if (!fh) { $('probe').classList.remove('on'); return; }
+    const f = fh.object.userData.flow;
+    $('p-name').textContent = f.label; $('p-body').textContent = f.note;
+    $('probe').style.setProperty('--probe', FLOW_KINDS[f.kind].color);
+    $('probe').classList.add('on');
+    return;
+  }
   const hit = ray.intersectObjects(gltf.scene.children, true).find(h => h.object.visible &&
     !(h.object.material.transparent && h.object.material.opacity < 0.3) &&
     cutPlane.distanceToPoint(h.point) >= 0);
@@ -582,6 +617,66 @@ if (BAYK) {
   $('bay').closest('.group').remove();
 }
 
+/* ---------------- what flows ----------------
+   Each line is a tube along its centreline, a little fatter than the pipe
+   it runs in, with dashes that travel the way the fluid does: fast for the
+   engines' air, slower for bleed and cockpit air, slowest for fuel. */
+const FLOW_KINDS = {
+  air:    {label: 'Intake air',            color: '#A9C1E8', speed: 2.4},
+  bleed:  {label: 'Hot bleed air',         color: '#EE8A4E', speed: 1.1},
+  cool:   {label: 'Cooled cockpit air',    color: '#5CC8D6', speed: 0.8},
+  oxygen: {label: 'Oxygen',                color: '#B7E4B0', speed: 0.5},
+  fuel:   {label: 'Fuel',                  color: '#E8C040', speed: 0.35},
+};
+const flowGroup = new THREE.Group();
+flowGroup.visible = false;
+scene.add(flowGroup);
+const dash = (() => {
+  // a chevron pointing along +u, so the flow's direction reads
+  const c = document.createElement('canvas'); c.width = 64; c.height = 16;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(0, 0, 64, 16);
+  g.fillStyle = '#fff';
+  g.beginPath(); g.moveTo(14, 0); g.lineTo(40, 0); g.lineTo(52, 8); g.lineTo(40, 16);
+  g.lineTo(14, 16); g.lineTo(26, 8); g.closePath(); g.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.RepeatWrapping;
+  return t;
+})();
+const flowTubes = [];
+for (const f of (M.flows || [])) {
+  const pts = f.pts.map(p => toScene(p).multiplyScalar(MM));
+  const path = new THREE.CurvePath();
+  for (let i = 1; i < pts.length; i++) path.add(new THREE.LineCurve3(pts[i - 1], pts[i]));
+  const len = path.getLength();
+  const r = Math.max(f.r * 1.2, 10) * MM;
+  const geo = new THREE.TubeGeometry(path, Math.max(8, Math.ceil(len / 0.02)), r, 10, false);
+  const pitch = Math.max(8 * r, 0.06);       // one chevron every this far along
+  const map = dash.clone();
+  map.repeat.set(len / pitch, 1);
+  map.needsUpdate = true;
+  const k = FLOW_KINDS[f.kind];
+  const mat = new THREE.MeshBasicMaterial({color: k.color, map, transparent: true,
+                                           depthWrite: false});
+  const tube = new THREE.Mesh(geo, mat);
+  tube.userData.flow = f;
+  tube.renderOrder = 2;
+  flowGroup.add(tube);
+  flowTubes.push({map, speed: k.speed / pitch});
+}
+$('flowkey').innerHTML = Object.entries(FLOW_KINDS)
+  .filter(([key]) => (M.flows || []).some(f => f.kind === key))
+  .map(([, k]) => `<li style="--fc:${k.color}"><span>${k.label}</span><i></i></li>`).join('');
+$('flow').addEventListener('click', () => {
+  look.flow = $('flow').getAttribute('aria-pressed') !== 'true';
+  $('flow').setAttribute('aria-pressed', look.flow);
+  $('flow').textContent = look.flow ? 'Hide the flows' : 'Show what flows';
+  flowGroup.visible = look.flow;
+  $('flowkey').classList.toggle('on', look.flow);
+  restyle();
+});
+if (!(M.flows || []).length) $('flow').closest('.group').remove();
+
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
 const clock = new THREE.Clock();
@@ -624,6 +719,7 @@ renderer.setAnimationLoop(() => {
     sw.yaw = reduced ? sw.ty : step(sw.yaw, sw.ty, 12);
     applySwivel();
   }
+  if (flowGroup.visible && !reduced) for (const t of flowTubes) t.map.offset.x -= t.speed * dt;
   controls.update();
   renderer.render(scene, camera);
 });

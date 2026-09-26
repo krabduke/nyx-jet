@@ -116,6 +116,16 @@ def _feed():
     fuel inlet union on the engine's gearbox pump, pushed on over its bead
     -- the path tools/route_solve found clear under the intake duct's end.
     The engines had no line to them from anywhere."""
+    p = feed_path()
+    parts = [mesh.pipe([p[0], (p[1][0] - 12.0, p[1][1], p[1][2])], 45.0, 24, bend=0.0),
+             mesh.pipe([(p[1][0] - 12.0, p[1][1], p[1][2]), p[1]], 30.0, 20, bend=0.0)]
+    parts.append(mesh.pipe(p[1:], 15.0, 18, bend=30.0))
+    return mesh.join(*parts)
+
+
+def feed_path():
+    """The starboard feed's centreline, pump to engine: the pump housing's
+    back, its outlet, and the line on to the inlet union."""
     from parts import engines
     e = engines.info()
     _, _, x1 = CENTRE
@@ -124,13 +134,15 @@ def _feed():
     # accessories._gearbox_units: on the pump's axis, ahead of its face)
     xu = spec.ENGINE_FAN_FACE_X + e["fuel_inlet"][0]
     yu, zu = spec.ENGINE_Y + e["fuel_inlet"][1], spec.ENGINE_Z + e["fuel_inlet"][2]
-    parts = [mesh.pipe([(x1 - 10.0, y0, z0), (x1 + 38.0, y0, z0)], 45.0, 24,
-                       bend=0.0),
-             mesh.pipe([(x1 + 38.0, y0, z0), (x1 + 50.0, y0, z0)], 30.0, 20,
-                       bend=0.0)]
-    parts.append(mesh.pipe([(x1 + 50.0, y0, z0), (xu - 32.0, yu, zu),
-                            (xu + 20.0, yu, zu)], 15.0, 18, bend=30.0))
-    return mesh.join(*parts)
+    return [(x1 - 10.0, y0, z0), (x1 + 50.0, y0, z0), (xu - 32.0, yu, zu), (xu + 20.0, yu, zu)]
+
+
+def refuel_path():
+    """Where fuel goes in: down from the receptacle's cup, into the gallery,
+    and aft along it to its end in the collector."""
+    x = REC["x"]
+    return [(x, 0.0, _rec_top()), (x, 0.0, GALLERY_Z + 40.0), (x + 60.0, 0.0, GALLERY_Z),
+            (CENTRE[2] - 60.0, 0.0, GALLERY_Z)]
 
 
 REC = {"x": 6055.0, "r_top": 64.0, "r_bot": 26.0, "depth": 150.0}
