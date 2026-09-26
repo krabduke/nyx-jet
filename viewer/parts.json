@@ -4,7 +4,7 @@
  "figures": {
   "length_mm": 14890.0,
   "span_mm": 13236.0,
-  "combat_mass_kg": 17473.0,
+  "combat_mass_kg": 17468.0,
   "empty_mass_kg": 13160.0,
   "wing_area_m2": 68.2,
   "aspect_ratio": 2.55,
@@ -293,7 +293,9 @@
       "parts": [
        "engine_l_swivel_duct_fwd",
        "engine_l_swivel_bearing_1",
-       "engine_l_swivel_drive_2"
+       "engine_l_swivel_drive_2",
+       "engine_l_swivel_hyd_fwd",
+       "engine_l_swivel_coupling_2"
       ]
      },
      {
@@ -310,7 +312,9 @@
       "parts": [
        "engine_l_swivel_duct_mid",
        "engine_l_swivel_bearing_2",
-       "engine_l_swivel_drive_3"
+       "engine_l_swivel_drive_3",
+       "engine_l_swivel_hyd_mid",
+       "engine_l_swivel_coupling_3"
       ]
      },
      {
@@ -336,7 +340,8 @@
        "engine_l_nozzle_hinges",
        "engine_l_nozzle_div_links",
        "engine_l_nozzle_unison_ring",
-       "engine_l_nozzle_actuators"
+       "engine_l_nozzle_actuators",
+       "engine_l_swivel_hyd_aft"
       ]
      }
     ],
@@ -363,7 +368,9 @@
       "parts": [
        "engine_r_swivel_duct_fwd",
        "engine_r_swivel_bearing_1",
-       "engine_r_swivel_drive_2"
+       "engine_r_swivel_drive_2",
+       "engine_r_swivel_hyd_fwd",
+       "engine_r_swivel_coupling_2"
       ]
      },
      {
@@ -380,7 +387,9 @@
       "parts": [
        "engine_r_swivel_duct_mid",
        "engine_r_swivel_bearing_2",
-       "engine_r_swivel_drive_3"
+       "engine_r_swivel_drive_3",
+       "engine_r_swivel_hyd_mid",
+       "engine_r_swivel_coupling_3"
       ]
      },
      {
@@ -406,7 +415,8 @@
        "engine_r_nozzle_hinges",
        "engine_r_nozzle_div_links",
        "engine_r_nozzle_unison_ring",
-       "engine_r_nozzle_actuators"
+       "engine_r_nozzle_actuators",
+       "engine_r_swivel_hyd_aft"
       ]
      }
     ],
@@ -984,7 +994,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42550
+   "faces": 42554
   },
   {
    "key": "02 Flying surfaces",
@@ -1026,35 +1036,35 @@
    "label": "Structure",
    "color": "#9A8F7E",
    "parts": 25,
-   "faces": 20731
+   "faces": 22163
   },
   {
    "key": "08 Engine port",
    "label": "Engine, port",
    "color": "#B8562E",
-   "parts": 124,
-   "faces": 741760
+   "parts": 134,
+   "faces": 756094
   },
   {
    "key": "09 Engine starboard",
    "label": "Engine, starboard",
    "color": "#B8562E",
-   "parts": 124,
-   "faces": 741760
+   "parts": 134,
+   "faces": 756094
   },
   {
    "key": "10 Systems",
    "label": "Systems",
    "color": "#4F8A8B",
-   "parts": 19,
-   "faces": 18652
+   "parts": 28,
+   "faces": 24628
   }
  ],
  "parts": {
   "aft_closure": {
    "m": "01 Airframe",
    "mat": "skin_dark",
-   "f": 382
+   "f": 386
   },
   "air_data_probe_l": {
    "m": "01 Airframe",
@@ -1261,6 +1271,51 @@
    "mat": "cockpit",
    "f": 334
   },
+  "ecs_bleed_l": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 578
+  },
+  "ecs_bleed_r": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 578
+  },
+  "ecs_diffuser": {
+   "m": "10 Systems",
+   "mat": "cockpit",
+   "f": 66
+  },
+  "ecs_duct": {
+   "m": "10 Systems",
+   "mat": "duct",
+   "f": 2210
+  },
+  "ecs_fuel_lines": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 36
+  },
+  "ecs_mount": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 164
+  },
+  "ecs_obogs": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 64
+  },
+  "ecs_oxygen": {
+   "m": "10 Systems",
+   "mat": "rubber",
+   "f": 2044
+  },
+  "ecs_pack": {
+   "m": "10 Systems",
+   "mat": "steel",
+   "f": 236
+  },
   "engine_l_ab_fuel_control": {
    "m": "08 Engine port",
    "mat": "steel",
@@ -1335,6 +1390,11 @@
    "m": "08 Engine port",
    "mat": "nickel_hot",
    "f": 9660
+  },
+  "engine_l_bleed_valve": {
+   "m": "08 Engine port",
+   "mat": "titanium",
+   "f": 122
   },
   "engine_l_brg_1_lp_roller": {
    "m": "08 Engine port",
@@ -1511,10 +1571,15 @@
    "mat": "casing",
    "f": 2640
   },
+  "engine_l_front_harness": {
+   "m": "08 Engine port",
+   "mat": "rubber",
+   "f": 1652
+  },
   "engine_l_fuel_lines": {
    "m": "08 Engine port",
    "mat": "steel",
-   "f": 1734
+   "f": 1862
   },
   "engine_l_fuel_manifold": {
    "m": "08 Engine port",
@@ -1530,6 +1595,16 @@
    "m": "08 Engine port",
    "mat": "steel",
    "f": 5796
+  },
+  "engine_l_fuel_oil_hx": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1658
+  },
+  "engine_l_fuel_oil_hx_lines": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 40
   },
   "engine_l_fuel_pump": {
    "m": "08 Engine port",
@@ -1766,6 +1841,21 @@
    "mat": "steel",
    "f": 1540
   },
+  "engine_l_swivel_coupling_1": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 226
+  },
+  "engine_l_swivel_coupling_2": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 198
+  },
+  "engine_l_swivel_coupling_3": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 198
+  },
   "engine_l_swivel_drive_1": {
    "m": "08 Engine port",
    "mat": "steel",
@@ -1800,6 +1890,21 @@
    "m": "08 Engine port",
    "mat": "inconel",
    "f": 11312
+  },
+  "engine_l_swivel_hyd_aft": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 5620
+  },
+  "engine_l_swivel_hyd_fwd": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 2768
+  },
+  "engine_l_swivel_hyd_mid": {
+   "m": "08 Engine port",
+   "mat": "steel",
+   "f": 1724
   },
   "engine_l_swivel_rotary_union": {
    "m": "08 Engine port",
@@ -1960,6 +2065,11 @@
    "m": "09 Engine starboard",
    "mat": "nickel_hot",
    "f": 9660
+  },
+  "engine_r_bleed_valve": {
+   "m": "09 Engine starboard",
+   "mat": "titanium",
+   "f": 122
   },
   "engine_r_brg_1_lp_roller": {
    "m": "09 Engine starboard",
@@ -2136,10 +2246,15 @@
    "mat": "casing",
    "f": 2640
   },
+  "engine_r_front_harness": {
+   "m": "09 Engine starboard",
+   "mat": "rubber",
+   "f": 1652
+  },
   "engine_r_fuel_lines": {
    "m": "09 Engine starboard",
    "mat": "steel",
-   "f": 1734
+   "f": 1862
   },
   "engine_r_fuel_manifold": {
    "m": "09 Engine starboard",
@@ -2155,6 +2270,16 @@
    "m": "09 Engine starboard",
    "mat": "steel",
    "f": 5796
+  },
+  "engine_r_fuel_oil_hx": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1658
+  },
+  "engine_r_fuel_oil_hx_lines": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 40
   },
   "engine_r_fuel_pump": {
    "m": "09 Engine starboard",
@@ -2391,6 +2516,21 @@
    "mat": "steel",
    "f": 1540
   },
+  "engine_r_swivel_coupling_1": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 226
+  },
+  "engine_r_swivel_coupling_2": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 198
+  },
+  "engine_r_swivel_coupling_3": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 198
+  },
   "engine_r_swivel_drive_1": {
    "m": "09 Engine starboard",
    "mat": "steel",
@@ -2425,6 +2565,21 @@
    "m": "09 Engine starboard",
    "mat": "inconel",
    "f": 11312
+  },
+  "engine_r_swivel_hyd_aft": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 5620
+  },
+  "engine_r_swivel_hyd_fwd": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 2768
+  },
+  "engine_r_swivel_hyd_mid": {
+   "m": "09 Engine starboard",
+   "mat": "steel",
+   "f": 1724
   },
   "engine_r_swivel_rotary_union": {
    "m": "09 Engine starboard",
@@ -2589,17 +2744,17 @@
   "frame_6800": {
    "m": "07 Structure",
    "mat": "structure",
-   "f": 882
+   "f": 914
   },
   "frame_7900": {
    "m": "07 Structure",
    "mat": "structure",
-   "f": 1094
+   "f": 1124
   },
   "frame_9000": {
    "m": "07 Structure",
    "mat": "structure",
-   "f": 1126
+   "f": 1231
   },
   "frame_engine_aft": {
    "m": "07 Structure",
@@ -2629,22 +2784,22 @@
   "fuel_tank_centre": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 3088
+   "f": 3530
   },
   "fuel_tank_fwd_1": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 1635
+   "f": 2078
   },
   "fuel_tank_fwd_2": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 1888
+   "f": 2060
   },
   "fuel_tank_fwd_3": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 2008
+   "f": 2216
   },
   "fuel_tank_wing_l": {
    "m": "07 Structure",

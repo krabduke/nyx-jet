@@ -464,6 +464,153 @@ def _union():
     return mesh.join(body, *ports)
 
 
+# --------------------------------------------------------------------------
+# the swivel's own hydraulics
+#
+# The rotary union took the fixed lines' pressure and return and handed them
+# to nothing: the two motors that turn the ducts and the four actuators on
+# the nozzle were driven by nothing. A swivel coupling at each bearing now
+# hands the pair across it -- a coupling's fixed half on one duct, its
+# turning half on the next -- and on each duct the pair runs aft at the
+# union's clock, branching to the motor on that duct; on the aft duct it
+# feeds two rings, pressure and return, round the duct behind the
+# actuators' head clevises, and from them a pair into each actuator's head.
+
+HYD_CLOCK = UNION_CLOCK
+HYD_R = 505.0               # the runs, over the flanges' bolt heads
+HYD_LINE_R = 5.0
+HYD_DC = 0.7                # the pair's clock offset: 12 mm apart
+RING_X = (3962.0, 3972.0)   # behind the head clevises, ahead of the flange
+RING_R = 485.0
+
+
+def _loft_pt(fa, fb, r, clock, s):
+    t = math.radians(clock)
+    pa = frame_pt(fa, 0.0, r * math.cos(t), r * math.sin(t))
+    pb = frame_pt(fb, 0.0, r * math.cos(t), r * math.sin(t))
+    return tuple(pa[j] + (pb[j] - pa[j]) * s for j in range(3))
+
+
+def _fr_pt(fr, a, r, clock):
+    t = math.radians(clock)
+    return frame_pt(fr, a, r * math.cos(t), r * math.sin(t))
+
+
+def _couplings():
+    """A swivel coupling straddling each bearing at the lines' clock."""
+    t = math.radians(HYD_CLOCK)
+    out = {}
+    frames = {1: square(N["x_brg1"]), 2: oblique(1), 3: oblique(2)}
+    for k, fr in frames.items():
+        a0 = -26.0
+        # its two halves, fixed and turning, either side of the joint, and
+        # the bolts that close each round the bearing's rim
+        halves = [common.sector_block(a0, -1.0, 486.0, 540.0, t - 0.07, t + 0.07, 12),
+                  common.sector_block(1.0, 26.0, 486.0, 540.0, t - 0.07, t + 0.07, 12),
+                  common.sector_block(-3.0, 3.0, 490.0, 536.0, t - 0.066, t + 0.066, 12)]
+        for ax in (a0 + 10.0, 16.0):
+            for dt in (-0.045, 0.045):
+                halves.append(common.radial_pin(ax, 539.0, 545.0, 4.5,
+                                                math.degrees(t + dt), 10))
+        if k == 1:
+            # the union is 18 mm ahead of the first coupling, on the fixed
+            # case: a short pair from its aft face into the coupling. (The
+            # coupling used to reach forward over the union to it, and stood
+            # into an airframe's aft closure where the body ends just ahead
+            # of this bearing.)
+            for side in (-1.0, 1.0):
+                c = math.radians(HYD_CLOCK + side * HYD_DC)
+                halves.append(mesh.pipe(
+                    [(UNION_X[1] - 3.0 - N["x_brg1"], 505.0 * math.cos(c), 505.0 * math.sin(c)),
+                     (a0 + 3.0, 505.0 * math.cos(c), 505.0 * math.sin(c))],
+                    HYD_LINE_R, 12, bend=0.0))
+        out[f"swivel_coupling_{k}"] = to_frame(mesh.join(*halves), fr)
+    return out
+
+
+def _on_segment(p, a, b):
+    ab = [b[i] - a[i] for i in range(3)]
+    L = sum(c * c for c in ab)
+    t = max(0.0, min(1.0, sum((p[i] - a[i]) * ab[i] for i in range(3)) / L))
+    return tuple(a[i] + ab[i] * t for i in range(3))
+
+
+def _to_drive(fa, fb, fr, drive_clock, s_arc, side, r_up, a_port, run):
+    """One line from the run at the lines' clock round to a motor's port:
+    an arc at s_arc along the duct, aft along the motor's clock to 150 mm
+    ahead of its joint plane, out over the motor and down onto the port."""
+    c0 = HYD_CLOCK + side * HYD_DC
+    c1 = drive_clock + side * HYD_DC
+    step = 15.0 if c1 > c0 else -15.0
+    arc = []
+    c = c0
+    while (c1 - c) * (step / abs(step)) > 0.0:
+        arc.append(_loft_pt(fa, fb, HYD_R, c, s_arc))
+        c += step
+    arc.append(_loft_pt(fa, fb, HYD_R, c1, s_arc))
+    # aft along the motor's clock on the duct, to beside where it rises
+    ahead = _fr_pt(fr, -150.0, HYD_R, c1)
+    along = []
+    for f in (0.35, 0.7):
+        along.append(tuple(arc[-1][j] + (ahead[j] - arc[-1][j]) * f for j in range(3)))
+    # it leaves the run itself, which is offset from the duct's loft by
+    # the couplings' half-width at each end
+    path = [_on_segment(arc[0], *run)] + arc + along + [ahead, _fr_pt(fr, -150.0, r_up, c1),
+                          _fr_pt(fr, a_port, r_up, drive_clock),
+                          _fr_pt(fr, a_port, N["gear_r"] + 25.0 + 48.0 - 2.0,
+                                 drive_clock)]
+    return mesh.pipe(path, HYD_LINE_R, 12, bend=14.0)
+
+
+def _hydraulics():
+    out = {}
+    fb1, f1, f2, fa = square(N["x_brg1"]), oblique(1), oblique(2), square(N["x_aft"])
+    rc = N["gear_r"] + 25.0
+    port_a = (-FT - 60.0 - 22.0, -FT - 60.0 + 22.0)
+    for name, (f_a, f_b), drive in (("fwd", (fb1, f1), (f1, DRIVE_CLOCKS[2], 0.30, 0.44)),
+                                    ("mid", (f1, f2), (f2, DRIVE_CLOCKS[3], 0.55, 0.62)),
+                                    ("aft", (f2, fa), None)):
+        lines = []
+        for k, side in enumerate((-1.0, 1.0)):
+            c = HYD_CLOCK + side * HYD_DC
+            start = _fr_pt(f_a, 26.0, HYD_R, c)
+            if drive is None:
+                # down onto its ring
+                xr = RING_X[k]
+                mid = _loft_pt(f_a, f_b, HYD_R, c, 0.35)
+                ring_pt = common.polar(xr, RING_R, c)
+                lines.append(mesh.pipe([start, mid, (xr, ring_pt[1] * HYD_R / RING_R,
+                                                     ring_pt[2] * HYD_R / RING_R),
+                                        ring_pt], HYD_LINE_R, 12, bend=12.0))
+            else:
+                end = _fr_pt(f_b, -26.0, HYD_R, c)
+                lines.append(mesh.pipe([start, end], HYD_LINE_R, 12, bend=0.0))
+                fr, dclock, sa, sb = drive
+                s_arc = (sa, sb)[k]
+                # the branch leaves the run where the arc begins
+                lines.append(_to_drive(f_a, f_b, fr, dclock, s_arc, side,
+                                       (600.0, 620.0)[k], port_a[k], (start, end)))
+        if drive is None:
+            # the rings, and a pair from them into each actuator's head
+            for k, xr in enumerate(RING_X):
+                v, f = mesh.ring_torus(xr, RING_R, HYD_LINE_R, 96, 10)
+                lines.append((v, f))
+            x_head = N["x_aft"] - 70.0
+            for ca in ACT_CLOCKS:
+                for k, side in enumerate((-1.0, 1.0)):
+                    xr = RING_X[k]
+                    cs = ca + side * 3.2            # beside the body
+                    ci = ca + side * 1.0            # into the head, off its axis
+                    lines.append(mesh.pipe(
+                        [common.polar(xr, RING_R, cs), common.polar(xr, ACT_R, cs),
+                         common.polar(x_head - 16.0, ACT_R, cs),
+                         common.polar(x_head - 16.0, ACT_R, ci),
+                         common.polar(x_head + 3.0, ACT_R, ci)],
+                        4.0, 10, bend=6.0))
+        out[f"swivel_hyd_{name}"] = mesh.join(*lines)
+    return out
+
+
 def build():
     out = {}
     fb1 = square(N["x_brg1"])
@@ -492,17 +639,22 @@ def build():
     out["nozzle_div_links"] = _div_links()
     out["nozzle_unison_ring"] = _unison()
     out["nozzle_actuators"] = _actuators()
+    out.update(_couplings())
+    out.update(_hydraulics())
     return out
 
 
 # which parts turn with which bearing, front to back
 GROUPS = {
-    "fwd": ["swivel_duct_fwd", "swivel_bearing_1", "swivel_drive_2"],
-    "mid": ["swivel_duct_mid", "swivel_bearing_2", "swivel_drive_3"],
+    "fwd": ["swivel_duct_fwd", "swivel_bearing_1", "swivel_drive_2",
+            "swivel_hyd_fwd", "swivel_coupling_2"],
+    "mid": ["swivel_duct_mid", "swivel_bearing_2", "swivel_drive_3",
+            "swivel_hyd_mid", "swivel_coupling_3"],
     "aft": ["swivel_duct_aft", "swivel_bearing_3", "nozzle_static_ring",
             "nozzle_conv_flaps", "nozzle_conv_seals", "nozzle_div_flaps",
             "nozzle_div_seals", "nozzle_ext_flaps", "nozzle_hinges",
-            "nozzle_div_links", "nozzle_unison_ring", "nozzle_actuators"],
+            "nozzle_div_links", "nozzle_unison_ring", "nozzle_actuators",
+            "swivel_hyd_aft"],
 }
 
 

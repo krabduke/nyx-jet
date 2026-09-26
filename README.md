@@ -64,6 +64,13 @@ The brief was agility over top speed. Each choice follows from it.
   computers, on a rack over the nose gear's bay. Each probe's pitot and
   static lines run inside the radome, over the radar and through its
   bulkhead to its air data computer; the rack's loom comes off the PDU's.
+- **Air and oxygen.** Each engine's customer bleed runs to an air-cycle pack
+  between the engine faces, which cools it against the fuel -- the F-35's
+  way, with no ram-air scoop -- and chills it through its turbine. The
+  conditioned air goes forward under the spine, in a channel let into the
+  fuel cells' tops and through the frames, to a grille in the seat
+  bulkhead; an oxygen generator off the pack sends the pilot's oxygen
+  forward beside it to the seat.
 - **A canopy that opens.** It hinges at its aft end on a beam across the
   opening, is lifted by two actuators behind the seat, and is held down by
   three hooks a side.

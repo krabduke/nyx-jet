@@ -86,6 +86,18 @@ AIRFRAME = [
     ("avionics_adc_", "avionics_pitot_lines_"),
     # the avionics loom comes off the nose gear's run of the starboard loom
     ("avionics_loom", "loom_nose_gear"),
+    # the air conditioning: each bleed duct on its engine's bleed flange and
+    # into the pack's air-cycle machine; the duct out of the pack's
+    # separator and into the diffuser on the seat bulkhead's back; the
+    # pack's fuel lines into the centre tank's aft wall; its mount on the
+    # keel; the oxygen generator's feed off the separator and its hose from
+    # the generator into the seat's connector
+    ("ecs_bleed_", "engine_"),
+    ("ecs_duct", "ecs_pack"), ("ecs_duct", "ecs_diffuser"),
+    ("ecs_diffuser", "seat_bulkhead"), ("ecs_fuel_lines", "fuel_tank_centre"),
+    ("ecs_fuel_lines", "ecs_pack"), ("ecs_mount", "keel"), ("ecs_mount", "ecs_pack"),
+    ("ecs_bleed_", "ecs_pack"),
+    ("ecs_obogs", "ecs_oxygen"), ("ecs_oxygen", "ecs_pack"), ("ecs_oxygen", "seat"),
     ("canopy_glass", "canopy_rim"), ("canopy_hinge", "canopy_rim"),
     ("canopy_hinge", "frame_5680"), ("canopy_actuator_", "canopy_actuator_rod_"),
     ("canopy_actuator_", "cockpit_tub"), ("canopy_locks", "fuselage_skin"),

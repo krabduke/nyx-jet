@@ -76,6 +76,9 @@ def build():
     out["mount_aft_lug"] = _aft_lug()
     out["coolant_lines"] = _coolant()
     out["mode_valve_actuators"] = _mode_valve_actuators()
+    out.update(_bleed())
+    out.update(_fohe())
+    out["front_harness"] = _front_harness()
     out.update(_hydraulics())
     out.update(_instrumentation(out))
     out.update(_ignition(out))
@@ -264,8 +267,14 @@ def _towershaft():
 
 
 def _gearbox_units():
-    """The two generators on the gearbox's flanks, the fuel pump on its
-    front face and the fuel metering unit under it."""
+    """The two starter-generators on the gearbox's flanks, the fuel pump on
+    its front face and the fuel metering unit under it.
+
+    The generators are starter-generators: run as motors from the
+    aircraft's electrical bus they turn the gearbox, and through the
+    towershaft the HP spool, to start the engine -- which is how an
+    all-electric aircraft starts its engines, with no air starter and no
+    start air to plumb to one."""
     out = {}
     zc = gb_centre_z()
     a = G["width"] / 2.0
@@ -373,13 +382,103 @@ def _fuel_lines():
     # down and aft under the gearbox into the unit's front face -- the path
     # tools/route_solve found clear of the hydraulic pump. The pump and the
     # metering unit had nothing between them.
+    #
+    # It goes through the fuel-oil heat exchanger on the way: the fuel is the
+    # engine's heat sink for its oil, as on every modern engine, so the pump's
+    # delivery enters the exchanger's tubes at its front and leaves at its
+    # back for the metering unit.
     zp = zc - 16.0
     x_fmu = 700.0
-    supply = mesh.pipe([(G["x0"] - 23.0, 36.0, zp), (G["x0"] - 23.0, 50.0, zp - 12.0),
-                        (G["x0"] - 25.0, 50.0, zp - 27.0), (425.0, 50.0, zp - 97.0),
-                        (640.0, 50.0, zp - 97.0), (x_fmu - 12.0, 8.0, zp - 70.0),
-                        (x_fmu + 4.0, 0.0, zp - 70.0)], 8.0, PIPE, bend=18.0)
+    (fx0, fx1), fy, fz, _fr = FOHE
+    supply = mesh.join(
+        mesh.pipe([(G["x0"] - 23.0, 36.0, zp), (G["x0"] - 23.0, 50.0, zp - 12.0),
+                   (G["x0"] - 25.0, 50.0, zp - 27.0), (425.0, fy, fz),
+                   (fx0 + 3.0, fy, fz)], 8.0, PIPE, bend=18.0),
+        mesh.pipe([(fx1 - 3.0, fy, fz), (fx1 + 14.0, fy, fz),
+                   (x_fmu - 12.0, 8.0, zp - 70.0), (x_fmu + 4.0, 0.0, zp - 70.0)],
+                  8.0, PIPE, bend=12.0))
     return mesh.join(main, reheat, supply)
+
+
+# The fuel-oil heat exchanger: (x range, y, z of its axis, shell radius). On
+# the fuel supply's run under the gearbox, between the hydraulic pump
+# (to x 520) and the metering unit (from x 700).
+FOHE = ((528.0, 658.0), 50.0, -625.0, 30.0)
+
+
+def _fohe():
+    """A finned shell with the fuel through its tubes, end to end, and the
+    oil through the shell: from the gearbox's lube pump in at the front and
+    back up into the gearbox's sump at the back, which is where the oil
+    system's heat goes."""
+    (x0, x1), y, z, r = FOHE
+    shell = mesh.pipe([(x0, y, z), (x1, y, z)], r, 28, bend=0.0)
+    fins = []
+    for k in range(7):
+        xf = x0 + 16.0 + (x1 - x0 - 32.0) * k / 6
+        v, f = mesh.ring_torus(xf, r + 1.0, 2.2, 28, 8)
+        fins.append(([(px, py + y, pz + z) for (px, py, pz) in v], f))
+    # end caps, a little proud of the shell, where the fuel lines enter
+    for xc in (x0 + 3.0, x1 - 3.0):
+        fins.append(mesh.pipe([(xc - 3.0, y, z), (xc + 3.0, y, z)], r + 3.0, 28,
+                              bend=0.0))
+    zb = gb_centre_z() - G["depth"] / 2.0          # the gearbox's underside
+    oil = [mesh.pipe([(xo, y, z + r - 4.0), (xo, y, zb + 3.0)], 6.0, PIPE, bend=0.0)
+           for xo in (x0 + 22.0, x1 - 22.0)]
+    return {"fuel_oil_hx": mesh.join(shell, *fins), "fuel_oil_hx_lines": mesh.join(*oil)}
+
+
+# The customer bleed: air for the aircraft's environmental control system,
+# taken off the core's front stages through the fan frame's top strut --
+# the struts are solid, so the offtake is inside it -- and out through the
+# case at twelve o'clock, through a shut-off and pressure-regulating valve,
+# to the flange the aircraft's duct bolts to.
+BLEED_X = 490.0
+BLEED_TOP = 528.0          # the outlet flange's face
+
+
+def bleed_outlet():
+    """(x, y, z) of the bleed's outlet flange's face centre, facing up."""
+    return common.polar(BLEED_X, BLEED_TOP, 90.0)
+
+
+def _bleed():
+    r0 = outer_od(BLEED_X) - 1.0
+    parts = [common.radial_pin(BLEED_X, r0, r0 + 12.0, 34.0, 90.0, 28),
+             common.radial_pin(BLEED_X, r0 + 12.0, 470.0, 24.0, 90.0, 24),
+             # the valve body, and its torque motor on its aft side
+             common.radial_pin(BLEED_X, 470.0, 518.0, 32.0, 90.0, 28),
+             common.radial_pin(BLEED_X, 518.0, BLEED_TOP, 40.0, 90.0, 28),
+             mesh.box(BLEED_X + 42.0, 0.0, 494.0, 24.0, 36.0, 30.0)]
+    return {"bleed_valve": mesh.join(*parts)}
+
+
+def _front_harness():
+    """FADEC A's second loom: forward from its front end, up round the case
+    to the top, across behind the bleed valve, and on round to the far mode
+    valve actuator -- with a spur into each actuator's head end and one
+    into the bleed valve's torque motor. The mode valve's actuators are
+    electromechanical; they had nothing to drive them."""
+    rc = outer_od(920.0) + 12.0 + 30.0
+    xh = 560.0                       # the run round the top
+    rr = 506.0
+    path = [common.polar(925.0, rc, -24.0), common.polar(880.0, rc, -24.0)]
+    path += [common.polar(xh + 60.0, rr, -24.0 + 69.0 * k / 6) for k in range(0, 1)]
+    for k in range(0, 23):
+        path.append(common.polar(xh, rr, -10.0 + 145.0 * k / 22))
+    loom = [mesh.pipe(path, 5.0, 12, bend=25.0)]
+    # the spurs
+    r_act = max(outer_od(530.0), outer_od(660.0)) + 28.0
+    for clock in (45.0, 135.0):
+        loom.append(mesh.pipe([common.polar(xh, rr, clock),
+                               common.polar(505.0, rr, clock),
+                               common.polar(505.0, r_act, clock),
+                               common.polar(533.0, r_act, clock)], 4.0, 12,
+                              bend=10.0))
+    loom.append(mesh.pipe([common.polar(xh, rr, 90.0),
+                           common.polar(BLEED_X + 58.0, 500.0, 90.0)], 4.0, 12,
+                          bend=0.0))
+    return mesh.join(*loom)
 
 
 def _fadec():

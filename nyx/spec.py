@@ -448,6 +448,10 @@ MATERIAL_MAP = {
     "avionics_rack": "structure",
     "avionics_loom": "rubber",
     "avionics_pitot": "steel",
+    "ecs_": "steel",
+    "ecs_duct": "duct",
+    "ecs_oxygen": "rubber",
+    "ecs_diffuser": "cockpit",
     "refuel_receptacle": "steel",
     "rudder_act": "steel",
 }

@@ -28,6 +28,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Pairs that share material on purpose, by name prefix. Each is a joint, and
 # the comment says which.
 EXPECTED = [
+    # the swivel's hydraulics: a coupling housing each bearing locally at
+    # the lines' clock, on both ducts' flanges and shells, the first on the
+    # rotary union; the lines start and end in the couplings, end in the
+    # motors' ports and in the actuators' heads
+    ("swivel_bearing_", "swivel_coupling_"), ("swivel_coupling_", "swivel_duct_"),
+    ("swivel_coupling_1", "swivel_fixed_ring"), ("swivel_coupling_1", "flange_outer_aft"),
+    ("swivel_coupling_1", "swivel_rotary_union"), ("swivel_coupling_", "swivel_hyd_"),
+    ("swivel_drive_", "swivel_hyd_"), ("nozzle_actuators", "swivel_hyd_aft"),
+    # the fuel-oil heat exchanger: the fuel supply's two halves end in its
+    # caps, and its oil lines run up into the gearbox's underside
+    ("fuel_lines", "fuel_oil_hx"), ("fuel_oil_hx", "fuel_oil_hx_lines"),
+    ("fuel_oil_hx_lines", "gearbox"),
+    # the customer bleed stands on the case over the fan frame's top strut,
+    # which its offtake comes up through
+    ("bleed_valve", "case_outer_fwd"), ("bleed_valve", "fan_frame_struts"),
+    # FADEC A's front loom leaves the box and ends in each actuator's head
+    ("fadec_a", "front_harness"), ("front_harness", "mode_valve_actuators"),
     # blades are dovetailed or welded into what carries them: 2 mm of root
     # into the drum, disc or rim
     ("blades_hpc_r", "hpc_drum"),

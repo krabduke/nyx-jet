@@ -91,6 +91,16 @@ CIRCUITS += [("the flight computers are on the PDU",
 CIRCUITS += mirrored("each air data computer reads its probe, and is powered",
                      ["air_data_probe_{s}", "avionics_pitot_lines_{s}",
                       "avionics_adc_{s}", "avionics_loom"])
+CIRCUITS += mirrored("air: each engine's bleed to the pack",
+                     ["engine_{s}_bleed_valve", "ecs_bleed_{s}", "ecs_pack"])
+CIRCUITS += [("and the pack's air to the cockpit, the pack on the keel",
+              ["keel", "ecs_mount", "ecs_pack", "ecs_duct", "ecs_diffuser",
+               "seat_bulkhead"]),
+             ("its heat into the fuel", ["ecs_pack", "ecs_fuel_lines",
+                                         "fuel_tank_centre"]),
+             ("oxygen: the generator off the pack, to the seat",
+              ["ecs_pack", "ecs_oxygen", "ecs_obogs"]),
+             ("", ["ecs_oxygen", "seat"])]
 CIRCUITS += [("the boxes stand on the rack on the nose gear bay's roof",
               ["gear_bay_nose", "avionics_rack", "avionics_fcc_2"])]
 CIRCUITS += mirrored("and is carried and driven off the cockpit tub",

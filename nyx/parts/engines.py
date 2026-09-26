@@ -161,6 +161,25 @@ def build():
                 out[pre + name] = _move(geom, off)
         for name, (one, holes, count, rest) in proto.items():
             PROTO[pre + name] = (one, holes, count, rest, off)
+    # The body closes onto each engine just ahead of its swivel's front
+    # bearing, and the bearing's hydraulic coupling -- with the short pair
+    # into it from the rotary union -- stands up under the closure's edge:
+    # the closure is relieved round it.
+    # (a box 3 mm clear of it all round: the coupling's own shape as the
+    # cutter leaves its surface exactly on the cut, where no test can say
+    # which side it is)
+    cv, cf = [], []
+    for _side, sy in SIDES:
+        v, _f = _move(built["swivel_coupling_1"], offset(sy))
+        lo = [min(p[i] for p in v) - 3.0 for i in range(3)]
+        hi = [max(p[i] for p in v) + 3.0 for i in range(3)]
+        n = len(cv)
+        cv += [(x, y, z) for z in (lo[2], hi[2]) for y in (lo[1], hi[1])
+               for x in (lo[0], hi[0])]
+        cf += [tuple(n + i for i in q) for q in
+               ((0, 2, 3, 1), (4, 5, 7, 6), (0, 1, 5, 4), (2, 6, 7, 3),
+                (0, 4, 6, 2), (1, 3, 7, 5))]
+    out["cut:aft_closure"] = (cv, cf)
     return out
 
 

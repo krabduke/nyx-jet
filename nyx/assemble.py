@@ -22,7 +22,8 @@ import spec              # noqa: E402
 import mesh as meshlib   # noqa: E402
 import materials         # noqa: E402
 from parts import (fuselage, surfaces, intakes, cockpit, bay, gear,  # noqa: E402
-                   structure, engines, details, fuel, electrical, avionics)
+                   structure, engines, details, fuel, electrical, avionics,
+                   ecs)
 
 MM = 0.001
 
@@ -31,6 +32,7 @@ MODULES = [
     ("cockpit", cockpit), ("bay", bay), ("gear", gear),
     ("structure", structure), ("details", details), ("engines", engines),
     ("fuel", fuel), ("electrical", electrical), ("avionics", avionics),
+    ("ecs", ecs),
 ]
 
 COLLECTIONS = ["01 Airframe", "02 Flying surfaces", "03 Intakes",
@@ -58,7 +60,7 @@ def collection_for(name):
         return "05 Weapons bay"
     if name.startswith(("gear", "tyre", "wheel")):
         return "06 Landing gear"
-    if name.startswith(("avionics_", "loom_", "pdu")):
+    if name.startswith(("avionics_", "loom_", "pdu", "ecs_")):
         return "10 Systems"
     return "07 Structure"
 

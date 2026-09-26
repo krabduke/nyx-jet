@@ -1,31 +1,31 @@
 {
  "fuel_tank_centre": {
-  "litres": 2213.8,
-  "kg": 1717.9,
+  "litres": 2209.4,
+  "kg": 1714.5,
   "x_cg_mm": 9600.6,
-  "y_cg_mm": 0.0,
-  "z_cg_mm": -56.9
+  "y_cg_mm": -0.2,
+  "z_cg_mm": -58.2
  },
  "fuel_tank_fwd_1": {
-  "litres": 2273.4,
-  "kg": 1764.2,
+  "litres": 2270.4,
+  "kg": 1761.9,
   "x_cg_mm": 6228.1,
-  "y_cg_mm": -16.0,
-  "z_cg_mm": 328.6
+  "y_cg_mm": -16.2,
+  "z_cg_mm": 327.9
  },
  "fuel_tank_fwd_2": {
-  "litres": 1897.9,
-  "kg": 1472.8,
+  "litres": 1895.2,
+  "kg": 1470.7,
   "x_cg_mm": 7333.4,
-  "y_cg_mm": -42.6,
-  "z_cg_mm": 314.1
+  "y_cg_mm": -42.8,
+  "z_cg_mm": 313.5
  },
  "fuel_tank_fwd_3": {
-  "litres": 1614.1,
-  "kg": 1252.6,
+  "litres": 1611.0,
+  "kg": 1250.1,
   "x_cg_mm": 8441.7,
-  "y_cg_mm": -9.9,
-  "z_cg_mm": 300.5
+  "y_cg_mm": -10.1,
+  "z_cg_mm": 299.8
  },
  "fuel_tank_wing_l": {
   "litres": 592.3,

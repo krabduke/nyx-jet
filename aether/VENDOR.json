@@ -3,7 +3,7 @@
  "files": {
   "spec.py": {
    "from": "engine/spec.py",
-   "sha": "f0ba99f6de89"
+   "sha": "89c63ae37470"
   },
   "cycle.py": {
    "from": "engine/cycle.py",
@@ -19,7 +19,7 @@
   },
   "engine_joints.py": {
    "from": "tools/audit_intersect.py",
-   "sha": "c1855b32443e"
+   "sha": "6604183375b2"
   },
   "parts/__init__.py": {
    "from": "engine/parts/__init__.py",
@@ -51,7 +51,7 @@
   },
   "parts/nozzle.py": {
    "from": "engine/parts/nozzle.py",
-   "sha": "8cba162310c7"
+   "sha": "4cf24164e196"
   },
   "parts/frames.py": {
    "from": "engine/parts/frames.py",
@@ -63,8 +63,8 @@
   },
   "parts/accessories.py": {
    "from": "engine/parts/accessories.py",
-   "sha": "524953259aa3"
+   "sha": "9f47a181321a"
   }
  },
- "commit": "007e847"
+ "commit": "8315bc7"
 }

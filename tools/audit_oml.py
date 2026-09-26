@@ -45,7 +45,7 @@ INTERNAL = ("frame_", "fuel_tank_", "fuel_gallery", "refuel_receptacle", "pdu",
             "le_flap_act_", "rudder_act_", "gear_actuator_", "seat_bulkhead",
             "cockpit_tub", "radar_", "keel", "bay_structure", "gear_bay_",
             "canopy_rim", "canopy_hinge", "canopy_locks", "canopy_actuator_",
-            "avionics_")
+            "avionics_", "ecs_")
 TOL = 0.5          # mm
 
 

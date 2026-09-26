@@ -235,6 +235,7 @@ CLOSE = {
     "c5_main_gear": ((6.4, -7.4, -0.7), (9.5, -2.9, -1.05), 38),
     "c6_wing": ((12.0, -10.0, 4.0), (10.5, -4.0, 0.0), 45),
     "c7_avionics": ((1.15, -1.55, 1.35), (2.25, 0.0, 0.38), 32),
+    "c8_ecs": ((11.25, -1.05, 1.45), (10.3, 0.0, 0.33), 30),
 }
 # what the avionics close-up takes off to see into the forward bay
 SKIN_OFF = ("fuselage_skin", "panel_seams", "irst_", "canopy_glass",
@@ -245,9 +246,11 @@ def mode_close(name, samples):
     reset(); setup(samples, (1600, 900)); world(); ground(); lights(0.8)
     if name == "c4_bay":
         open_bay()
-    if name == "c7_avionics":
+    if name in ("c7_avionics", "c8_ecs"):
+        off = SKIN_OFF + (("fuel_tank_centre", "keel", "frame_engine_fwd")
+                          if name == "c8_ecs" else ())
         for o in bpy.data.objects:
-            if o.type == "MESH" and o.name.startswith(SKIN_OFF):
+            if o.type == "MESH" and o.name.startswith(off):
                 o.hide_render = True
     loc, tgt, lens = CLOSE[name]
     if tgt[2] < -0.3:
