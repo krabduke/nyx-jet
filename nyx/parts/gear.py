@@ -185,8 +185,10 @@ def walls(x0, x1, y0, y1, roof, skip=()):
     def foot(x, y):
         # on the skin's inside where the body is, on the wing's lower
         # surface where it is not
+        # (3 mm up: the skin between its stations is a chord, which stands
+        # above the surface it is cut from by up to a couple of millimetres)
         if abs(y) < shapes.half_width(x, spec.SKIN_T) - 1.0:
-            return shapes.z_dn(x, y, spec.SKIN_T) + 2.0
+            return shapes.z_dn(x, y, spec.SKIN_T) + 3.0
         return under_z(x, y) + 1.0
     xs = [x0 + (x1 - x0) * i / 16 for i in range(17)]
     for tag, ya, yb in (("ylo", lo - WALL, lo), ("yhi", hi, hi + WALL)):

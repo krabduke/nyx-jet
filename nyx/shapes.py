@@ -195,13 +195,22 @@ def half_width(x, inset=0.0):
     return section(x)[0] - inset * _edge_ratio()
 
 
+RING_GATHER = 0.68    # 0 is plain cosine spacing; the centre's spacing is 1 - this
+
+
 def ring(x, m, inset=0.0):
     """m points round the section at x, from the starboard chine over the
     top to the port chine and back underneath. Points are cosine-spaced in
-    y so the chine edges, where the surface turns fastest, get the most."""
+    y so the chine edges, where the surface turns fastest, get the most --
+    and gathered again toward the centreline, where the spine's hump turns.
+    Cosine spacing alone left them 112 mm apart across the crest, which a
+    hump a few hundred millimetres wide shows as flat facets."""
     w = half_width(x, inset)
     h = m // 2
-    ys = [w * math.cos(math.pi * k / h) for k in range(h + 1)]
+    k = RING_GATHER
+    ts = [s + k * math.sin(2.0 * math.pi * s) / (2.0 * math.pi)
+          for s in (j / h for j in range(h + 1))]
+    ys = [w * math.cos(math.pi * t) for t in ts]
     pts = [(x, y, z_up(x, y, inset)) for y in ys]
     pts += [(x, -ys[k], z_dn(x, -ys[k], inset)) for k in range(1, h)]
     return pts

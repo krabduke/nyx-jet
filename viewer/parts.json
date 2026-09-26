@@ -1096,7 +1096,7 @@
    "label": "Airframe",
    "color": "#C9CDD1",
    "parts": 18,
-   "faces": 42588
+   "faces": 40755
   },
   {
    "key": "02 Flying surfaces",
@@ -1138,7 +1138,7 @@
    "label": "Structure",
    "color": "#9A8F7E",
    "parts": 25,
-   "faces": 22163
+   "faces": 22468
   },
   {
    "key": "08 Engine port",
@@ -2926,22 +2926,22 @@
   "fuel_tank_centre": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 3530
+   "f": 3577
   },
   "fuel_tank_fwd_1": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 2078
+   "f": 2203
   },
   "fuel_tank_fwd_2": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 2060
+   "f": 2139
   },
   "fuel_tank_fwd_3": {
    "m": "07 Structure",
    "mat": "tank",
-   "f": 2216
+   "f": 2268
   },
   "fuel_tank_wing_l": {
    "m": "07 Structure",
@@ -2956,7 +2956,7 @@
   "fuselage_skin": {
    "m": "01 Airframe",
    "mat": "skin",
-   "f": 35802
+   "f": 33969
   },
   "gear_actuator_main_l": {
    "m": "06 Landing gear",
@@ -3226,7 +3226,7 @@
   "radar_bulkhead": {
    "m": "07 Structure",
    "mat": "radar",
-   "f": 132
+   "f": 134
   },
   "refuel_receptacle": {
    "m": "07 Structure",
