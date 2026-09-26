@@ -72,7 +72,7 @@
   .toggle[aria-pressed="true"]{border-color:var(--ink)}
   button:focus-visible, input:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
   .group > label{color:var(--muted); font-size:13px}
-  #swivel, #yaw{width:160px; accent-color:var(--ink)}
+  #swivel, #yaw, #apart{width:160px; accent-color:var(--ink)}
   .val{min-width:3em; display:inline-block; color:var(--ink)}
 
   /* the one loud thing: how fast it turns */
@@ -179,6 +179,13 @@
   <div class="group">
     <span>Systems</span>
     <button class="toggle" id="flow" aria-pressed="false">Show what flows</button>
+  </div>
+  <div class="group">
+    <label for="apart">Take it apart <span class="val" id="apartval">together</span></label>
+    <div style="display:flex; gap:10px; align-items:center">
+      <input id="apart" type="range" min="0" max="100" step="1" value="0">
+      <button class="toggle" id="build">Assemble it</button>
+    </div>
   </div>
   <div class="group">
     <label for="cut">Cut away the port side <span class="val" id="cutval">none</span></label>
@@ -671,11 +678,73 @@ $('flow').addEventListener('click', () => {
   look.flow = $('flow').getAttribute('aria-pressed') !== 'true';
   $('flow').setAttribute('aria-pressed', look.flow);
   $('flow').textContent = look.flow ? 'Hide the flows' : 'Show what flows';
-  flowGroup.visible = look.flow;
+  flowGroup.visible = look.flow && apart.s === 0;
   $('flowkey').classList.toggle('on', look.flow);
   restyle();
 });
 if (!(M.flows || []).length) $('flow').closest('.group').remove();
+
+/* ---------------- taking it apart ----------------
+   Each module comes off the skin the way it would in the shop: the
+   surfaces outboard, the engines out aft, the gear and the bay's contents
+   down, the cockpit and the systems up. They come off in the reverse of
+   the order they go on, and "Assemble it" plays that order. Offsets are
+   in the aircraft's millimetres. */
+const APART = {                        // module -> [x aft, y starboard, z up] at full
+  '07 Structure':         [0, 0, 2100],
+  '03 Intakes':           [-500, 400, -1400],
+  '08 Engine port':       [3600, 0, 0],
+  '09 Engine starboard':  [3600, 0, 0],
+  '10 Systems':           [0, 0, 3500],
+  '04 Cockpit':           [-300, 0, 1400],
+  '05 Weapons bay':       [0, 0, -2000],
+  '06 Landing gear':      [0, 0, -2900],
+  '02 Flying surfaces':   [0, 1800, 0],
+};
+const ORDER = Object.keys(APART);       // the order they go on
+const STAGGER = 0.07;
+const sideOf = (n) => /(^engine_l_|_l$|_l_)/.test(n) ? -1 : /(^engine_r_|_r$|_r_)/.test(n) ? 1 : 0;
+const apartMeshes = [];
+for (const [name, list] of meshes) {
+  const mod = M.parts[name].m;
+  if (!(mod in APART)) continue;
+  const [dx, dy, dz] = APART[mod];
+  const sy = sideOf(name);
+  // things on the centreline stay on it; the fins go up as well as out
+  const up = name.startsWith('fin_') || name.startsWith('rudder') ? 700 : 0;
+  const off = toScene([dx, dy * sy + (mod.includes('Engine') ? 900 * sy : 0), dz + up]).multiplyScalar(MM);
+  for (const m of list) apartMeshes.push({m, base: m.position.clone(), off, k: ORDER.indexOf(mod)});
+}
+const apart = {s: 0, target: 0, playing: false};
+const qInv = new THREE.Quaternion(), v3 = new THREE.Vector3();
+function applyApart(){
+  const n = ORDER.length, w = 1 - (n - 1) * STAGGER;
+  for (const a of apartMeshes) {
+    const p = Math.min(1, Math.max(0, (apart.s - (n - 1 - a.k) * STAGGER) / w));
+    const e = p * p * (3 - 2 * p);
+    a.m.parent.getWorldQuaternion(qInv).invert();
+    a.m.position.copy(a.base).add(v3.copy(a.off).multiplyScalar(e).applyQuaternion(qInv));
+  }
+  flowGroup.visible = look.flow && apart.s === 0;
+  const pct = Math.round(apart.s * 100);
+  $('apartval').textContent = pct === 0 ? 'together' : pct === 100 ? 'all apart' : `${pct} %`;
+}
+$('apart').addEventListener('input', (e) => {
+  apart.playing = false;
+  apart.target = +e.target.value / 100;
+  if (reduced) { apart.s = apart.target; applyApart(); }
+});
+$('build').addEventListener('click', () => {
+  // from wherever it is, out to all apart and back together, in order
+  apart.playing = true;
+  apart.target = apart.s > 0.5 ? 0 : 1;
+  // stand back far enough to see it all apart
+  const d = camera.position.distanceTo(controls.target);
+  if (d < size * 1.5) flight = {from: camera.position.clone(), t: 0,
+    to: controls.target.clone().add(camera.position.clone().sub(controls.target).setLength(size * 1.5))};
+  apart.then = apart.target === 1 ? 0 : null;
+  if (reduced) { apart.s = 0; apart.playing = false; $('apart').value = 0; applyApart(); }
+});
 
 /* ---------------- loop ---------------- */
 $('loading').classList.add('gone');
@@ -719,6 +788,19 @@ renderer.setAnimationLoop(() => {
     sw.yaw = reduced ? sw.ty : step(sw.yaw, sw.ty, 12);
     applySwivel();
   }
+  // apart and back: a slider drag follows quickly; the build plays slowly
+  if (apart.s !== apart.target) {
+    const v = dt / (apart.playing ? 7.0 : 0.6);
+    apart.s = Math.abs(apart.target - apart.s) < v ? apart.target
+      : apart.s + Math.sign(apart.target - apart.s) * v;
+    if (apart.playing) $('apart').value = Math.round(apart.s * 100);
+    if (apart.s === apart.target && apart.playing) {
+      if (apart.then != null) { apart.target = apart.then; apart.then = null; }
+      else apart.playing = false;
+    }
+    applyApart();
+  } else if (apart.s > 0 && (gearState.u !== gearState.target || bayState.u !== bayState.target ||
+                             canState.u !== canState.target)) applyApart();
   if (flowGroup.visible && !reduced) for (const t of flowTubes) t.map.offset.x -= t.speed * dt;
   controls.update();
   renderer.render(scene, camera);
