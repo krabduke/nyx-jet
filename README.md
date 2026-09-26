@@ -138,6 +138,7 @@ make aero       # area rule, vortex lattice, turn performance
 make build      # generate geometry, assemble build/nyx.blend, write parts.csv
 make verify     # every gate below  <- the definition of done
 make render     # in flight, hero, plan, side, rear, x-ray
+make bom        # bom.csv: every part, its group, material, pieces and size
 make web        # decimated, Draco-compressed GLB for the viewer
 ```
 
