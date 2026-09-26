@@ -237,16 +237,20 @@ def main():
         print(f"  [{modname}] {len(objs)} objects in {time.time() - t1:.1f}s")
     os.makedirs(os.path.join(ROOT, "build"), exist_ok=True)
     rows.sort(key=lambda r: r["name"])
-    with open(os.path.join(ROOT, "build", "parts.csv"), "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
-        w.writeheader()
-        w.writerows(rows)
+    # NYX_BLEND_OUT writes a second build (the gear up, for the aero study)
+    # beside the real one, and leaves the real one's parts table alone
+    alt = os.environ.get("NYX_BLEND_OUT")
+    if not alt:
+        with open(os.path.join(ROOT, "build", "parts.csv"), "w", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            w.writerows(rows)
     print(f"\n{len(rows)} objects | {sum(r['verts'] for r in rows):,} verts | "
           f"{sum(r['faces'] for r in rows):,} faces")
     print(f"booleans: {n_ok}/{n_bool} applied")
     if n_ok < n_bool:
         raise SystemExit(f"{n_bool - n_ok} booleans failed")
-    blend = os.path.join(ROOT, "build", "nyx.blend")
+    blend = os.path.join(ROOT, alt) if alt else os.path.join(ROOT, "build", "nyx.blend")
     bpy.ops.wm.save_as_mainfile(filepath=blend)
     print(f"blend -> {blend}\ntotal {time.time() - t0:.1f}s")
 
