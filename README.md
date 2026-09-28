@@ -11,6 +11,8 @@ This is **version 2** of the aircraft project. Version 1 — a single-engine
 jet built around the GE F110 — is kept at
 [Krabduke/rc-jet](https://github.com/Krabduke/rc-jet) (tag `v1`).
 
+![studio](renders/studio/nyx_hero.jpg)
+
 ![in flight](renders/00_flight.png)
 
 | | |
